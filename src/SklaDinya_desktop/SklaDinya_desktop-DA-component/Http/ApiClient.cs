@@ -10,7 +10,7 @@ namespace SklaDinya_desktop_DA_component.Http;
 /// Базовый HTTP-клиент для обращения к REST API бэкенда.
 /// Выбрасывает типизированные исключения из BL-компонента при ошибочных статусах.
 /// </summary>
-public class ApiClient
+public class ApiClient(HttpClient http)
 {
     private readonly HttpClient _http;
 
@@ -19,11 +19,6 @@ public class ApiClient
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy        = JsonNamingPolicy.CamelCase,
     };
-
-    public ApiClient(HttpClient http)
-    {
-        _http = http;
-    }
 
     // ─── GET ────────────────────────────────────────────────────────────────
 
@@ -117,12 +112,11 @@ public class ApiClient
 
         var result = JsonSerializer.Deserialize<T>(content, JsonOptions);
 
-        if (result is null)
-            throw new ServerException(
+        return result is null
+            ? throw new ServerException(
                 "Не удалось десериализовать ответ сервера. " +
-                $"Тело: {content[..Math.Min(200, content.Length)]}");
-
-        return result;
+                $"Тело: {content[..Math.Min(200, content.Length)]}")
+            : result;
     }
 
     private static async Task EnsureSuccessAsync(HttpResponseMessage response)
