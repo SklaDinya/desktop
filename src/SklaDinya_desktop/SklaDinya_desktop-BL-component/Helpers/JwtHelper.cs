@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using SklaDinya_desktop_BL_component.Enums;
+using SklaDinya_desktop_BL_component.Exceptions;
 using SklaDinya_desktop_BL_component.Models;
 
 namespace SklaDinya_desktop_BL_component.Helpers;
@@ -16,7 +16,7 @@ public static class JwtHelper
     /// Распарсить payload JWT и вернуть типизированную модель.
     /// </summary>
     /// <exception cref="ArgumentException">Токен имеет неверный формат.</exception>
-    /// <exception cref="InvalidOperationException">Payload не содержит обязательных полей.</exception>
+    /// <exception cref="ApiException">Payload содержит неизвестное значение enum.</exception>
     public static JwtPayload ParsePayload(string token)
     {
         var parts = token.Split('.');
@@ -33,7 +33,10 @@ public static class JwtHelper
         var userRoleStr = root.GetProperty("userRole").GetString()
             ?? throw new InvalidOperationException("JWT не содержит userRole.");
 
-        var userRole = Enum.Parse<UserRole>(userRoleStr);
+        if (!Enum.TryParse<UserRole>(userRoleStr, out var userRole))
+            throw new ApiException(0,
+                $"Неизвестная роль пользователя в JWT: '{userRoleStr}'. " +
+                "Возможно, API обновился — обновите приложение.");
 
         Guid? storageId = null;
         if (root.TryGetProperty("storageId", out var storageIdEl) &&
@@ -46,7 +49,12 @@ public static class JwtHelper
         if (root.TryGetProperty("role", out var roleEl) &&
             roleEl.ValueKind == JsonValueKind.String)
         {
-            operatorRole = Enum.Parse<OperatorRole>(roleEl.GetString()!);
+            var roleStr = roleEl.GetString()!;
+            if (!Enum.TryParse<OperatorRole>(roleStr, out var parsedOperatorRole))
+                throw new ApiException(0,
+                    $"Неизвестная роль оператора в JWT: '{roleStr}'. " +
+                    "Возможно, API обновился — обновите приложение.");
+            operatorRole = parsedOperatorRole;
         }
 
         return new JwtPayload
@@ -60,7 +68,7 @@ public static class JwtHelper
 
     private static string DecodeBase64Url(string base64Url)
     {
-        // Base64Url -> Base64: заменяем символы и добавляем padding
+        // Base64Url → Base64: заменяем символы и добавляем padding
         var base64 = base64Url
             .Replace('-', '+')
             .Replace('_', '/');
