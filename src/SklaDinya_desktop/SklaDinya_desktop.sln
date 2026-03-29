@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36518.9 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-BL-component", "SklaDinya_desktop-BL-component\SklaDinya_desktop-BL-component.csproj", "{3CE77912-FDDF-4CAB-A787-8AB14E8CF0ED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya-desktop-BL-component", "SklaDinya_desktop-BL-component\SklaDinya-desktop-BL-component.csproj", "{3CE77912-FDDF-4CAB-A787-8AB14E8CF0ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
