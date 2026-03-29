@@ -13,9 +13,11 @@ public interface IBookingService
     Task<List<BookingModel>> GetMyBookingsAsync(BookingSearchQuery query);
 
     /// <summary>
-    /// Создать бронирование. Возвращает чек для последующей оплаты.
+    /// Создать бронирование.
+    /// Чек для оплаты сохраняется внутри сервиса — получить его можно через
+    /// свойство <see cref="BookingService.LastReceipt"/> конкретной реализации.
     /// </summary>
-    Task<BookingReceiptModel> CreateBookingAsync(BookingCreateForm form);
+    Task<BookingModel> CreateBookingAsync(BookingCreateForm form);
 
     /// <summary>Получить конкретное своё бронирование по ID (для клиента)</summary>
     Task<BookingModel> GetMyBookingByIdAsync(Guid bookingId);

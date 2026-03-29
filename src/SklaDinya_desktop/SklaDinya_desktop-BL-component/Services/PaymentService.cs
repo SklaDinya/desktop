@@ -8,20 +8,13 @@ namespace SklaDinya_desktop_BL_component.Services;
 /// <summary>
 /// Сервис для проведения оплаты бронирований.
 /// </summary>
-public class PaymentService : IPaymentService
+public class PaymentService(IPaymentRepository paymentRepository, ISessionService session) : IPaymentService
 {
-    private readonly IPaymentRepository _paymentRepository;
-
-    public PaymentService(IPaymentRepository paymentRepository)
-    {
-        _paymentRepository = paymentRepository;
-    }
-
     /// <inheritdoc/>
     public Task<List<BookingModel>> PayNoopAsync(PaymentForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        return _paymentRepository.PayNoopAsync(form);
+        return paymentRepository.PayNoopAsync(form, session.Token!);
     }
 
     /// <inheritdoc/>
@@ -32,6 +25,6 @@ public class PaymentService : IPaymentService
     public Task<List<BookingModel>> PayRandomAsync(PaymentForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        return _paymentRepository.PayRandomAsync(form);
+        return paymentRepository.PayRandomAsync(form, session.Token!);
     }
 }

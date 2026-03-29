@@ -8,27 +8,20 @@ namespace SklaDinya_desktop_BL_component.Services;
 /// <summary>
 /// Сервис для работы с тарифами пунктов хранения.
 /// </summary>
-public class PriceService : IPriceService
+public class PriceService(IPriceRepository priceRepository, ISessionService session) : IPriceService
 {
-    private readonly IPriceRepository _priceRepository;
-
-    public PriceService(IPriceRepository priceRepository)
-    {
-        _priceRepository = priceRepository;
-    }
-
     /// <inheritdoc/>
     public Task<List<PriceModel>> GetPricesAsync(Guid storageId) =>
-        _priceRepository.GetPricesAsync(storageId);
+        priceRepository.GetPricesAsync(storageId);
 
     /// <inheritdoc/>
     public Task<List<PriceModel>> GetMyPricesAsync() =>
-        _priceRepository.GetMyPricesAsync();
+        priceRepository.GetMyPricesAsync(session.Token!);
 
     /// <inheritdoc/>
     public Task CreatePriceAsync(PriceCreateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        return _priceRepository.CreatePriceAsync(form);
+        return priceRepository.CreatePriceAsync(form, session.Token!);
     }
 }

@@ -1,4 +1,5 @@
 using SklaDinya_desktop_BL_component.Enums;
+using SklaDinya_desktop_BL_component.Helpers;
 using SklaDinya_desktop_BL_component.Interfaces.Services;
 using SklaDinya_desktop_BL_component.Models;
 
@@ -6,35 +7,31 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Реализация сессии приложения.
-/// Хранит JWT-токен и данные текущего пользователя в памяти процесса.
+/// Хранит JWT-токен и распарсенный payload в памяти процесса.
+/// При установке токена автоматически извлекает из него роль и остальные данные.
 /// </summary>
 public class SessionService : ISessionService
 {
     private string? _token;
-    private MeModel? _currentUser;
+    private JwtPayload? _payload;
 
     public string? Token => _token;
 
-    public UserRole? CurrentRole => _currentUser?.Role;
+    public JwtPayload? Payload => _payload;
 
-    public MeModel? CurrentUser => _currentUser;
+    public UserRole? CurrentRole => _payload?.UserRole;
 
     public void SetToken(string token)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
         _token = token;
-    }
-
-    public void SetCurrentUser(MeModel user)
-    {
-        ArgumentNullException.ThrowIfNull(user, nameof(user));
-        _currentUser = user;
+        _payload = JwtHelper.ParsePayload(token);
     }
 
     public void Clear()
     {
         _token = null;
-        _currentUser = null;
+        _payload = null;
     }
 
     public bool IsAuthenticated() => _token is not null;

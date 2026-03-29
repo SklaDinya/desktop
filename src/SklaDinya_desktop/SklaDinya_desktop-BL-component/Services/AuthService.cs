@@ -6,36 +6,18 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис авторизации и регистрации.
-/// После успешного входа/регистрации сохраняет токен в сессии
-/// и немедленно загружает данные текущего пользователя.
+/// После успешного входа/регистрации сохраняет токен в сессии.
+/// Роль и данные пользователя извлекаются из payload токена — лишний запрос к API не нужен.
 /// </summary>
-public class AuthService : IAuthService
+public class AuthService(IAuthRepository authRepository, ISessionService session) : IAuthService
 {
-    private readonly IAuthRepository _authRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly ISessionService _session;
-
-    public AuthService(
-        IAuthRepository authRepository,
-        IUserRepository userRepository,
-        ISessionService session)
-    {
-        _authRepository = authRepository;
-        _userRepository = userRepository;
-        _session = session;
-    }
-
     /// <inheritdoc/>
     public async Task LoginAsync(LoginForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var token = await _authRepository.LoginAsync(form);
-        _session.SetToken(token);
-
-        // Сразу загружаем профиль, чтобы знать роль пользователя
-        var me = await _userRepository.GetMeAsync();
-        _session.SetCurrentUser(me);
+        var token = await authRepository.LoginAsync(form);
+        session.SetToken(token);
     }
 
     /// <inheritdoc/>
@@ -43,19 +25,13 @@ public class AuthService : IAuthService
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var token = await _authRepository.RegisterAsync(form);
-        _session.SetToken(token);
-
-        var me = await _userRepository.GetMeAsync();
-        _session.SetCurrentUser(me);
+        var token = await authRepository.RegisterAsync(form);
+        session.SetToken(token);
     }
 
     /// <inheritdoc/>
-    public void Logout()
-    {
-        _session.Clear();
-    }
+    public void Logout() => session.Clear();
 
     /// <inheritdoc/>
-    public bool IsAuthenticated() => _session.IsAuthenticated();
+    public bool IsAuthenticated() => session.IsAuthenticated();
 }

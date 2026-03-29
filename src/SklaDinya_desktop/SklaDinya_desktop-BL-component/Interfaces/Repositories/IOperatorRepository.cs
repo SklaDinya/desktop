@@ -5,19 +5,20 @@ using SklaDinya_desktop_BL_component.Queries;
 namespace SklaDinya_desktop_BL_component.Interfaces.Repositories;
 
 /// <summary>
-/// Репозиторий для работы с операторами пункта хранения
+/// Репозиторий для работы с операторами пункта хранения.
+/// Все методы защищённые — требуют JWT-токен.
 /// </summary>
 public interface IOperatorRepository
 {
     /// <summary>Найти операторов своего пункта хранения</summary>
-    Task<List<OperatorModel>> GetOperatorsAsync(OperatorSearchQuery query);
+    Task<List<OperatorModel>> GetOperatorsAsync(OperatorSearchQuery query, string token);
 
     /// <summary>Создать оператора для своего пункта хранения</summary>
-    Task<OperatorModel> CreateOperatorAsync(OperatorCreateForm form);
+    Task<OperatorModel> CreateOperatorAsync(OperatorCreateForm form, string token);
 
     /// <summary>Получить данные оператора по ID</summary>
-    Task<OperatorModel> GetOperatorByIdAsync(Guid operatorId);
+    Task<OperatorModel> GetOperatorByIdAsync(Guid operatorId, string token);
 
     /// <summary>Обновить данные оператора</summary>
-    Task<OperatorModel> UpdateOperatorAsync(Guid operatorId, OperatorUpdateForm form);
+    Task<OperatorModel> UpdateOperatorAsync(Guid operatorId, OperatorUpdateForm form, string token);
 }

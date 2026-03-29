@@ -9,41 +9,34 @@ namespace SklaDinya_desktop_BL_component.Services;
 /// <summary>
 /// Сервис для работы с камерами хранения (ячейками).
 /// </summary>
-public class CellService : ICellService
+public class CellService(ICellRepository cellRepository, ISessionService session) : ICellService
 {
-    private readonly ICellRepository _cellRepository;
-
-    public CellService(ICellRepository cellRepository)
-    {
-        _cellRepository = cellRepository;
-    }
-
     /// <inheritdoc/>
     public Task<List<CellModel>> GetCellsAsync(Guid storageId, CellSearchQuery query)
     {
         ArgumentNullException.ThrowIfNull(query, nameof(query));
-        return _cellRepository.GetCellsAsync(storageId, query);
+        return cellRepository.GetCellsAsync(storageId, query);
     }
 
     /// <inheritdoc/>
     public Task<List<string>> GetCellClassesAsync(Guid storageId) =>
-        _cellRepository.GetCellClassesAsync(storageId);
+        cellRepository.GetCellClassesAsync(storageId);
 
     /// <inheritdoc/>
     public Task<List<CellModel>> GetMyCellsAsync(MyCellSearchQuery query)
     {
         ArgumentNullException.ThrowIfNull(query, nameof(query));
-        return _cellRepository.GetMyCellsAsync(query);
+        return cellRepository.GetMyCellsAsync(query, session.Token!);
     }
 
     /// <inheritdoc/>
     public Task<List<string>> GetMyCellClassesAsync() =>
-        _cellRepository.GetMyCellClassesAsync();
+        cellRepository.GetMyCellClassesAsync(session.Token!);
 
     /// <inheritdoc/>
     public Task<CellModel> CreateCellAsync(CellCreateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        return _cellRepository.CreateCellAsync(form);
+        return cellRepository.CreateCellAsync(form, session.Token!);
     }
 }

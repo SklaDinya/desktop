@@ -10,37 +10,30 @@ namespace SklaDinya_desktop_BL_component.Services;
 /// Сервис для управления операторами пункта хранения.
 /// Доступен только главному оператору (MainOperator).
 /// </summary>
-public class OperatorService : IOperatorService
+public class OperatorService(IOperatorRepository operatorRepository, ISessionService session) : IOperatorService
 {
-    private readonly IOperatorRepository _operatorRepository;
-
-    public OperatorService(IOperatorRepository operatorRepository)
-    {
-        _operatorRepository = operatorRepository;
-    }
-
     /// <inheritdoc/>
     public Task<List<OperatorModel>> GetOperatorsAsync(OperatorSearchQuery query)
     {
         ArgumentNullException.ThrowIfNull(query, nameof(query));
-        return _operatorRepository.GetOperatorsAsync(query);
+        return operatorRepository.GetOperatorsAsync(query, session.Token!);
     }
 
     /// <inheritdoc/>
     public Task<OperatorModel> CreateOperatorAsync(OperatorCreateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        return _operatorRepository.CreateOperatorAsync(form);
+        return operatorRepository.CreateOperatorAsync(form, session.Token!);
     }
 
     /// <inheritdoc/>
     public Task<OperatorModel> GetOperatorByIdAsync(Guid operatorId) =>
-        _operatorRepository.GetOperatorByIdAsync(operatorId);
+        operatorRepository.GetOperatorByIdAsync(operatorId, session.Token!);
 
     /// <inheritdoc/>
     public Task<OperatorModel> UpdateOperatorAsync(Guid operatorId, OperatorUpdateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        return _operatorRepository.UpdateOperatorAsync(operatorId, form);
+        return operatorRepository.UpdateOperatorAsync(operatorId, form, session.Token!);
     }
 }

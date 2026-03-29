@@ -6,7 +6,7 @@
     <RootNamespace>SklaDinya_desktop_BL_component</RootNamespace>
     <AssemblyName>SklaDinya_desktop_BL_component</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
