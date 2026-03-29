@@ -9,13 +9,19 @@ namespace SklaDinya_desktop_BL_component.Interfaces.Services;
 /// </summary>
 public interface IBookingService
 {
+    /// <summary>
+    /// Чек последнего созданного бронирования.
+    /// Заполняется после <see cref="CreateBookingAsync"/> и используется
+    /// сервисом оплаты для получения receipt JWT.
+    /// </summary>
+    BookingReceiptModel LastReceipt { get; }
+
     /// <summary>Получить список своих бронирований (для клиента)</summary>
     Task<List<BookingModel>> GetMyBookingsAsync(BookingSearchQuery query);
 
     /// <summary>
     /// Создать бронирование.
-    /// Чек для оплаты сохраняется внутри сервиса — получить его можно через
-    /// свойство <see cref="BookingService.LastReceipt"/> конкретной реализации.
+    /// Чек сохраняется в <see cref="LastReceipt"/> — передавать его в UI не нужно.
     /// </summary>
     Task<BookingModel> CreateBookingAsync(BookingCreateForm form);
 

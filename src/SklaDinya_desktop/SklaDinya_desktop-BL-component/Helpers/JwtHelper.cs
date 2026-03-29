@@ -66,13 +66,8 @@ public static class JwtHelper
         };
     }
 
-    private static string DecodeBase64Url(string base64Url)
+    private static string DecodeBase64Url(string base64)
     {
-        // Base64Url → Base64: заменяем символы и добавляем padding
-        var base64 = base64Url
-            .Replace('-', '+')
-            .Replace('_', '/');
-
         var padding = (base64.Length % 4) switch
         {
             2 => "==",

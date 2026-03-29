@@ -7,13 +7,26 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис для проведения оплаты бронирований.
+/// Чек берётся из <see cref="IBookingService.LastReceipt"/> — UI не должен передавать его вручную.
 /// </summary>
-public class PaymentService(IPaymentRepository paymentRepository, ISessionService session) : IPaymentService
+public class PaymentService(
+    IPaymentRepository paymentRepository,
+    IBookingService bookingService,
+    ISessionService session) : IPaymentService
 {
-    /// <inheritdoc/>
-    public Task<List<BookingModel>> PayNoopAsync(PaymentForm form)
+    private PaymentForm GetReceiptForm()
     {
-        ArgumentNullException.ThrowIfNull(form, nameof(form));
+        if (bookingService.LastReceipt is null)
+            throw new InvalidOperationException(
+                "Нет активного чека для оплаты. Сначала создайте бронирование.");
+
+        return new PaymentForm { Receipt = bookingService.LastReceipt.Receipt };
+    }
+
+    /// <inheritdoc/>
+    public Task<List<BookingModel>> PayNoopAsync()
+    {
+        var form = GetReceiptForm();
         return paymentRepository.PayNoopAsync(form, session.Token!);
     }
 
@@ -22,9 +35,9 @@ public class PaymentService(IPaymentRepository paymentRepository, ISessionServic
     /// Выбрасывается, когда сервер вернул 418 — оплата не прошла.
     /// UI должен поймать это исключение и предложить попробовать снова.
     /// </exception>
-    public Task<List<BookingModel>> PayRandomAsync(PaymentForm form)
+    public Task<List<BookingModel>> PayRandomAsync()
     {
-        ArgumentNullException.ThrowIfNull(form, nameof(form));
+        var form = GetReceiptForm();
         return paymentRepository.PayRandomAsync(form, session.Token!);
     }
 }
