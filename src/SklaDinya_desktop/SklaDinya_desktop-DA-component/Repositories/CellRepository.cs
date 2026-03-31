@@ -35,7 +35,7 @@ public class CellRepository(ApiClient client) : ICellRepository
     {
         var list = await client.GetAsync<List<string>>(
             $"/api/v1/storages/{storageId}/cells/classes");
-        return Mapper.ToCellClasses(list);
+        return list;
     }
 
     /// <inheritdoc/>
@@ -61,7 +61,7 @@ public class CellRepository(ApiClient client) : ICellRepository
 
         var list = await client.GetAsync<List<string>>(
             "/api/v1/storages/my/cells/classes", token);
-        return Mapper.ToCellClasses(list);
+        return list;
     }
 
     /// <inheritdoc/>
@@ -70,7 +70,7 @@ public class CellRepository(ApiClient client) : ICellRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new CellCreateRequest(form.Name, form.CellClass);
+        var body = Mapper.ToCellCreateRequest(form);
         var dto  = await client.PostAsync<CellDto>("/api/v1/storages/my/cells", body, token);
         return Mapper.ToCell(dto);
     }

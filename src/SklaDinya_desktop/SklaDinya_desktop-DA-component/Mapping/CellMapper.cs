@@ -1,3 +1,5 @@
+using SklaDinya_desktop_BL_component.Exceptions;
+using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
 
@@ -5,6 +7,8 @@ namespace SklaDinya_desktop_DA_component.Mapping;
 
 internal static partial class Mapper
 {
+    // ── DA → BL ────────────────────────────────────────────────────────────
+
     public static CellModel ToCell(CellDto dto)
     {
         var name      = RequireNonEmpty(dto.Name,      "cell.name");
@@ -22,4 +26,9 @@ internal static partial class Mapper
 
     public static List<CellModel> ToCellList(List<CellDto> list) =>
         list.Select(ToCell).ToList();
+
+    // ── BL → DA ────────────────────────────────────────────────────────────
+
+    public static CellCreateRequest ToCellCreateRequest(CellCreateForm form) =>
+        new(form.Name, form.CellClass);
 }

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Xml;
 using System.Text.Json.Serialization;
 using SklaDinya_desktop_BL_component.Exceptions;
 
@@ -19,7 +20,7 @@ internal sealed class TimeSpanIso8601Converter : JsonConverter<TimeSpan>
 
         try
         {
-            return System.Xml.XmlConvert.ToTimeSpan(value);
+            return XmlConvert.ToTimeSpan(value);
         }
         catch
         {
@@ -30,6 +31,6 @@ internal sealed class TimeSpanIso8601Converter : JsonConverter<TimeSpan>
 
     public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(System.Xml.XmlConvert.ToString(value));
+        writer.WriteStringValue(XmlConvert.ToString(value));
     }
 }

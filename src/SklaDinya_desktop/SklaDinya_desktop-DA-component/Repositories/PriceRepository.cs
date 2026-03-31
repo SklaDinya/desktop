@@ -36,8 +36,7 @@ public class PriceRepository(ApiClient client) : IPriceRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new PriceCreateRequest(form.CellClass, form.Price);
-
+        var body = Mapper.ToPriceCreateRequest(form);
         await client.PostAsync("/api/v1/storages/my/prices", body, token);
     }
 }

@@ -20,11 +20,15 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentNullException.ThrowIfNull(query, nameof(query));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
+        var roleDto = query.Role.HasValue
+            ? Mapper.ToUserRoleDto(query.Role.Value)
+            : (Enums.UserRoleDto?)null;
+
         var url = new QueryBuilder("/api/v1/users")
             .Add("username",   query.Username)
             .Add("name",       query.Name)
             .Add("email",      query.Email)
-            .AddEnum("role",   query.Role)
+            .AddEnum("role",   roleDto)
             .Add("pageNumber", query.PageNumber)
             .Add("pageSize",   query.PageSize)
             .Build();
@@ -40,7 +44,11 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = new UserCreateRequest(
-            form.Username, form.Password, form.Name, form.Email, form.Role);
+            form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            Mapper.ToUserRoleDto(form.Role));
 
         var dto = await client.PostAsync<UserDto>("/api/v1/users", body, token);
         return Mapper.ToUser(dto);
@@ -86,7 +94,6 @@ public class UserRepository(ApiClient client) : IUserRepository
         var body = new MeUpdateRequest(
             form.Username, form.OldPassword, form.NewPassword, form.Name, form.Email);
 
-        // Сервер возвращает новый JWT как plain string
         var newToken = await client.PatchAsync<string>("/api/v1/users/me", body, token);
 
         if (string.IsNullOrWhiteSpace(newToken))

@@ -14,6 +14,7 @@ namespace SklaDinya_desktop_DA_component.Http;
 /// </summary>
 public class ApiClient(HttpClient http)
 {
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -22,7 +23,6 @@ public class ApiClient(HttpClient http)
         {
             new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
             new TimeSpanIso8601Converter(),
-            new DecimalStringConverter(),
         },
     };
 
@@ -112,16 +112,17 @@ public class ApiClient(HttpClient http)
     {
         var content = await response.Content.ReadAsStringAsync();
 
-        if (string.IsNullOrWhiteSpace(content))
+        T result;
+        try
+        {
+            result = JsonSerializer.Deserialize<T>(content, JsonOptions);
+        }
+        catch (Exception ex)
+        {
             throw new ServerException(
-                $"Сервер вернул пустое тело ответа при статусе {(int)response.StatusCode}.");
-
-        var result = JsonSerializer.Deserialize<T>(content, JsonOptions);
-
-        if (result is null)
-            throw new ServerException(
-                "Не удалось десериализовать ответ сервера. " +
+                "Ошибка при десереализации ответа сервера. " +
                 $"Тело: {content[..Math.Min(200, content.Length)]}");
+        }
 
         return result;
     }
@@ -138,19 +139,19 @@ public class ApiClient(HttpClient http)
 
         throw response.StatusCode switch
         {
-            HttpStatusCode.BadRequest       => new ApiException(400,
+            HttpStatusCode.BadRequest          => new ApiException(400,
                 msg ?? "Некорректные данные запроса."),
-            HttpStatusCode.Unauthorized     => new UnauthorizedException(
+            HttpStatusCode.Unauthorized        => new UnauthorizedException(
                 msg ?? "Пользователь не авторизован."),
-            HttpStatusCode.Forbidden        => new ForbiddenException(
+            HttpStatusCode.Forbidden           => new ForbiddenException(
                 msg ?? "Доступ запрещён."),
-            HttpStatusCode.NotFound         => new NotFoundException(
+            HttpStatusCode.NotFound            => new NotFoundException(
                 msg ?? "Ресурс не найден."),
-            HttpStatusCode.MethodNotAllowed => new ReadOnlyModeException(
+            HttpStatusCode.MethodNotAllowed    => new ReadOnlyModeException(
                 msg ?? "Сервер запущен в режиме только для чтения."),
-            HttpStatusCode.Conflict         => new ConflictException(
+            HttpStatusCode.Conflict            => new ConflictException(
                 msg ?? "Конфликт данных."),
-            (HttpStatusCode)418             => new PaymentFailedException(
+            (HttpStatusCode)418                => new PaymentFailedException(
                 msg ?? "Оплата не прошла. Попробуйте ещё раз."),
             HttpStatusCode.InternalServerError => new ServerException(
                 msg ?? "Внутренняя ошибка сервера."),

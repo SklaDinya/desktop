@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using SklaDinya_desktop_BL_component.Enums;
 using SklaDinya_desktop_DA_component.Converters;
+using SklaDinya_desktop_DA_component.Enums;
 
 namespace SklaDinya_desktop_DA_component.Dtos;
 
@@ -14,16 +14,16 @@ internal record BookingCreateRequest(
 
 /// <summary>Ответ API: бронирование для пользователя</summary>
 internal record BookingUserDto(
-    Guid          Id,
-    Guid          UserId,
-    Guid          StorageId,
-    StorageDto    Storage,
-    List<CellDto> Cells,
-    DateTime      StartTime,
+    Guid             Id,
+    Guid             UserId,
+    Guid             StorageId,
+    StorageDto       Storage,
+    List<CellDto>    Cells,
+    DateTime         StartTime,
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
-    TimeSpan      BookingTime,
-    DateTime      CreatedAt,
-    BookingStatus Status);
+    TimeSpan         BookingTime,
+    DateTime         CreatedAt,
+    BookingStatusDto Status);
 
 /// <summary>Ответ API: бронирование для оператора</summary>
 internal record BookingOperatorDto(
@@ -36,7 +36,7 @@ internal record BookingOperatorDto(
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan           BookingTime,
     DateTime           CreatedAt,
-    BookingStatus      Status);
+    BookingStatusDto   Status);
 
 /// <summary>Краткие данные о пользователе внутри бронирования оператора</summary>
 internal record BookingUserInfoDto(

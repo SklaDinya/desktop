@@ -13,6 +13,7 @@
     <Folder Include="Mapping\" />
     <Folder Include="Repositories\" />
     <Folder Include="Converters\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>

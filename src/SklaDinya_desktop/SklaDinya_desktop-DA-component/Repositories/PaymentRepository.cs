@@ -18,7 +18,7 @@ public class PaymentRepository(ApiClient client) : IPaymentRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new PaymentRequest(form.Receipt);
+        var body = new PaymentNoopRequest(form.Receipt);
         var dtos = await client.PostAsync<List<BookingUserDto>>(
             "/api/v1/payments/noop", body, token);
         return Mapper.ToBookingList(dtos);
@@ -34,7 +34,7 @@ public class PaymentRepository(ApiClient client) : IPaymentRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new PaymentRequest(form.Receipt);
+        var body = new PaymentRandomRequest(form.Receipt);
         var dtos = await client.PostAsync<List<BookingUserDto>>(
             "/api/v1/payments/random", body, token);
         return Mapper.ToBookingList(dtos);

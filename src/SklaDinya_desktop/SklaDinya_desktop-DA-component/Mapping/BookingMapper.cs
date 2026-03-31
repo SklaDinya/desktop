@@ -1,71 +1,72 @@
-using SklaDinya_desktop_BL_component.Exceptions;
+using SklaDinya_desktop_BL_component.Enums;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
+using SklaDinya_desktop_DA_component.Enums;
 
 namespace SklaDinya_desktop_DA_component.Mapping;
 
 internal static partial class Mapper
 {
-    public static BookingModel ToBooking(BookingUserDto dto)
+    // ── DA → BL ────────────────────────────────────────────────────────────
+
+    public static BookingModel ToBooking(BookingUserDto dto) => new()
     {
-        return new BookingModel
-        {
-            Id          = dto.Id,
-            UserId      = dto.UserId,
-            StorageId   = dto.StorageId,
-            Storage     = ToStorage(dto.Storage),
-            Cells       = ToCellList(dto.Cells),
-            StartTime   = dto.StartTime,
-            BookingTime = dto.BookingTime,
-            CreatedAt   = dto.CreatedAt,
-            Status      = dto.Status,
-        };
-    }
+        Id          = dto.Id,
+        UserId      = dto.UserId,
+        StorageId   = dto.StorageId,
+        Storage     = ToStorage(dto.Storage),
+        Cells       = dto.Cells.Select(ToCell).ToList(),
+        StartTime   = dto.StartTime,
+        BookingTime = dto.BookingTime,
+        CreatedAt   = dto.CreatedAt,
+        Status      = ToBookingStatus(dto.Status),
+    };
 
-    public static List<BookingModel> ToBookingList(List<BookingUserDto> list) =>
-        list.Select(ToBooking).ToList();
+    public static List<BookingModel> ToBookingList(List<BookingUserDto> dtos) =>
+        dtos.Select(ToBooking).ToList();
 
-    public static BookingOperatorModel ToBookingOperator(BookingOperatorDto dto)
+    public static BookingOperatorModel ToBookingOperator(BookingOperatorDto dto) => new()
     {
-        return new BookingOperatorModel
-        {
-            Id          = dto.Id,
-            UserId      = dto.UserId,
-            User        = ToBookingUser(dto.User),
-            StorageId   = dto.StorageId,
-            Cells       = ToCellList(dto.Cells),
-            StartTime   = dto.StartTime,
-            BookingTime = dto.BookingTime,
-            CreatedAt   = dto.CreatedAt,
-            Status      = dto.Status,
-        };
-    }
+        Id          = dto.Id,
+        UserId      = dto.UserId,
+        User        = new BookingUserModel { Id = dto.User.Id, Name = dto.User.Name, Email = dto.User.Email },
+        StorageId   = dto.StorageId,
+        Cells       = dto.Cells.Select(ToCell).ToList(),
+        StartTime   = dto.StartTime,
+        BookingTime = dto.BookingTime,
+        CreatedAt   = dto.CreatedAt,
+        Status      = ToBookingStatus(dto.Status),
+    };
 
-    public static List<BookingOperatorModel> ToBookingOperatorList(List<BookingOperatorDto> list) =>
-        list.Select(ToBookingOperator).ToList();
+    public static List<BookingOperatorModel> ToBookingOperatorList(List<BookingOperatorDto> dtos) =>
+        dtos.Select(ToBookingOperator).ToList();
 
-    public static BookingReceiptModel ToBookingReceipt(BookingReceiptDto dto)
+    public static BookingReceiptModel ToBookingReceipt(BookingReceiptDto dto) => new()
     {
-        if (string.IsNullOrWhiteSpace(dto.Receipt))
-            throw new ServerException("Поле 'bookingReceipt.receipt' пустое в ответе API.");
+        Receipt = dto.Receipt,
+    };
 
-        return new BookingReceiptModel
-        {
-            Booking = ToBooking(dto.Booking),
-            Receipt = dto.Receipt,
-        };
-    }
+    // ── BL → DA ────────────────────────────────────────────────────────────
 
-    private static BookingUserModel ToBookingUser(BookingUserInfoDto dto)
+    public static BookingStatusDto ToBookingStatusDto(BookingStatus status) => status switch
     {
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            throw new ServerException("Поле 'bookingUser.name' пустое в ответе API.");
+        BookingStatus.Created   => BookingStatusDto.Created,
+        BookingStatus.Paid      => BookingStatusDto.Paid,
+        BookingStatus.InProcess => BookingStatusDto.InProcess,
+        BookingStatus.Finished  => BookingStatusDto.Finished,
+        BookingStatus.Canceled  => BookingStatusDto.Canceled,
+        _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный BookingStatus: {status}")
+    };
 
-        return new BookingUserModel
-        {
-            Id    = dto.Id,
-            Name  = dto.Name,
-            Email = dto.Email,
-        };
-    }
+    // ── Внутренние конвертеры ───────────────────────────────────────────────
+
+    private static BookingStatus ToBookingStatus(BookingStatusDto status) => status switch
+    {
+        BookingStatusDto.Created   => BookingStatus.Created,
+        BookingStatusDto.Paid      => BookingStatus.Paid,
+        BookingStatusDto.InProcess => BookingStatus.InProcess,
+        BookingStatusDto.Finished  => BookingStatus.Finished,
+        BookingStatusDto.Canceled  => BookingStatus.Canceled,
+        _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный BookingStatusDto: {status}")
+    };
 }

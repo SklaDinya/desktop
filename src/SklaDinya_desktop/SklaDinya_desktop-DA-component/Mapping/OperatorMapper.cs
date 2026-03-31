@@ -1,28 +1,44 @@
+using SklaDinya_desktop_BL_component.Enums;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
+using SklaDinya_desktop_DA_component.Enums;
 
 namespace SklaDinya_desktop_DA_component.Mapping;
 
 internal static partial class Mapper
 {
-    public static OperatorModel ToOperator(OperatorDto dto)
+    // ── DA → BL ────────────────────────────────────────────────────────────
+
+    public static OperatorModel ToOperator(OperatorDto dto) => new()
     {
-        var username = RequireNonEmpty(dto.Username, "operator.username");
-        var name     = RequireNonEmpty(dto.Name,     "operator.name");
+        Id        = dto.Id,
+        Username  = dto.Username,
+        Name      = dto.Name,
+        Email     = dto.Email,
+        Role      = ToOperatorRole(dto.Role),
+        Banned    = dto.Banned,
+        CreatedAt = dto.CreatedAt,
+        UpdatedAt = dto.UpdatedAt,
+    };
 
-        return new OperatorModel
-        {
-            Id        = dto.Id,
-            Username  = username,
-            Name      = name,
-            Email     = dto.Email,
-            Role      = dto.Role,
-            Banned    = dto.Banned,
-            CreatedAt = dto.CreatedAt,
-            UpdatedAt = dto.UpdatedAt,
-        };
-    }
+    public static List<OperatorModel> ToOperatorList(List<OperatorDto> dtos) =>
+        dtos.Select(ToOperator).ToList();
 
-    public static List<OperatorModel> ToOperatorList(List<OperatorDto> list) =>
-        list.Select(ToOperator).ToList();
+    // ── BL → DA ────────────────────────────────────────────────────────────
+
+    public static OperatorRoleDto ToOperatorRoleDto(OperatorRole role) => role switch
+    {
+        OperatorRole.MainOperator     => OperatorRoleDto.MainOperator,
+        OperatorRole.OrdinaryOperator => OperatorRoleDto.OrdinaryOperator,
+        _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный OperatorRole: {role}")
+    };
+
+    // ── Внутренние конвертеры ───────────────────────────────────────────────
+
+    private static OperatorRole ToOperatorRole(OperatorRoleDto role) => role switch
+    {
+        OperatorRoleDto.MainOperator     => OperatorRole.MainOperator,
+        OperatorRoleDto.OrdinaryOperator => OperatorRole.OrdinaryOperator,
+        _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный OperatorRoleDto: {role}")
+    };
 }

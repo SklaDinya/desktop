@@ -20,11 +20,15 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentNullException.ThrowIfNull(query, nameof(query));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
+        var roleDto = query.Role.HasValue
+            ? Mapper.ToOperatorRoleDto(query.Role.Value)
+            : (Enums.OperatorRoleDto?)null;
+
         var url = new QueryBuilder("/api/v1/storages/my/operators")
             .Add("username",   query.Username)
             .Add("name",       query.Name)
             .Add("email",      query.Email)
-            .AddEnum("role",   query.Role)
+            .AddEnum("role",   roleDto)
             .Add("pageNumber", query.PageNumber)
             .Add("pageSize",   query.PageSize)
             .Build();
@@ -40,7 +44,11 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = new OperatorCreateRequest(
-            form.Username, form.Password, form.Name, form.Email, form.Role);
+            form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            Mapper.ToOperatorRoleDto(form.Role));
 
         var dto = await client.PostAsync<OperatorDto>(
             "/api/v1/storages/my/operators", body, token);
@@ -64,9 +72,17 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
+        var roleDto = form.Role.HasValue
+            ? Mapper.ToOperatorRoleDto(form.Role.Value)
+            : (Enums.OperatorRoleDto?)null;
+
         var body = new OperatorUpdateRequest(
-            form.Username, form.Password, form.Name,
-            form.Email, form.Role, form.Banned);
+            form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            roleDto,
+            form.Banned);
 
         var dto = await client.PatchAsync<OperatorDto>(
             $"/api/v1/storages/my/operators/{operatorId}", body, token);

@@ -74,12 +74,16 @@ public class BookingRepository(ApiClient client) : IBookingRepository
         ArgumentNullException.ThrowIfNull(query, nameof(query));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
+        var statusesDto = query.Statuses?
+            .Select(Mapper.ToBookingStatusDto)
+            .ToList();
+
         var url = new QueryBuilder("/api/v1/storages/my/bookings")
-            .Add("startBooking",    query.StartBooking.ToString("o"))
-            .Add("endBooking",      query.EndBooking.ToString("o"))
-            .AddEnumList("statuses", query.Statuses)
-            .Add("pageNumber",      query.PageNumber)
-            .Add("pageSize",        query.PageSize)
+            .Add("startBooking",     query.StartBooking.ToString("o"))
+            .Add("endBooking",       query.EndBooking.ToString("o"))
+            .AddEnumList("statuses", statusesDto)
+            .Add("pageNumber",       query.PageNumber)
+            .Add("pageSize",         query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<BookingOperatorDto>>(url, token);

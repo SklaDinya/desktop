@@ -1,48 +1,55 @@
-using SklaDinya_desktop_BL_component.Exceptions;
+using SklaDinya_desktop_BL_component.Enums;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
+using SklaDinya_desktop_DA_component.Enums;
 
 namespace SklaDinya_desktop_DA_component.Mapping;
 
 internal static partial class Mapper
 {
-    public static MeModel ToMe(MeDto dto)
+    // ── DA → BL ────────────────────────────────────────────────────────────
+
+    public static UserModel ToUser(UserDto dto) => new()
     {
-        if (string.IsNullOrWhiteSpace(dto.Username))
-            throw new ServerException("Поле 'me.username' пустое в ответе API.");
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            throw new ServerException("Поле 'me.name' пустое в ответе API.");
+        Id        = dto.Id,
+        Username  = dto.Username,
+        Name      = dto.Name,
+        Email     = dto.Email,
+        Role      = ToUserRole(dto.Role),
+        Banned    = dto.Banned,
+        CreatedAt = dto.CreatedAt,
+        UpdatedAt = dto.UpdatedAt,
+    };
 
-        return new MeModel
-        {
-            Id       = dto.Id,
-            Username = dto.Username,
-            Name     = dto.Name,
-            Email    = dto.Email,
-            Role     = dto.Role,
-        };
-    }
+    public static List<UserModel> ToUserList(List<UserDto> dtos) =>
+        dtos.Select(ToUser).ToList();
 
-    public static UserModel ToUser(UserDto dto)
+    public static MeModel ToMe(MeDto dto) => new()
     {
-        if (string.IsNullOrWhiteSpace(dto.Username))
-            throw new ServerException("Поле 'user.username' пустое в ответе API.");
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            throw new ServerException("Поле 'user.name' пустое в ответе API.");
+        Id       = dto.Id,
+        Username = dto.Username,
+        Name     = dto.Name,
+        Email    = dto.Email,
+        Role     = ToUserRole(dto.Role),
+    };
 
-        return new UserModel
-        {
-            Id        = dto.Id,
-            Username  = dto.Username,
-            Name      = dto.Name,
-            Email     = dto.Email,
-            Role      = dto.Role,
-            Banned    = dto.Banned,
-            CreatedAt = dto.CreatedAt,
-            UpdatedAt = dto.UpdatedAt,
-        };
-    }
+    // ── BL → DA ────────────────────────────────────────────────────────────
 
-    public static List<UserModel> ToUserList(List<UserDto> list) =>
-        list.Select(ToUser).ToList();
+    public static UserRoleDto ToUserRoleDto(UserRole role) => role switch
+    {
+        UserRole.Client          => UserRoleDto.Client,
+        UserRole.StorageOperator => UserRoleDto.StorageOperator,
+        UserRole.Admin           => UserRoleDto.Admin,
+        _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный UserRole: {role}")
+    };
+
+    // ── Внутренние конвертеры ───────────────────────────────────────────────
+
+    private static UserRole ToUserRole(UserRoleDto role) => role switch
+    {
+        UserRoleDto.Client          => UserRole.Client,
+        UserRoleDto.StorageOperator => UserRole.StorageOperator,
+        UserRoleDto.Admin           => UserRole.Admin,
+        _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный UserRoleDto: {role}")
+    };
 }
