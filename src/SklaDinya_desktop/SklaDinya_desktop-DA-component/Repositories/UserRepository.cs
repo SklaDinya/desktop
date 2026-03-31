@@ -40,7 +40,7 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = new UserCreateRequest(
-            form.Username, form.Password, form.Name, form.Email, form.Role.ToString());
+            form.Username, form.Password, form.Name, form.Email, form.Role);
 
         var dto = await client.PostAsync<UserDto>("/api/v1/users", body, token);
         return Mapper.ToUser(dto);

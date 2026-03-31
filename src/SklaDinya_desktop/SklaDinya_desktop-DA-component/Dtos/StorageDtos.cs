@@ -1,13 +1,16 @@
+using SklaDinya_desktop_BL_component.Enums;
+
 namespace SklaDinya_desktop_DA_component.Dtos;
 
+/// <summary>Ответ API: пункт хранения</summary>
 internal record StorageDto(
-    string? Id,
-    string? Name,
-    string? Address,
-    string? Description,
-    string? Status,
-    string? CreatedAt,
-    string? UpdatedAt);
+    Guid          Id,
+    string        Name,
+    string        Address,
+    string?       Description,
+    StorageStatus Status,
+    DateTime      CreatedAt,
+    DateTime      UpdatedAt);
 
 internal record StorageCreateRequest(
     string  Username,

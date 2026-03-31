@@ -12,6 +12,7 @@
     <Folder Include="Http\" />
     <Folder Include="Mapping\" />
     <Folder Include="Repositories\" />
+    <Folder Include="Converters\" />
   </ItemGroup>
 
   <ItemGroup>

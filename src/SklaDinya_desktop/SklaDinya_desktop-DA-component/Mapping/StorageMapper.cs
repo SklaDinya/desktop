@@ -1,4 +1,3 @@
-using SklaDinya_desktop_BL_component.Enums;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
 
@@ -6,24 +5,23 @@ namespace SklaDinya_desktop_DA_component.Mapping;
 
 internal static partial class Mapper
 {
-    public static StorageModel ToStorage(StorageDto? dto)
+    public static StorageModel ToStorage(StorageDto dto)
     {
-        EnsureNotNull(dto, "StorageDto");
+        var name    = RequireNonEmpty(dto.Name,    "storage.name");
+        var address = RequireNonEmpty(dto.Address, "storage.address");
+
         return new StorageModel
         {
-            Id          = ParseGuid(dto!.Id,         "storage.id"),
-            Name        = RequireString(dto.Name,    "storage.name"),
-            Address     = RequireString(dto.Address, "storage.address"),
+            Id          = dto.Id,
+            Name        = name,
+            Address     = address,
             Description = dto.Description,
-            Status      = ParseEnum<StorageStatus>(dto.Status,    "storage.status"),
-            CreatedAt   = ParseDateTime(dto.CreatedAt, "storage.createdAt"),
-            UpdatedAt   = ParseDateTime(dto.UpdatedAt, "storage.updatedAt"),
+            Status      = dto.Status,
+            CreatedAt   = dto.CreatedAt,
+            UpdatedAt   = dto.UpdatedAt,
         };
     }
 
-    public static List<StorageModel> ToStorageList(List<StorageDto>? list)
-    {
-        EnsureNotNull(list, "Storage[]");
-        return list!.Select(ToStorage).ToList();
-    }
+    public static List<StorageModel> ToStorageList(List<StorageDto> list) =>
+        list.Select(ToStorage).ToList();
 }

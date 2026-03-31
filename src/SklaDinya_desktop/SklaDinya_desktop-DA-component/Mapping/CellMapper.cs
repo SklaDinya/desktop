@@ -5,28 +5,21 @@ namespace SklaDinya_desktop_DA_component.Mapping;
 
 internal static partial class Mapper
 {
-    public static CellModel ToCell(CellDto? dto)
+    public static CellModel ToCell(CellDto dto)
     {
-        EnsureNotNull(dto, "CellDto");
+        var name      = RequireNonEmpty(dto.Name,      "cell.name");
+        var cellClass = RequireNonEmpty(dto.CellClass, "cell.cellClass");
+
         return new CellModel
         {
-            Id        = ParseGuid(dto!.Id,           "cell.id"),
-            StorageId = ParseGuid(dto.StorageId,     "cell.storageId"),
-            Name      = RequireString(dto.Name,      "cell.name"),
-            CellClass = RequireString(dto.CellClass, "cell.cellClass"),
-            CreatedAt = ParseDateTime(dto.CreatedAt, "cell.createdAt"),
+            Id        = dto.Id,
+            StorageId = dto.StorageId,
+            Name      = name,
+            CellClass = cellClass,
+            CreatedAt = dto.CreatedAt,
         };
     }
 
-    public static List<CellModel> ToCellList(List<CellDto>? list)
-    {
-        EnsureNotNull(list, "Cell[]");
-        return list!.Select(ToCell).ToList();
-    }
-
-    public static List<string> ToCellClasses(List<string>? list)
-    {
-        EnsureNotNull(list, "CellClasses[]");
-        return list!;
-    }
+    public static List<CellModel> ToCellList(List<CellDto> list) =>
+        list.Select(ToCell).ToList();
 }

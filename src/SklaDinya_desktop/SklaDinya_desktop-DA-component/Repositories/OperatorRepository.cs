@@ -40,7 +40,7 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = new OperatorCreateRequest(
-            form.Username, form.Password, form.Name, form.Email, form.Role.ToString());
+            form.Username, form.Password, form.Name, form.Email, form.Role);
 
         var dto = await client.PostAsync<OperatorDto>(
             "/api/v1/storages/my/operators", body, token);
@@ -66,7 +66,7 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
 
         var body = new OperatorUpdateRequest(
             form.Username, form.Password, form.Name,
-            form.Email, form.Role?.ToString(), form.Banned);
+            form.Email, form.Role, form.Banned);
 
         var dto = await client.PatchAsync<OperatorDto>(
             $"/api/v1/storages/my/operators/{operatorId}", body, token);
