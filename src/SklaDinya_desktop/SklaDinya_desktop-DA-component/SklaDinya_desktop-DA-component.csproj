@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>SklaDinya_desktop_DA_component</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Dtos\" />
+    <Folder Include="Http\" />
+    <Folder Include="Mapping\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Converters\" />
+    <Folder Include="Enums\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SklaDinya_desktop-BL-component\SklaDinya-desktop-BL-component.csproj" />
+  </ItemGroup>
+
+</Project>
