@@ -34,10 +34,7 @@ public class StorageRepository(ApiClient client) : IStorageRepository
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var body = new StorageCreateRequest(
-            form.Username, form.Password, form.Name, form.Email,
-            form.StorageName, form.Address, form.Description);
-
+        var body = Mapper.ToStorageCreateRequest(form);
         await client.PostAsync("/api/v1/storages", body);
     }
 
@@ -57,7 +54,7 @@ public class StorageRepository(ApiClient client) : IStorageRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new StorageUpdateRequest(form.Name, form.Address, form.Description);
+        var body = Mapper.ToStorageUpdateRequest(form);
         var dto  = await client.PatchAsync<StorageDto>(
             $"/api/v1/storages/{storageId}", body, token);
         return Mapper.ToStorage(dto);
@@ -96,7 +93,7 @@ public class StorageRepository(ApiClient client) : IStorageRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new StorageUpdateRequest(form.Name, form.Address, form.Description);
+        var body = Mapper.ToStorageUpdateRequest(form);
         var dto  = await client.PatchAsync<StorageDto>("/api/v1/storages/my", body, token);
         return Mapper.ToStorage(dto);
     }

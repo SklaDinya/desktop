@@ -1,4 +1,5 @@
 using SklaDinya_desktop_BL_component.Enums;
+using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
 using SklaDinya_desktop_DA_component.Enums;
@@ -34,6 +35,19 @@ internal static partial class Mapper
     };
 
     // ── BL → DA ────────────────────────────────────────────────────────────
+
+    public static UserCreateRequest ToUserCreateRequest(UserCreateForm form) =>
+        new(form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            ToUserRoleDto(form.Role));
+
+    public static UserUpdateRequest ToUserUpdateRequest(UserUpdateForm form) =>
+        new(form.Username, form.Password, form.Name, form.Email, form.Banned);
+
+    public static MeUpdateRequest ToMeUpdateRequest(MeUpdateForm form) =>
+        new(form.Username, form.OldPassword, form.NewPassword, form.Name, form.Email);
 
     public static UserRoleDto ToUserRoleDto(UserRole role) => role switch
     {

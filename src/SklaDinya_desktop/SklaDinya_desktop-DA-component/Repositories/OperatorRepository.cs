@@ -43,14 +43,8 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new OperatorCreateRequest(
-            form.Username,
-            form.Password,
-            form.Name,
-            form.Email,
-            Mapper.ToOperatorRoleDto(form.Role));
-
-        var dto = await client.PostAsync<OperatorDto>(
+        var body = Mapper.ToOperatorCreateRequest(form);
+        var dto  = await client.PostAsync<OperatorDto>(
             "/api/v1/storages/my/operators", body, token);
         return Mapper.ToOperator(dto);
     }
@@ -72,19 +66,8 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var roleDto = form.Role.HasValue
-            ? Mapper.ToOperatorRoleDto(form.Role.Value)
-            : (Enums.OperatorRoleDto?)null;
-
-        var body = new OperatorUpdateRequest(
-            form.Username,
-            form.Password,
-            form.Name,
-            form.Email,
-            roleDto,
-            form.Banned);
-
-        var dto = await client.PatchAsync<OperatorDto>(
+        var body = Mapper.ToOperatorUpdateRequest(form);
+        var dto  = await client.PatchAsync<OperatorDto>(
             $"/api/v1/storages/my/operators/{operatorId}", body, token);
         return Mapper.ToOperator(dto);
     }

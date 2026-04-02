@@ -43,14 +43,8 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new UserCreateRequest(
-            form.Username,
-            form.Password,
-            form.Name,
-            form.Email,
-            Mapper.ToUserRoleDto(form.Role));
-
-        var dto = await client.PostAsync<UserDto>("/api/v1/users", body, token);
+        var body = Mapper.ToUserCreateRequest(form);
+        var dto  = await client.PostAsync<UserDto>("/api/v1/users", body, token);
         return Mapper.ToUser(dto);
     }
 
@@ -69,10 +63,8 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new UserUpdateRequest(
-            form.Username, form.Password, form.Name, form.Email, form.Banned);
-
-        var dto = await client.PatchAsync<UserDto>($"/api/v1/users/{userId}", body, token);
+        var body = Mapper.ToUserUpdateRequest(form);
+        var dto  = await client.PatchAsync<UserDto>($"/api/v1/users/{userId}", body, token);
         return Mapper.ToUser(dto);
     }
 
@@ -91,9 +83,7 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new MeUpdateRequest(
-            form.Username, form.OldPassword, form.NewPassword, form.Name, form.Email);
-
+        var body     = Mapper.ToMeUpdateRequest(form);
         var newToken = await client.PatchAsync<string>("/api/v1/users/me", body, token);
 
         if (string.IsNullOrWhiteSpace(newToken))

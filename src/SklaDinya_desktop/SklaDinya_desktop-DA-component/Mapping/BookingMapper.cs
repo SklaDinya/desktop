@@ -1,4 +1,5 @@
 using SklaDinya_desktop_BL_component.Enums;
+using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
 using SklaDinya_desktop_DA_component.Enums;
@@ -29,7 +30,7 @@ internal static partial class Mapper
     {
         Id          = dto.Id,
         UserId      = dto.UserId,
-        User        = new BookingUserModel { Id = dto.User.Id, Name = dto.User.Name, Email = dto.User.Email },
+        User        = ToBookingUser(dto.User),
         StorageId   = dto.StorageId,
         Cells       = dto.Cells.Select(ToCell).ToList(),
         StartTime   = dto.StartTime,
@@ -41,12 +42,23 @@ internal static partial class Mapper
     public static List<BookingOperatorModel> ToBookingOperatorList(List<BookingOperatorDto> dtos) =>
         dtos.Select(ToBookingOperator).ToList();
 
+    public static BookingUserModel ToBookingUser(BookingUserInfoDto dto) => new()
+    {
+        Id    = dto.Id,
+        Name  = dto.Name,
+        Email = dto.Email,
+    };
+
     public static BookingReceiptModel ToBookingReceipt(BookingReceiptDto dto) => new()
     {
+        Booking = ToBooking(dto.Booking),
         Receipt = dto.Receipt,
     };
 
     // ── BL → DA ────────────────────────────────────────────────────────────
+
+    public static BookingCreateRequest ToBookingCreateRequest(BookingCreateForm form) =>
+        new(form.StorageId, form.CellIds, form.StartTime, form.BookingTime);
 
     public static BookingStatusDto ToBookingStatusDto(BookingStatus status) => status switch
     {

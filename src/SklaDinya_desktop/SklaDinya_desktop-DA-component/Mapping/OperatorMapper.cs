@@ -1,4 +1,5 @@
 using SklaDinya_desktop_BL_component.Enums;
+using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
 using SklaDinya_desktop_DA_component.Enums;
@@ -25,6 +26,21 @@ internal static partial class Mapper
         dtos.Select(ToOperator).ToList();
 
     // ── BL → DA ────────────────────────────────────────────────────────────
+
+    public static OperatorCreateRequest ToOperatorCreateRequest(OperatorCreateForm form) =>
+        new(form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            ToOperatorRoleDto(form.Role));
+
+    public static OperatorUpdateRequest ToOperatorUpdateRequest(OperatorUpdateForm form) =>
+        new(form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            form.Role.HasValue ? ToOperatorRoleDto(form.Role.Value) : null,
+            form.Banned);
 
     public static OperatorRoleDto ToOperatorRoleDto(OperatorRole role) => role switch
     {

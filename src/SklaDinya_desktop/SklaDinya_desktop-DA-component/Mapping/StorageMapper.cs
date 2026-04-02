@@ -1,4 +1,5 @@
 using SklaDinya_desktop_BL_component.Enums;
+using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
 using SklaDinya_desktop_DA_component.Enums;
@@ -24,6 +25,18 @@ internal static partial class Mapper
         dtos.Select(ToStorage).ToList();
 
     // ── BL → DA ────────────────────────────────────────────────────────────
+
+    public static StorageCreateRequest ToStorageCreateRequest(StorageCreateForm form) =>
+        new(form.Username,
+            form.Password,
+            form.Name,
+            form.Email,
+            form.StorageName,
+            form.Address,
+            form.Description);
+
+    public static StorageUpdateRequest ToStorageUpdateRequest(StorageUpdateForm form) =>
+        new(form.Name, form.Address, form.Description);
 
     public static StorageStatusDto ToStorageStatusDto(StorageStatus status) => status switch
     {

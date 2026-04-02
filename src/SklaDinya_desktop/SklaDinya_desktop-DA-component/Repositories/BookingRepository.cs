@@ -36,13 +36,8 @@ public class BookingRepository(ApiClient client) : IBookingRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new BookingCreateRequest(
-            form.StorageId,
-            form.CellIds,
-            form.StartTime,
-            form.BookingTime);
-
-        var dto = await client.PostAsync<BookingReceiptDto>(
+        var body = Mapper.ToBookingCreateRequest(form);
+        var dto  = await client.PostAsync<BookingReceiptDto>(
             "/api/v1/users/me/bookings", body, token);
         return Mapper.ToBookingReceipt(dto);
     }
