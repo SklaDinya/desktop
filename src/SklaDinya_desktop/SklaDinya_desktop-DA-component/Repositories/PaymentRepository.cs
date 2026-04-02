@@ -18,7 +18,7 @@ public class PaymentRepository(ApiClient client) : IPaymentRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new PaymentNoopRequest(form.Receipt);
+        var body = Mapper.ToPaymentNoopRequest(form);
         var dtos = await client.PostAsync<List<BookingUserDto>>(
             "/api/v1/payments/noop", body, token);
         return Mapper.ToBookingList(dtos);
@@ -27,14 +27,14 @@ public class PaymentRepository(ApiClient client) : IPaymentRepository
     /// <inheritdoc/>
     /// <remarks>
     /// При HTTP 418 сервер сигнализирует о неудаче моковой оплаты —
-    /// <see cref="ApiClient"/> выбросит <see cref="BL_component.Exceptions.PaymentFailedException"/>.
+    /// <see cref="ApiClient"/> выбросит <see cref="SklaDinya_desktop_BL_component.Exceptions.PaymentFailedException"/>.
     /// </remarks>
     public async Task<List<BookingModel>> PayRandomAsync(PaymentForm form, string token)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body = new PaymentRandomRequest(form.Receipt);
+        var body = Mapper.ToPaymentRandomRequest(form);
         var dtos = await client.PostAsync<List<BookingUserDto>>(
             "/api/v1/payments/random", body, token);
         return Mapper.ToBookingList(dtos);

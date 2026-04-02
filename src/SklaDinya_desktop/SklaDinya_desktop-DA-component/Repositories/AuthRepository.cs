@@ -1,8 +1,8 @@
 using SklaDinya_desktop_BL_component.Exceptions;
 using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Interfaces.Repositories;
-using SklaDinya_desktop_DA_component.Dtos;
 using SklaDinya_desktop_DA_component.Http;
+using SklaDinya_desktop_DA_component.Mapping;
 
 namespace SklaDinya_desktop_DA_component.Repositories;
 
@@ -16,7 +16,7 @@ public class AuthRepository(ApiClient client) : IAuthRepository
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var body  = new LoginRequest(form.Username, form.Password);
+        var body  = Mapper.ToLoginRequest(form);
         var token = await client.PostAsync<string>("/api/v1/auth/login", body);
 
         if (string.IsNullOrWhiteSpace(token))
@@ -30,7 +30,7 @@ public class AuthRepository(ApiClient client) : IAuthRepository
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var body  = new RegistrationRequest(form.Username, form.Password, form.Name, form.Email);
+        var body  = Mapper.ToRegistrationRequest(form);
         var token = await client.PostAsync<string>("/api/v1/auth/register", body);
 
         if (string.IsNullOrWhiteSpace(token))

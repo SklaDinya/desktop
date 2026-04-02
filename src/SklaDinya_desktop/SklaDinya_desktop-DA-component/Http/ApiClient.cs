@@ -112,19 +112,15 @@ public class ApiClient(HttpClient http)
     {
         var content = await response.Content.ReadAsStringAsync();
 
-        T result;
         try
         {
-            result = JsonSerializer.Deserialize<T>(content, JsonOptions);
+            return JsonSerializer.Deserialize<T>(content, JsonOptions)!;
         }
         catch (Exception ex)
         {
             throw new ServerException(
-                "Ошибка при десереализации ответа сервера. " +
-                $"Тело: {content[..Math.Min(200, content.Length)]}");
+                $"Ошибка при десериализации ответа сервера: {ex}");
         }
-
-        return result;
     }
 
     private static async Task EnsureSuccessAsync(HttpResponseMessage response)
