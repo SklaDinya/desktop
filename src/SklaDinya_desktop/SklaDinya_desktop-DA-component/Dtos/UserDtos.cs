@@ -3,7 +3,7 @@ using SklaDinya_desktop_DA_component.Enums;
 namespace SklaDinya_desktop_DA_component.Dtos;
 
 /// <summary>Ответ API: данные своего аккаунта</summary>
-internal record MeDto(
+public record MeDto(
     Guid        Id,
     string      Username,
     string      Name,
@@ -11,7 +11,7 @@ internal record MeDto(
     UserRoleDto Role);
 
 /// <summary>Ответ API: данные пользователя для администратора</summary>
-internal record UserDto(
+public record UserDto(
     Guid        Id,
     string      Username,
     string      Name,
@@ -21,21 +21,21 @@ internal record UserDto(
     DateTime    CreatedAt,
     DateTime    UpdatedAt);
 
-internal record UserCreateRequest(
+public record UserCreateRequest(
     string      Username,
     string      Password,
     string      Name,
     string?     Email,
     UserRoleDto Role);
 
-internal record UserUpdateRequest(
+public record UserUpdateRequest(
     string?  Username,
     string?  Password,
     string?  Name,
     string?  Email,
     bool?    Banned);
 
-internal record MeUpdateRequest(
+public record MeUpdateRequest(
     string? Username,
     string? OldPassword,
     string? NewPassword,

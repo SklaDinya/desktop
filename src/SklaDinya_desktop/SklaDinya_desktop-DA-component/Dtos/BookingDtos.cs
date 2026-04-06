@@ -5,7 +5,7 @@ using SklaDinya_desktop_DA_component.Enums;
 namespace SklaDinya_desktop_DA_component.Dtos;
 
 /// <summary>Запрос на создание бронирования. bookingTime — ISO 8601 duration</summary>
-internal record BookingCreateRequest(
+public record BookingCreateRequest(
     Guid       StorageId,
     List<Guid> CellIds,
     DateTime   StartTime,
@@ -13,7 +13,7 @@ internal record BookingCreateRequest(
     TimeSpan   BookingTime);
 
 /// <summary>Ответ API: бронирование для пользователя</summary>
-internal record BookingUserDto(
+public record BookingUserDto(
     Guid             Id,
     Guid             UserId,
     Guid             StorageId,
@@ -26,7 +26,7 @@ internal record BookingUserDto(
     BookingStatusDto Status);
 
 /// <summary>Ответ API: бронирование для оператора</summary>
-internal record BookingOperatorDto(
+public record BookingOperatorDto(
     Guid               Id,
     Guid               UserId,
     BookingUserInfoDto User,
@@ -39,12 +39,12 @@ internal record BookingOperatorDto(
     BookingStatusDto   Status);
 
 /// <summary>Краткие данные о пользователе внутри бронирования оператора</summary>
-internal record BookingUserInfoDto(
+public record BookingUserInfoDto(
     Guid    Id,
     string  Name,
     string? Email);
 
 /// <summary>Ответ API: чек созданного бронирования</summary>
-internal record BookingReceiptDto(
+public record BookingReceiptDto(
     BookingUserDto Booking,
     string         Receipt);

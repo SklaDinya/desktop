@@ -46,7 +46,7 @@ public static class JwtHelper
         }
 
         OperatorRole? operatorRole = null;
-        if (root.TryGetProperty("role", out var roleEl) &&
+        if (root.TryGetProperty("operatorRole", out var roleEl) &&
             roleEl.ValueKind == JsonValueKind.String)
         {
             var roleStr = roleEl.GetString()!;
@@ -59,9 +59,9 @@ public static class JwtHelper
 
         return new JwtPayload
         {
-            UserId = userId,
-            UserRole = userRole,
-            StorageId = storageId,
+            UserId       = userId,
+            UserRole     = userRole,
+            StorageId    = storageId,
             OperatorRole = operatorRole,
         };
     }

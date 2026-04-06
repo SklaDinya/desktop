@@ -3,7 +3,7 @@ using SklaDinya_desktop_DA_component.Enums;
 namespace SklaDinya_desktop_DA_component.Dtos;
 
 /// <summary>Ответ API: оператор пункта хранения</summary>
-internal record OperatorDto(
+public record OperatorDto(
     Guid            Id,
     string          Username,
     string          Name,
@@ -13,14 +13,14 @@ internal record OperatorDto(
     DateTime        CreatedAt,
     DateTime        UpdatedAt);
 
-internal record OperatorCreateRequest(
+public record OperatorCreateRequest(
     string          Username,
     string          Password,
     string          Name,
     string?         Email,
     OperatorRoleDto Role);
 
-internal record OperatorUpdateRequest(
+public record OperatorUpdateRequest(
     string?          Username,
     string?          Password,
     string?          Name,

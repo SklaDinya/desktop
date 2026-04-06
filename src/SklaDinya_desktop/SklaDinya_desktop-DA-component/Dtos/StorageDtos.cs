@@ -3,7 +3,7 @@ using SklaDinya_desktop_DA_component.Enums;
 namespace SklaDinya_desktop_DA_component.Dtos;
 
 /// <summary>Ответ API: пункт хранения</summary>
-internal record StorageDto(
+public record StorageDto(
     Guid             Id,
     string           Name,
     string           Address,
@@ -12,7 +12,7 @@ internal record StorageDto(
     DateTime         CreatedAt,
     DateTime         UpdatedAt);
 
-internal record StorageCreateRequest(
+public record StorageCreateRequest(
     string  Username,
     string  Password,
     string  Name,
@@ -21,7 +21,7 @@ internal record StorageCreateRequest(
     string  Address,
     string? Description);
 
-internal record StorageUpdateRequest(
+public record StorageUpdateRequest(
     string? Name,
     string? Address,
     string? Description);
