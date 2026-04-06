@@ -1,10 +1,10 @@
 namespace SklaDinya_desktop_DA_component.Dtos;
 
-internal record LoginRequest(
+public record LoginRequest(
     string Username,
     string Password);
 
-internal record RegistrationRequest(
+public record RegistrationRequest(
     string  Username,
     string  Password,
     string  Name,

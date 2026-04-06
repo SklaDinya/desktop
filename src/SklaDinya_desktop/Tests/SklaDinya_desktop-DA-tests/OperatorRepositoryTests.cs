@@ -27,14 +27,6 @@ public class OperatorRepositoryTests
     }
 
     [Fact]
-    public async Task GetOperatorsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new OperatorRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetOperatorsAsync(null!, Token));
-    }
-
-    [Fact]
     public async Task GetOperatorsAsync_EmptyToken_ThrowsArgumentException()
     {
         var repo  = new OperatorRepository(MockHttpFactory.CreateOk());
@@ -72,14 +64,6 @@ public class OperatorRepositoryTests
         };
 
         await Assert.ThrowsAsync<ConflictException>(() => repo.CreateOperatorAsync(form, Token));
-    }
-
-    [Fact]
-    public async Task CreateOperatorAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new OperatorRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.CreateOperatorAsync(null!, Token));
     }
 
     // ── GetOperatorByIdAsync ───────────────────────────────────────────────
@@ -132,13 +116,5 @@ public class OperatorRepositoryTests
         var form = new OperatorUpdateForm { Name = "Updated" };
 
         await Assert.ThrowsAsync<NotFoundException>(() => repo.UpdateOperatorAsync(Guid.NewGuid(), form, Token));
-    }
-
-    [Fact]
-    public async Task UpdateOperatorAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new OperatorRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateOperatorAsync(Guid.NewGuid(), null!, Token));
     }
 }

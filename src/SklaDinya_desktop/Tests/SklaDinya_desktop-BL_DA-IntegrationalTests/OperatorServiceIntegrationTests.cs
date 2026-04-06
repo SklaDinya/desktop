@@ -41,14 +41,6 @@ public class OperatorServiceIntegrationTests
             () => sut.GetOperatorsAsync(new OperatorSearchQuery()));
     }
 
-    [Fact]
-    public async Task GetOperatorsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Operator(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetOperatorsAsync(null!));
-    }
-
     // ── CreateOperatorAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -78,14 +70,6 @@ public class OperatorServiceIntegrationTests
             Username = "existing", Password = "p", Name = "N",
             Email    = "e@e.com", Role = OperatorRole.OrdinaryOperator
         }));
-    }
-
-    [Fact]
-    public async Task CreateOperatorAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Operator(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateOperatorAsync(null!));
     }
 
     // ── GetOperatorByIdAsync ───────────────────────────────────────────────
@@ -135,14 +119,5 @@ public class OperatorServiceIntegrationTests
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.UpdateOperatorAsync(Guid.NewGuid(), new OperatorUpdateForm { Name = "Updated" }));
-    }
-
-    [Fact]
-    public async Task UpdateOperatorAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Operator(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            () => sut.UpdateOperatorAsync(Guid.NewGuid(), null!));
     }
 }

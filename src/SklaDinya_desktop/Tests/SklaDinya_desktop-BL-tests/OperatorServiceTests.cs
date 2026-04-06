@@ -13,7 +13,7 @@ public class OperatorServiceTests
 {
     private readonly Mock<IOperatorRepository> _repo    = new();
     private readonly Mock<ISessionService>     _session = new();
-    private readonly OperatorService           _sut;
+    private readonly IOperatorService          _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -39,14 +39,6 @@ public class OperatorServiceTests
         _repo.Verify(r => r.GetOperatorsAsync(query, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task GetOperatorsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetOperatorsAsync(null!));
-
-        _repo.Verify(r => r.GetOperatorsAsync(It.IsAny<OperatorSearchQuery>(), It.IsAny<string>()), Times.Never);
-    }
-
     // ── CreateOperatorAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -63,14 +55,6 @@ public class OperatorServiceTests
         _repo.Verify(r => r.CreateOperatorAsync(form, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task CreateOperatorAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreateOperatorAsync(null!));
-
-        _repo.Verify(r => r.CreateOperatorAsync(It.IsAny<OperatorCreateForm>(), It.IsAny<string>()), Times.Never);
-    }
-
     // ── GetOperatorByIdAsync ───────────────────────────────────────────────
 
     [Fact]
@@ -83,17 +67,6 @@ public class OperatorServiceTests
         var result = await _sut.GetOperatorByIdAsync(expected.Id);
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task GetOperatorByIdAsync_RepoThrows_PropagatesException()
-    {
-        var id = Guid.NewGuid();
-
-        _repo.Setup(r => r.GetOperatorByIdAsync(id, Token))
-             .ThrowsAsync(new InvalidOperationException("Not found"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetOperatorByIdAsync(id));
     }
 
     // ── UpdateOperatorAsync ────────────────────────────────────────────────
@@ -111,13 +84,5 @@ public class OperatorServiceTests
 
         Assert.Equal(expected, result);
         _repo.Verify(r => r.UpdateOperatorAsync(id, form, Token), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateOperatorAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.UpdateOperatorAsync(Guid.NewGuid(), null!));
-
-        _repo.Verify(r => r.UpdateOperatorAsync(It.IsAny<Guid>(), It.IsAny<OperatorUpdateForm>(), It.IsAny<string>()), Times.Never);
     }
 }

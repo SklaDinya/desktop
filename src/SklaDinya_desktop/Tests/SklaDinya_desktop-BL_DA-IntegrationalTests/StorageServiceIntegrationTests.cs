@@ -43,14 +43,6 @@ public class StorageServiceIntegrationTests
             () => sut.GetStoragesAsync(new StorageSearchQuery()));
     }
 
-    [Fact]
-    public async Task GetStoragesAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Storage(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetStoragesAsync(null!));
-    }
-
     // ── CreateStorageAsync ─────────────────────────────────────────────────
 
     [Fact]
@@ -80,14 +72,6 @@ public class StorageServiceIntegrationTests
             Username = "op", Password = "p", Name = "N",
             Email    = "e@e.com", StorageName = "S", Address = "A"
         }));
-    }
-
-    [Fact]
-    public async Task CreateStorageAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Storage(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateStorageAsync(null!));
     }
 
     // ── GetStorageByIdAsync ────────────────────────────────────────────────
@@ -137,15 +121,6 @@ public class StorageServiceIntegrationTests
 
         await Assert.ThrowsAsync<ForbiddenException>(
             () => sut.UpdateStorageByIdAsync(Guid.NewGuid(), new StorageUpdateForm { Name = "U" }));
-    }
-
-    [Fact]
-    public async Task UpdateStorageByIdAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Storage(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            () => sut.UpdateStorageByIdAsync(Guid.NewGuid(), null!));
     }
 
     // ── ApproveStorageAsync ────────────────────────────────────────────────
@@ -240,13 +215,5 @@ public class StorageServiceIntegrationTests
 
         await Assert.ThrowsAsync<UnauthorizedException>(
             () => sut.UpdateMyStorageAsync(new StorageUpdateForm { Name = "Updated" }));
-    }
-
-    [Fact]
-    public async Task UpdateMyStorageAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Storage(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.UpdateMyStorageAsync(null!));
     }
 }

@@ -13,7 +13,7 @@ public class PaymentServiceTests
     private readonly Mock<IPaymentRepository> _repo           = new();
     private readonly Mock<IBookingService>    _bookingService = new();
     private readonly Mock<ISessionService>    _session        = new();
-    private readonly PaymentService           _sut;
+    private readonly IPaymentService          _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -45,7 +45,7 @@ public class PaymentServiceTests
     [Fact]
     public async Task PayNoopAsync_NoLastReceipt_ThrowsInvalidOperationExceptionWithoutCallingRepo()
     {
-        _bookingService.Setup(b => b.LastReceipt).Returns((BookingReceiptModel?)null);
+        _bookingService.Setup(b => b.LastReceipt).Returns(null as BookingReceiptModel);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.PayNoopAsync());
 
@@ -74,7 +74,7 @@ public class PaymentServiceTests
     [Fact]
     public async Task PayRandomAsync_NoLastReceipt_ThrowsInvalidOperationExceptionWithoutCallingRepo()
     {
-        _bookingService.Setup(b => b.LastReceipt).Returns((BookingReceiptModel?)null);
+        _bookingService.Setup(b => b.LastReceipt).Returns(null as BookingReceiptModel);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.PayRandomAsync());
 

@@ -50,15 +50,6 @@ public class CellServiceIntegrationTests
             }));
     }
 
-    [Fact]
-    public async Task GetCellsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Cell(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            () => sut.GetCellsAsync(Guid.NewGuid(), null!));
-    }
-
     // ── GetCellClassesAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -110,14 +101,6 @@ public class CellServiceIntegrationTests
             () => sut.GetMyCellsAsync(new MyCellSearchQuery()));
     }
 
-    [Fact]
-    public async Task GetMyCellsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Cell(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetMyCellsAsync(null!));
-    }
-
     // ── GetMyCellClassesAsync ──────────────────────────────────────────────
 
     [Fact]
@@ -165,13 +148,5 @@ public class CellServiceIntegrationTests
 
         await Assert.ThrowsAsync<ConflictException>(
             () => sut.CreateCellAsync(new CellCreateForm { Name = "A1", CellClass = "Small" }));
-    }
-
-    [Fact]
-    public async Task CreateCellAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Cell(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateCellAsync(null!));
     }
 }

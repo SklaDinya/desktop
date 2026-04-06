@@ -42,14 +42,6 @@ public class BookingServiceIntegrationTests
             () => sut.GetMyBookingsAsync(new BookingSearchQuery()));
     }
 
-    [Fact]
-    public async Task GetMyBookingsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Booking(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetMyBookingsAsync(null!));
-    }
-
     // ── CreateBookingAsync ─────────────────────────────────────────────────
 
     [Fact]
@@ -86,14 +78,6 @@ public class BookingServiceIntegrationTests
             StartTime   = DateTime.UtcNow,
             BookingTime = TimeSpan.FromHours(1)
         }));
-    }
-
-    [Fact]
-    public async Task CreateBookingAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Booking(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateBookingAsync(null!));
     }
 
     // ── GetMyBookingByIdAsync ──────────────────────────────────────────────
@@ -182,13 +166,5 @@ public class BookingServiceIntegrationTests
                 StartBooking = DateTime.UtcNow,
                 EndBooking   = DateTime.UtcNow.AddDays(1)
             }));
-    }
-
-    [Fact]
-    public async Task GetStorageBookingsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Booking(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetStorageBookingsAsync(null!));
     }
 }

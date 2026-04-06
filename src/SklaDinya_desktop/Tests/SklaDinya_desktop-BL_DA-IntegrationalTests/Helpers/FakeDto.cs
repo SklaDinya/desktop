@@ -1,25 +1,24 @@
-using System.Xml;
+using SklaDinya_desktop_DA_component.Dtos;
+using SklaDinya_desktop_DA_component.Enums;
 
 namespace SklaDinya_desktop_BL_DA_IntegrationalTests.Helpers;
 
 /// <summary>
-/// Анонимные объекты, которые при camelCase-сериализации совпадают
-/// с internal DTO DA-компонента.
+/// Строитель тестовых DTO объектов DA-компонента для интеграционных тестов.
+/// Использует реальные публичные типы вместо анонимных объектов.
 ///
-/// ВАЖНО: Token() генерирует роль в PascalCase ("Client", "StorageOperator", "Admin"),
-/// потому что JwtHelper.ParsePayload использует Enum.TryParse — регистрозависимо,
-/// имена должны совпадать с именами членов enum UserRole/OperatorRole.
+/// Token() генерирует userRole в PascalCase ("Client", "StorageOperator", "Admin") —
+/// JwtHelper.ParsePayload использует Enum.TryParse без ignoreCase.
+/// Поле оператора в JWT называется "OperatorRole" — совпадает с TryGetProperty("OperatorRole") в JwtHelper.
+/// Кодирование — обычный Base64 без URL-замен, как в JwtHelper.DecodeBase64Url.
 /// </summary>
 internal static class FakeDto
 {
-    private static string Iso(TimeSpan ts) => XmlConvert.ToString(ts);
-    private static string Now() => DateTime.UtcNow.ToString("o");
-
     // ── Tokens ────────────────────────────────────────────────────────────
 
     /// <summary>
     /// Генерирует JWT с нужной ролью.
-    /// role должен совпадать с именем члена enum UserRole:
+    /// userRole должен совпадать с именем члена enum UserRole:
     /// "Client", "StorageOperator", "Admin".
     /// </summary>
     public static string Token(string userRole = "Client")
@@ -28,150 +27,136 @@ internal static class FakeDto
         return BuildJwt(payloadJson);
     }
 
-    /// <summary>JWT оператора с дополнительными полями storageId и role.</summary>
+    /// <summary>JWT оператора с полями storageId и OperatorRole.</summary>
     public static string OperatorToken()
     {
         var payloadJson =
             $"{{\"userId\":\"{Guid.NewGuid()}\"," +
             $"\"userRole\":\"StorageOperator\"," +
             $"\"storageId\":\"{Guid.NewGuid()}\"," +
-            $"\"role\":\"MainOperator\"}}";
+            $"\"OperatorRole\":\"MainOperator\"}}";
         return BuildJwt(payloadJson);
     }
 
     private static string BuildJwt(string payloadJson)
     {
-        var header = Base64Url("{\"alg\":\"HS256\",\"typ\":\"JWT\"}"u8.ToArray());
-        var payload = Base64Url(System.Text.Encoding.UTF8.GetBytes(payloadJson));
+        var header  = Base64Encode("{\"alg\":\"HS256\",\"typ\":\"JWT\"}"u8.ToArray());
+        var payload = Base64Encode(System.Text.Encoding.UTF8.GetBytes(payloadJson));
         return $"{header}.{payload}.fakesig";
     }
 
-    private static string Base64Url(byte[] bytes)
-        => Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    private static string Base64Encode(byte[] bytes)
+        => Convert.ToBase64String(bytes);
 
     // ── Storage ────────────────────────────────────────────────────────────
 
-    public static object Storage(Guid? id = null) => new
-    {
-        id = id ?? Guid.NewGuid(),
-        name = "Test Storage",
-        address = "Test Address",
-        description = "Test Description",
-        status = "active",
-        createdAt = Now(),
-        updatedAt = Now(),
-    };
+    public static StorageDto Storage(Guid? id = null) => new(
+        Id:          id ?? Guid.NewGuid(),
+        Name:        "Test Storage",
+        Address:     "Test Address",
+        Description: "Test Description",
+        Status:      StorageStatusDto.Active,
+        CreatedAt:   DateTime.UtcNow,
+        UpdatedAt:   DateTime.UtcNow);
 
-    public static object[] StorageList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => Storage()).ToArray();
+    public static List<StorageDto> StorageList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => Storage()).ToList();
 
     // ── Cell ───────────────────────────────────────────────────────────────
 
-    public static object Cell(Guid? id = null, Guid? storageId = null) => new
-    {
-        id = id ?? Guid.NewGuid(),
-        storageId = storageId ?? Guid.NewGuid(),
-        name = "A1",
-        cellClass = "Small",
-        createdAt = Now(),
-    };
+    public static CellDto Cell(Guid? id = null, Guid? storageId = null) => new(
+        Id:        id        ?? Guid.NewGuid(),
+        StorageId: storageId ?? Guid.NewGuid(),
+        Name:      "A1",
+        CellClass: "Small",
+        CreatedAt: DateTime.UtcNow);
 
-    public static object[] CellList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => Cell()).ToArray();
+    public static List<CellDto> CellList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => Cell()).ToList();
 
     // ── Price ──────────────────────────────────────────────────────────────
 
-    public static object Price(Guid? storageId = null) => new
-    {
-        storageId = storageId ?? Guid.NewGuid(),
-        cellClass = "Small",
-        price = "99.99",
-        createdAt = Now(),
-    };
+    public static PriceDto Price(Guid? storageId = null) => new(
+        StorageId: storageId ?? Guid.NewGuid(),
+        CellClass: "Small",
+        Price:     "99.99",
+        CreatedAt: DateTime.UtcNow);
 
-    public static object[] PriceList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => Price()).ToArray();
+    public static List<PriceDto> PriceList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => Price()).ToList();
 
     // ── User ───────────────────────────────────────────────────────────────
 
-    public static object User(Guid? id = null) => new
-    {
-        id = id ?? Guid.NewGuid(),
-        username = "testuser",
-        name = "Test User",
-        email = "test@example.com",
-        role = "client",      // camelCase — это DA-enum, не UserRole
-        banned = false,
-        createdAt = Now(),
-        updatedAt = Now(),
-    };
+    public static UserDto User(Guid? id = null) => new(
+        Id:        id ?? Guid.NewGuid(),
+        Username:  "testuser",
+        Name:      "Test User",
+        Email:     "test@example.com",
+        Role:      UserRoleDto.Client,
+        Banned:    false,
+        CreatedAt: DateTime.UtcNow,
+        UpdatedAt: DateTime.UtcNow);
 
-    public static object[] UserList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => User()).ToArray();
+    public static List<UserDto> UserList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => User()).ToList();
 
-    public static object Me(Guid? id = null) => new
-    {
-        id = id ?? Guid.NewGuid(),
-        username = "me",
-        name = "Me User",
-        email = "me@example.com",
-        role = "client",       
-    };
+    public static MeDto Me(Guid? id = null) => new(
+        Id:       id ?? Guid.NewGuid(),
+        Username: "me",
+        Name:     "Me User",
+        Email:    "me@example.com",
+        Role:     UserRoleDto.Client);
 
     // ── Operator ───────────────────────────────────────────────────────────
 
-    public static object Operator(Guid? id = null) => new
-    {
-        id = id ?? Guid.NewGuid(),
-        username = "operator1",
-        name = "Operator One",
-        email = "op@example.com",
-        role = "ordinaryOperator",   
-        banned = false,
-        createdAt = Now(),
-        updatedAt = Now(),
-    };
+    public static OperatorDto Operator(Guid? id = null) => new(
+        Id:        id ?? Guid.NewGuid(),
+        Username:  "operator1",
+        Name:      "Operator One",
+        Email:     "op@example.com",
+        Role:      OperatorRoleDto.OrdinaryOperator,
+        Banned:    false,
+        CreatedAt: DateTime.UtcNow,
+        UpdatedAt: DateTime.UtcNow);
 
-    public static object[] OperatorList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => Operator()).ToArray();
+    public static List<OperatorDto> OperatorList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => Operator()).ToList();
 
     // ── Booking ────────────────────────────────────────────────────────────
 
-    public static object BookingForUser(Guid? id = null) => new
+    public static BookingUserDto BookingForUser(Guid? id = null)
     {
-        id = id ?? Guid.NewGuid(),
-        userId = Guid.NewGuid(),
-        storageId = Guid.NewGuid(),
-        storage = Storage(),
-        cells = CellList(1),
-        startTime = Now(),
-        bookingTime = Iso(TimeSpan.FromHours(2)),
-        createdAt = Now(),
-        status = "paid",              
-    };
+        var storageId = Guid.NewGuid();
+        return new(
+            Id:          id ?? Guid.NewGuid(),
+            UserId:      Guid.NewGuid(),
+            StorageId:   storageId,
+            Storage:     Storage(storageId),
+            Cells:       CellList(1),
+            StartTime:   DateTime.UtcNow,
+            BookingTime: TimeSpan.FromHours(2),
+            CreatedAt:   DateTime.UtcNow,
+            Status:      BookingStatusDto.Paid);
+    }
 
-    public static object[] BookingForUserList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => BookingForUser()).ToArray();
+    public static List<BookingUserDto> BookingForUserList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => BookingForUser()).ToList();
 
-    public static object BookingForOperator(Guid? id = null) => new
-    {
-        id = id ?? Guid.NewGuid(),
-        userId = Guid.NewGuid(),
-        user = new { id = Guid.NewGuid(), name = "Client Name", email = "c@e.com" },
-        storageId = Guid.NewGuid(),
-        cells = CellList(1),
-        startTime = Now(),
-        bookingTime = Iso(TimeSpan.FromHours(1)),
-        createdAt = Now(),
-        status = "created",           
-    };
+    public static BookingOperatorDto BookingForOperator(Guid? id = null) => new(
+        Id:          id ?? Guid.NewGuid(),
+        UserId:      Guid.NewGuid(),
+        User:        new BookingUserInfoDto(Guid.NewGuid(), "Client Name", "c@e.com"),
+        StorageId:   Guid.NewGuid(),
+        Cells:       CellList(1),
+        StartTime:   DateTime.UtcNow,
+        BookingTime: TimeSpan.FromHours(1),
+        CreatedAt:   DateTime.UtcNow,
+        Status:      BookingStatusDto.Created);
 
-    public static object[] BookingForOperatorList(int count = 1)
-        => Enumerable.Range(0, count).Select(_ => BookingForOperator()).ToArray();
+    public static List<BookingOperatorDto> BookingForOperatorList(int count = 1)
+        => Enumerable.Range(0, count).Select(_ => BookingForOperator()).ToList();
 
-    public static object BookingReceipt(Guid? bookingId = null) => new
-    {
-        booking = BookingForUser(bookingId),
-        receipt = "receipt.jwt.token",
-    };
+    public static BookingReceiptDto BookingReceipt(Guid? bookingId = null) => new(
+        Booking: BookingForUser(bookingId),
+        Receipt: "receipt.jwt.token");
 }

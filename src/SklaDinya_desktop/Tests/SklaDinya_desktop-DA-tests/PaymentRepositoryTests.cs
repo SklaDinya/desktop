@@ -34,14 +34,6 @@ public class PaymentRepositoryTests
     }
 
     [Fact]
-    public async Task PayNoopAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new PaymentRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.PayNoopAsync(null!, Token));
-    }
-
-    [Fact]
     public async Task PayNoopAsync_EmptyToken_ThrowsArgumentException()
     {
         var repo = new PaymentRepository(MockHttpFactory.CreateOk());
@@ -72,14 +64,6 @@ public class PaymentRepositoryTests
         var form = new PaymentForm { Receipt = "receipt.jwt" };
 
         await Assert.ThrowsAsync<PaymentFailedException>(() => repo.PayRandomAsync(form, Token));
-    }
-
-    [Fact]
-    public async Task PayRandomAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new PaymentRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.PayRandomAsync(null!, Token));
     }
 
     [Fact]

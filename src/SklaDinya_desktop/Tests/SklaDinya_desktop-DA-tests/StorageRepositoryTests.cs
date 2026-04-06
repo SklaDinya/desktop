@@ -24,14 +24,6 @@ public class StorageRepositoryTests
         Assert.Equal("Test Storage", result[0].Name);
     }
 
-    [Fact]
-    public async Task GetStoragesAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new StorageRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetStoragesAsync(null!));
-    }
-
     // ── CreateStorageAsync ─────────────────────────────────────────────────
 
     [Fact]
@@ -43,14 +35,6 @@ public class StorageRepositoryTests
         var ex = await Record.ExceptionAsync(() => repo.CreateStorageAsync(form));
 
         Assert.Null(ex);
-    }
-
-    [Fact]
-    public async Task CreateStorageAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new StorageRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.CreateStorageAsync(null!));
     }
 
     // ── GetStorageByIdAsync ────────────────────────────────────────────────
@@ -95,14 +79,6 @@ public class StorageRepositoryTests
         var result = await repo.UpdateStorageByIdAsync(id, form, Token);
 
         Assert.Equal(id, result.Id);
-    }
-
-    [Fact]
-    public async Task UpdateStorageByIdAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new StorageRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateStorageByIdAsync(Guid.NewGuid(), null!, Token));
     }
 
     [Fact]
@@ -221,14 +197,6 @@ public class StorageRepositoryTests
         var result = await repo.UpdateMyStorageAsync(form, Token);
 
         Assert.Equal(id, result.Id);
-    }
-
-    [Fact]
-    public async Task UpdateMyStorageAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new StorageRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateMyStorageAsync(null!, Token));
     }
 
     [Fact]

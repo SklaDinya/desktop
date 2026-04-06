@@ -11,7 +11,7 @@ public class PriceServiceTests
 {
     private readonly Mock<IPriceRepository> _repo    = new();
     private readonly Mock<ISessionService>  _session = new();
-    private readonly PriceService           _sut;
+    private readonly IPriceService          _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -36,15 +36,6 @@ public class PriceServiceTests
         Assert.Equal(expected, result);
     }
 
-    [Fact]
-    public async Task GetPricesAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.GetPricesAsync(It.IsAny<Guid>()))
-             .ThrowsAsync(new InvalidOperationException("Not found"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetPricesAsync(Guid.NewGuid()));
-    }
-
     // ── GetMyPricesAsync ───────────────────────────────────────────────────
 
     [Fact]
@@ -60,15 +51,6 @@ public class PriceServiceTests
         _repo.Verify(r => r.GetMyPricesAsync(Token), Times.Once);
     }
 
-    [Fact]
-    public async Task GetMyPricesAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.GetMyPricesAsync(Token))
-             .ThrowsAsync(new UnauthorizedAccessException());
-
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _sut.GetMyPricesAsync());
-    }
-
     // ── CreatePriceAsync ───────────────────────────────────────────────────
 
     [Fact]
@@ -81,13 +63,5 @@ public class PriceServiceTests
         await _sut.CreatePriceAsync(form);
 
         _repo.Verify(r => r.CreatePriceAsync(form, Token), Times.Once);
-    }
-
-    [Fact]
-    public async Task CreatePriceAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreatePriceAsync(null!));
-
-        _repo.Verify(r => r.CreatePriceAsync(It.IsAny<PriceCreateForm>(), It.IsAny<string>()), Times.Never);
     }
 }

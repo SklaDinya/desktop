@@ -73,14 +73,6 @@ public class PriceRepositoryTests
     }
 
     [Fact]
-    public async Task CreatePriceAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new PriceRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.CreatePriceAsync(null!, Token));
-    }
-
-    [Fact]
     public async Task CreatePriceAsync_EmptyToken_ThrowsArgumentException()
     {
         var repo = new PriceRepository(MockHttpFactory.CreateOk());

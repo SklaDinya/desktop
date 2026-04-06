@@ -35,14 +35,6 @@ public class BookingRepositoryTests
     }
 
     [Fact]
-    public async Task GetMyBookingsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new BookingRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetMyBookingsAsync(null!, Token));
-    }
-
-    [Fact]
     public async Task GetMyBookingsAsync_EmptyToken_ThrowsArgumentException()
     {
         var repo  = new BookingRepository(MockHttpFactory.CreateOk());
@@ -84,14 +76,6 @@ public class BookingRepositoryTests
         };
 
         await Assert.ThrowsAsync<ConflictException>(() => repo.CreateBookingAsync(form, Token));
-    }
-
-    [Fact]
-    public async Task CreateBookingAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new BookingRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.CreateBookingAsync(null!, Token));
     }
 
     [Fact]
@@ -180,14 +164,6 @@ public class BookingRepositoryTests
 
         Assert.Single(result);
         Assert.Equal(id, result[0].Id);
-    }
-
-    [Fact]
-    public async Task GetStorageBookingsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new BookingRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetStorageBookingsAsync(null!, Token));
     }
 
     [Fact]

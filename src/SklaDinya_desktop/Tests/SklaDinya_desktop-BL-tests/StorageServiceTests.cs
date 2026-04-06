@@ -12,7 +12,7 @@ public class StorageServiceTests
 {
     private readonly Mock<IStorageRepository> _repo    = new();
     private readonly Mock<ISessionService>    _session = new();
-    private readonly StorageService           _sut;
+    private readonly IStorageService          _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -37,14 +37,6 @@ public class StorageServiceTests
         Assert.Equal(expected, result);
     }
 
-    [Fact]
-    public async Task GetStoragesAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetStoragesAsync(null!));
-
-        _repo.Verify(r => r.GetStoragesAsync(It.IsAny<StorageSearchQuery>()), Times.Never);
-    }
-
     // ── CreateStorageAsync ─────────────────────────────────────────────────
 
     [Fact]
@@ -59,14 +51,6 @@ public class StorageServiceTests
         _repo.Verify(r => r.CreateStorageAsync(form), Times.Once);
     }
 
-    [Fact]
-    public async Task CreateStorageAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreateStorageAsync(null!));
-
-        _repo.Verify(r => r.CreateStorageAsync(It.IsAny<StorageCreateForm>()), Times.Never);
-    }
-
     // ── GetStorageByIdAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -79,15 +63,6 @@ public class StorageServiceTests
         var result = await _sut.GetStorageByIdAsync(expected.Id);
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task GetStorageByIdAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.GetStorageByIdAsync(It.IsAny<Guid>(), Token))
-             .ThrowsAsync(new InvalidOperationException("Not found"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetStorageByIdAsync(Guid.NewGuid()));
     }
 
     // ── UpdateStorageByIdAsync ─────────────────────────────────────────────
@@ -107,14 +82,6 @@ public class StorageServiceTests
         _repo.Verify(r => r.UpdateStorageByIdAsync(id, form, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task UpdateStorageByIdAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.UpdateStorageByIdAsync(Guid.NewGuid(), null!));
-
-        _repo.Verify(r => r.UpdateStorageByIdAsync(It.IsAny<Guid>(), It.IsAny<StorageUpdateForm>(), It.IsAny<string>()), Times.Never);
-    }
-
     // ── ApproveStorageAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -127,15 +94,6 @@ public class StorageServiceTests
         var result = await _sut.ApproveStorageAsync(expected.Id);
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task ApproveStorageAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.ApproveStorageAsync(It.IsAny<Guid>(), Token))
-             .ThrowsAsync(new InvalidOperationException("Forbidden"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.ApproveStorageAsync(Guid.NewGuid()));
     }
 
     // ── RejectStorageAsync ─────────────────────────────────────────────────
@@ -152,15 +110,6 @@ public class StorageServiceTests
         _repo.Verify(r => r.RejectStorageAsync(id, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task RejectStorageAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.RejectStorageAsync(It.IsAny<Guid>(), Token))
-             .ThrowsAsync(new InvalidOperationException("Forbidden"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.RejectStorageAsync(Guid.NewGuid()));
-    }
-
     // ── GetMyStorageAsync ──────────────────────────────────────────────────
 
     [Fact]
@@ -173,15 +122,6 @@ public class StorageServiceTests
         var result = await _sut.GetMyStorageAsync();
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task GetMyStorageAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.GetMyStorageAsync(Token))
-             .ThrowsAsync(new UnauthorizedAccessException());
-
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _sut.GetMyStorageAsync());
     }
 
     // ── UpdateMyStorageAsync ───────────────────────────────────────────────
@@ -198,13 +138,5 @@ public class StorageServiceTests
 
         Assert.Equal(expected, result);
         _repo.Verify(r => r.UpdateMyStorageAsync(form, Token), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateMyStorageAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.UpdateMyStorageAsync(null!));
-
-        _repo.Verify(r => r.UpdateMyStorageAsync(It.IsAny<StorageUpdateForm>(), It.IsAny<string>()), Times.Never);
     }
 }

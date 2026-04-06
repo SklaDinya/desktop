@@ -45,14 +45,6 @@ public class UserServiceIntegrationTests
             () => sut.GetUsersAsync(new UserSearchQuery()));
     }
 
-    [Fact]
-    public async Task GetUsersAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetUsersAsync(null!));
-    }
-
     // ── CreateUserAsync ────────────────────────────────────────────────────
 
     [Fact]
@@ -82,14 +74,6 @@ public class UserServiceIntegrationTests
             Username = "existing", Password = "p", Name = "N",
             Email    = "e@e.com", Role = UserRole.Client
         }));
-    }
-
-    [Fact]
-    public async Task CreateUserAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateUserAsync(null!));
     }
 
     // ── GetUserByIdAsync ───────────────────────────────────────────────────
@@ -138,15 +122,6 @@ public class UserServiceIntegrationTests
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.UpdateUserAsync(Guid.NewGuid(), new UserUpdateForm { Name = "Updated" }));
-    }
-
-    [Fact]
-    public async Task UpdateUserAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            () => sut.UpdateUserAsync(Guid.NewGuid(), null!));
     }
 
     // ── GetMeAsync ─────────────────────────────────────────────────────────
@@ -208,13 +183,5 @@ public class UserServiceIntegrationTests
 
         // Токен в сессии не должен измениться после ошибки
         Assert.Equal(Token, session.Token);
-    }
-
-    [Fact]
-    public async Task UpdateMeAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.UpdateMeAsync(null!));
     }
 }

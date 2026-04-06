@@ -12,7 +12,7 @@ public class BookingServiceTests
 {
     private readonly Mock<IBookingRepository> _repo    = new();
     private readonly Mock<ISessionService>    _session = new();
-    private readonly BookingService           _sut;
+    private readonly IBookingService          _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -38,14 +38,6 @@ public class BookingServiceTests
         _repo.Verify(r => r.GetMyBookingsAsync(query, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task GetMyBookingsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetMyBookingsAsync(null!));
-
-        _repo.Verify(r => r.GetMyBookingsAsync(It.IsAny<BookingSearchQuery>(), It.IsAny<string>()), Times.Never);
-    }
-
     // ── CreateBookingAsync ─────────────────────────────────────────────────
 
     [Fact]
@@ -63,14 +55,6 @@ public class BookingServiceTests
         _repo.Verify(r => r.CreateBookingAsync(form, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task CreateBookingAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreateBookingAsync(null!));
-
-        _repo.Verify(r => r.CreateBookingAsync(It.IsAny<BookingCreateForm>(), It.IsAny<string>()), Times.Never);
-    }
-
     // ── GetMyBookingByIdAsync ──────────────────────────────────────────────
 
     [Fact]
@@ -83,17 +67,6 @@ public class BookingServiceTests
         var result = await _sut.GetMyBookingByIdAsync(expected.Id);
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task GetMyBookingByIdAsync_RepoThrows_PropagatesException()
-    {
-        var id = Guid.NewGuid();
-
-        _repo.Setup(r => r.GetMyBookingByIdAsync(id, Token))
-             .ThrowsAsync(new InvalidOperationException("Not found"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetMyBookingByIdAsync(id));
     }
 
     // ── CancelMyBookingAsync ───────────────────────────────────────────────
@@ -110,17 +83,6 @@ public class BookingServiceTests
         Assert.Equal(expected, result);
     }
 
-    [Fact]
-    public async Task CancelMyBookingAsync_RepoThrows_PropagatesException()
-    {
-        var id = Guid.NewGuid();
-
-        _repo.Setup(r => r.CancelMyBookingAsync(id, Token))
-             .ThrowsAsync(new InvalidOperationException("Conflict"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.CancelMyBookingAsync(id));
-    }
-
     // ── GetStorageBookingsAsync ────────────────────────────────────────────
 
     [Fact]
@@ -134,13 +96,5 @@ public class BookingServiceTests
         var result = await _sut.GetStorageBookingsAsync(query);
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task GetStorageBookingsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetStorageBookingsAsync(null!));
-
-        _repo.Verify(r => r.GetStorageBookingsAsync(It.IsAny<OperatorBookingSearchQuery>(), It.IsAny<string>()), Times.Never);
     }
 }

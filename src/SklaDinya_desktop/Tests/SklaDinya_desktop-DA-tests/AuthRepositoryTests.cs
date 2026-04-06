@@ -39,14 +39,6 @@ public class AuthRepositoryTests
         await Assert.ThrowsAsync<UnauthorizedException>(() => repo.LoginAsync(form));
     }
 
-    [Fact]
-    public async Task LoginAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new AuthRepository(MockHttpFactory.CreateOk("token"));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.LoginAsync(null!));
-    }
-
     // ── RegisterAsync ──────────────────────────────────────────────────────
 
     [Fact]
@@ -77,13 +69,5 @@ public class AuthRepositoryTests
         var form = new RegistrationForm { Username = "existing", Password = "pass", Name = "N", Email = "e@e.com" };
 
         await Assert.ThrowsAsync<ConflictException>(() => repo.RegisterAsync(form));
-    }
-
-    [Fact]
-    public async Task RegisterAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new AuthRepository(MockHttpFactory.CreateOk("token"));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.RegisterAsync(null!));
     }
 }

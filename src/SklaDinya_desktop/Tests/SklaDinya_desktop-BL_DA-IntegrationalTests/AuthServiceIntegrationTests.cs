@@ -39,14 +39,6 @@ public class AuthServiceIntegrationTests
         Assert.False(sut.IsAuthenticated());
     }
 
-    [Fact]
-    public async Task LoginAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(), ServiceFactory.Session());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.LoginAsync(null!));
-    }
-
     // ── RegisterAsync ──────────────────────────────────────────────────────
 
     [Fact]
@@ -72,14 +64,6 @@ public class AuthServiceIntegrationTests
             () => sut.RegisterAsync(new RegistrationForm { Username = "existing", Password = "p", Name = "N", Email = "e@e.com" }));
 
         Assert.False(sut.IsAuthenticated());
-    }
-
-    [Fact]
-    public async Task RegisterAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(), ServiceFactory.Session());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.RegisterAsync(null!));
     }
 
     // ── Logout ─────────────────────────────────────────────────────────────

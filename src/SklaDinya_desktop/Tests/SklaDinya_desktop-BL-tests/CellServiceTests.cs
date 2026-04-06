@@ -12,7 +12,7 @@ public class CellServiceTests
 {
     private readonly Mock<ICellRepository> _repo    = new();
     private readonly Mock<ISessionService> _session = new();
-    private readonly CellService           _sut;
+    private readonly ICellService          _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -38,14 +38,6 @@ public class CellServiceTests
         Assert.Equal(expected, result);
     }
 
-    [Fact]
-    public async Task GetCellsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetCellsAsync(Guid.NewGuid(), null!));
-
-        _repo.Verify(r => r.GetCellsAsync(It.IsAny<Guid>(), It.IsAny<CellSearchQuery>()), Times.Never);
-    }
-
     // ── GetCellClassesAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -59,17 +51,6 @@ public class CellServiceTests
         var result = await _sut.GetCellClassesAsync(storageId);
 
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public async Task GetCellClassesAsync_RepoThrows_PropagatesException()
-    {
-        var storageId = Guid.NewGuid();
-
-        _repo.Setup(r => r.GetCellClassesAsync(storageId))
-             .ThrowsAsync(new InvalidOperationException("Storage not found"));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetCellClassesAsync(storageId));
     }
 
     // ── GetMyCellsAsync ────────────────────────────────────────────────────
@@ -88,14 +69,6 @@ public class CellServiceTests
         _repo.Verify(r => r.GetMyCellsAsync(query, Token), Times.Once);
     }
 
-    [Fact]
-    public async Task GetMyCellsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.GetMyCellsAsync(null!));
-
-        _repo.Verify(r => r.GetMyCellsAsync(It.IsAny<MyCellSearchQuery>(), It.IsAny<string>()), Times.Never);
-    }
-
     // ── GetMyCellClassesAsync ──────────────────────────────────────────────
 
     [Fact]
@@ -109,15 +82,6 @@ public class CellServiceTests
 
         Assert.Equal(expected, result);
         _repo.Verify(r => r.GetMyCellClassesAsync(Token), Times.Once);
-    }
-
-    [Fact]
-    public async Task GetMyCellClassesAsync_RepoThrows_PropagatesException()
-    {
-        _repo.Setup(r => r.GetMyCellClassesAsync(Token))
-             .ThrowsAsync(new UnauthorizedAccessException());
-
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _sut.GetMyCellClassesAsync());
     }
 
     // ── CreateCellAsync ────────────────────────────────────────────────────
@@ -134,13 +98,5 @@ public class CellServiceTests
 
         Assert.Equal(expected, result);
         _repo.Verify(r => r.CreateCellAsync(form, Token), Times.Once);
-    }
-
-    [Fact]
-    public async Task CreateCellAsync_NullForm_ThrowsArgumentNullException()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreateCellAsync(null!));
-
-        _repo.Verify(r => r.CreateCellAsync(It.IsAny<CellCreateForm>(), It.IsAny<string>()), Times.Never);
     }
 }

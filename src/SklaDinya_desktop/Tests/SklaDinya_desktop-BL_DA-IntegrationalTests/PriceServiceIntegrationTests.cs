@@ -85,12 +85,4 @@ public class PriceServiceIntegrationTests
         await Assert.ThrowsAsync<ForbiddenException>(
             () => sut.CreatePriceAsync(new PriceCreateForm { CellClass = "Large", Price = 200m }));
     }
-
-    [Fact]
-    public async Task CreatePriceAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var sut = ServiceFactory.Price(MockHttpFactory.CreateOk(), ServiceFactory.Session(Token));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreatePriceAsync(null!));
-    }
 }

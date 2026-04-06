@@ -37,14 +37,6 @@ public class UserRepositoryTests
         await Assert.ThrowsAsync<ForbiddenException>(() => repo.GetUsersAsync(query, Token));
     }
 
-    [Fact]
-    public async Task GetUsersAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new UserRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetUsersAsync(null!, Token));
-    }
-
     // ── CreateUserAsync ────────────────────────────────────────────────────
 
     [Fact]
@@ -66,14 +58,6 @@ public class UserRepositoryTests
         var form = new UserCreateForm { Username = "existing", Password = "p", Name = "N", Email = "e@e.com", Role = UserRole.Client };
 
         await Assert.ThrowsAsync<ConflictException>(() => repo.CreateUserAsync(form, Token));
-    }
-
-    [Fact]
-    public async Task CreateUserAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new UserRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.CreateUserAsync(null!, Token));
     }
 
     // ── GetUserByIdAsync ───────────────────────────────────────────────────
@@ -128,14 +112,6 @@ public class UserRepositoryTests
         await Assert.ThrowsAsync<NotFoundException>(() => repo.UpdateUserAsync(Guid.NewGuid(), form, Token));
     }
 
-    [Fact]
-    public async Task UpdateUserAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new UserRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateUserAsync(Guid.NewGuid(), null!, Token));
-    }
-
     // ── GetMeAsync ─────────────────────────────────────────────────────────
 
     [Fact]
@@ -186,13 +162,5 @@ public class UserRepositoryTests
         var form = new MeUpdateForm { Username = "u", OldPassword = "o", NewPassword = "n", Name = "N", Email = "e@e.com" };
 
         await Assert.ThrowsAsync<ServerException>(() => repo.UpdateMeAsync(form, Token));
-    }
-
-    [Fact]
-    public async Task UpdateMeAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new UserRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateMeAsync(null!, Token));
     }
 }

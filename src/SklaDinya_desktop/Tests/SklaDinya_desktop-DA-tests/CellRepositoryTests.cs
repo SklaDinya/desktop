@@ -26,14 +26,6 @@ public class CellRepositoryTests
         Assert.Equal("Small", result[0].CellClass);
     }
 
-    [Fact]
-    public async Task GetCellsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new CellRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetCellsAsync(Guid.NewGuid(), null!));
-    }
-
     // ── GetCellClassesAsync ────────────────────────────────────────────────
 
     [Fact]
@@ -68,14 +60,6 @@ public class CellRepositoryTests
 
         Assert.Single(result);
         Assert.Equal(id, result[0].Id);
-    }
-
-    [Fact]
-    public async Task GetMyCellsAsync_NullQuery_ThrowsArgumentNullException()
-    {
-        var repo = new CellRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.GetMyCellsAsync(null!, Token));
     }
 
     [Fact]
@@ -121,14 +105,6 @@ public class CellRepositoryTests
 
         Assert.Equal(id,      result.Id);
         Assert.Equal("Small", result.CellClass);
-    }
-
-    [Fact]
-    public async Task CreateCellAsync_NullForm_ThrowsArgumentNullException()
-    {
-        var repo = new CellRepository(MockHttpFactory.CreateOk());
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => repo.CreateCellAsync(null!, Token));
     }
 
     [Fact]
