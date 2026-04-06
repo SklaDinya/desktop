@@ -31,7 +31,7 @@ internal static class JwtTestHelper
 
     /// <summary>JWT оператора — поле "OperatorRole" совпадает с TryGetProperty("OperatorRole") в JwtHelper.</summary>
     public static string OperatorToken()
-        => Build("""{"userId":"00000000-0000-0000-0000-000000000003","userRole":"StorageOperator","storageId":"00000000-0000-0000-0000-000000000010","OperatorRole":"MainOperator"}""");
+        => Build("""{"userId":"00000000-0000-0000-0000-000000000003","userRole":"StorageOperator","storageId":"00000000-0000-0000-0000-000000000010","operatorRole":"MainOperator"}""");
 
     private static string Base64Encode(byte[] bytes)
         => Convert.ToBase64String(bytes);
