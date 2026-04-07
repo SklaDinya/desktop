@@ -11,11 +11,11 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class UserServiceTests
 {
-    private readonly Mock<IUserRepository> _repo    = new();
+    private readonly Mock<IUserRepository> _repo = new();
     private readonly Mock<ISessionService> _session = new();
-    private readonly IUserService          _sut;
+    private readonly IUserService _sut;
 
-    private const string Token    = "test.jwt.token";
+    private const string Token = "test.jwt.token";
     private const string NewToken = "new.jwt.token";
 
     public UserServiceTests()
@@ -29,7 +29,7 @@ public class UserServiceTests
     [Fact]
     public async Task GetUsersAsync_ValidQuery_ReturnsUsers()
     {
-        var query    = new UserSearchQuery { PageNumber = 1, PageSize = 10 };
+        var query = new UserSearchQuery { PageNumber = 1, PageSize = 10 };
         var expected = new List<SklaDinya_desktop_BL_component.Models.UserModel> { ModelBuilder.User() };
 
         _repo.Setup(r => r.GetUsersAsync(query, Token)).ReturnsAsync(expected);
@@ -45,7 +45,7 @@ public class UserServiceTests
     [Fact]
     public async Task CreateUserAsync_ValidForm_ReturnsCreatedUser()
     {
-        var form     = new UserCreateForm { Username = "u", Password = "p", Name = "N", Email = "e@e.com", Role = UserRole.Client };
+        var form = new UserCreateForm { Username = "u", Password = "p", Name = "N", Email = "e@e.com", Role = UserRole.Client };
         var expected = ModelBuilder.User();
 
         _repo.Setup(r => r.CreateUserAsync(form, Token)).ReturnsAsync(expected);
@@ -75,8 +75,8 @@ public class UserServiceTests
     [Fact]
     public async Task UpdateUserAsync_ValidArgs_ReturnsUpdatedUser()
     {
-        var id       = Guid.NewGuid();
-        var form     = new UserUpdateForm { Name = "New Name" };
+        var id = Guid.NewGuid();
+        var form = new UserUpdateForm { Name = "New Name" };
         var expected = ModelBuilder.User(id);
 
         _repo.Setup(r => r.UpdateUserAsync(id, form, Token)).ReturnsAsync(expected);

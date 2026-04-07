@@ -16,7 +16,7 @@ internal static class JwtTestHelper
 {
     public static string Build(string payloadJson)
     {
-        var header  = Base64Encode("{\"alg\":\"HS256\",\"typ\":\"JWT\"}"u8.ToArray());
+        var header = Base64Encode("{\"alg\":\"HS256\",\"typ\":\"JWT\"}"u8.ToArray());
         var payload = Base64Encode(System.Text.Encoding.UTF8.GetBytes(payloadJson));
         return $"{header}.{payload}.fakesignature";
     }

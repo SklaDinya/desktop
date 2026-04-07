@@ -10,10 +10,10 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class PaymentServiceTests
 {
-    private readonly Mock<IPaymentRepository> _repo           = new();
-    private readonly Mock<IBookingService>    _bookingService = new();
-    private readonly Mock<ISessionService>    _session        = new();
-    private readonly IPaymentService          _sut;
+    private readonly Mock<IPaymentRepository> _repo = new();
+    private readonly Mock<IBookingService> _bookingService = new();
+    private readonly Mock<ISessionService> _session = new();
+    private readonly IPaymentService _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -28,7 +28,7 @@ public class PaymentServiceTests
     [Fact]
     public async Task PayNoopAsync_WithLastReceipt_CallsRepoWithReceiptAndReturnsBookings()
     {
-        var receipt  = ModelBuilder.BookingReceipt();
+        var receipt = ModelBuilder.BookingReceipt();
         var expected = new List<BookingModel> { ModelBuilder.Booking() };
 
         _bookingService.Setup(b => b.LastReceipt).Returns(receipt);
@@ -57,7 +57,7 @@ public class PaymentServiceTests
     [Fact]
     public async Task PayRandomAsync_WithLastReceipt_CallsRepoWithReceiptAndReturnsBookings()
     {
-        var receipt  = ModelBuilder.BookingReceipt();
+        var receipt = ModelBuilder.BookingReceipt();
         var expected = new List<BookingModel> { ModelBuilder.Booking() };
 
         _bookingService.Setup(b => b.LastReceipt).Returns(receipt);

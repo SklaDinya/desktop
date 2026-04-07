@@ -16,8 +16,8 @@ public class OperatorRepositoryTests
     [Fact]
     public async Task GetOperatorsAsync_ServerReturnsOk_ReturnsMappedList()
     {
-        var id    = Guid.NewGuid();
-        var repo  = new OperatorRepository(MockHttpFactory.CreateOk(new[] { FakeDto.Operator(id) }));
+        var id = Guid.NewGuid();
+        var repo = new OperatorRepository(MockHttpFactory.CreateOk(new[] { FakeDto.Operator(id) }));
         var query = new OperatorSearchQuery { PageNumber = 1, PageSize = 10 };
 
         var result = await repo.GetOperatorsAsync(query, Token);
@@ -29,7 +29,7 @@ public class OperatorRepositoryTests
     [Fact]
     public async Task GetOperatorsAsync_EmptyToken_ThrowsArgumentException()
     {
-        var repo  = new OperatorRepository(MockHttpFactory.CreateOk());
+        var repo = new OperatorRepository(MockHttpFactory.CreateOk());
         var query = new OperatorSearchQuery { PageNumber = 1, PageSize = 10 };
 
         await Assert.ThrowsAsync<ArgumentException>(() => repo.GetOperatorsAsync(query, ""));
@@ -40,12 +40,15 @@ public class OperatorRepositoryTests
     [Fact]
     public async Task CreateOperatorAsync_ValidArgs_ReturnsMappedOperator()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new OperatorRepository(MockHttpFactory.CreateOk(FakeDto.Operator(id)));
         var form = new OperatorCreateForm
         {
-            Username = "op", Password = "p", Name = "N",
-            Email    = "e@e.com", Role = OperatorRole.OrdinaryOperator
+            Username = "op",
+            Password = "p",
+            Name = "N",
+            Email = "e@e.com",
+            Role = OperatorRole.OrdinaryOperator
         };
 
         var result = await repo.CreateOperatorAsync(form, Token);
@@ -59,8 +62,11 @@ public class OperatorRepositoryTests
         var repo = new OperatorRepository(MockHttpFactory.CreateConflict());
         var form = new OperatorCreateForm
         {
-            Username = "existing", Password = "p", Name = "N",
-            Email    = "e@e.com", Role = OperatorRole.OrdinaryOperator
+            Username = "existing",
+            Password = "p",
+            Name = "N",
+            Email = "e@e.com",
+            Role = OperatorRole.OrdinaryOperator
         };
 
         await Assert.ThrowsAsync<ConflictException>(() => repo.CreateOperatorAsync(form, Token));
@@ -71,7 +77,7 @@ public class OperatorRepositoryTests
     [Fact]
     public async Task GetOperatorByIdAsync_ValidArgs_ReturnsMappedOperator()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new OperatorRepository(MockHttpFactory.CreateOk(FakeDto.Operator(id)));
 
         var result = await repo.GetOperatorByIdAsync(id, Token);
@@ -100,7 +106,7 @@ public class OperatorRepositoryTests
     [Fact]
     public async Task UpdateOperatorAsync_ValidArgs_ReturnsMappedOperator()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new OperatorRepository(MockHttpFactory.CreateOk(FakeDto.Operator(id)));
         var form = new OperatorUpdateForm { Name = "Updated" };
 

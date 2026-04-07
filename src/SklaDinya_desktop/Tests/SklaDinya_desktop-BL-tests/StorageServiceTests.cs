@@ -10,9 +10,9 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class StorageServiceTests
 {
-    private readonly Mock<IStorageRepository> _repo    = new();
-    private readonly Mock<ISessionService>    _session = new();
-    private readonly IStorageService          _sut;
+    private readonly Mock<IStorageRepository> _repo = new();
+    private readonly Mock<ISessionService> _session = new();
+    private readonly IStorageService _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -27,7 +27,7 @@ public class StorageServiceTests
     [Fact]
     public async Task GetStoragesAsync_ValidQuery_ReturnsStorages()
     {
-        var query    = new StorageSearchQuery { PageNumber = 1, PageSize = 10 };
+        var query = new StorageSearchQuery { PageNumber = 1, PageSize = 10 };
         var expected = new List<SklaDinya_desktop_BL_component.Models.StorageModel> { ModelBuilder.Storage() };
 
         _repo.Setup(r => r.GetStoragesAsync(query)).ReturnsAsync(expected);
@@ -70,8 +70,8 @@ public class StorageServiceTests
     [Fact]
     public async Task UpdateStorageByIdAsync_ValidArgs_ReturnsUpdatedStorage()
     {
-        var id       = Guid.NewGuid();
-        var form     = new StorageUpdateForm { Name = "New" };
+        var id = Guid.NewGuid();
+        var form = new StorageUpdateForm { Name = "New" };
         var expected = ModelBuilder.Storage(id);
 
         _repo.Setup(r => r.UpdateStorageByIdAsync(id, form, Token)).ReturnsAsync(expected);
@@ -129,7 +129,7 @@ public class StorageServiceTests
     [Fact]
     public async Task UpdateMyStorageAsync_ValidForm_ReturnsUpdatedStorage()
     {
-        var form     = new StorageUpdateForm { Name = "Updated" };
+        var form = new StorageUpdateForm { Name = "Updated" };
         var expected = ModelBuilder.Storage();
 
         _repo.Setup(r => r.UpdateMyStorageAsync(form, Token)).ReturnsAsync(expected);

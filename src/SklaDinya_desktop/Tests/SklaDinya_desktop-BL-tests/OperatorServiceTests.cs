@@ -11,9 +11,9 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class OperatorServiceTests
 {
-    private readonly Mock<IOperatorRepository> _repo    = new();
-    private readonly Mock<ISessionService>     _session = new();
-    private readonly IOperatorService          _sut;
+    private readonly Mock<IOperatorRepository> _repo = new();
+    private readonly Mock<ISessionService> _session = new();
+    private readonly IOperatorService _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -28,7 +28,7 @@ public class OperatorServiceTests
     [Fact]
     public async Task GetOperatorsAsync_ValidQuery_ReturnsOperators()
     {
-        var query    = new OperatorSearchQuery { PageNumber = 1, PageSize = 10 };
+        var query = new OperatorSearchQuery { PageNumber = 1, PageSize = 10 };
         var expected = new List<SklaDinya_desktop_BL_component.Models.OperatorModel> { ModelBuilder.Operator() };
 
         _repo.Setup(r => r.GetOperatorsAsync(query, Token)).ReturnsAsync(expected);
@@ -44,7 +44,7 @@ public class OperatorServiceTests
     [Fact]
     public async Task CreateOperatorAsync_ValidForm_ReturnsCreatedOperator()
     {
-        var form     = new OperatorCreateForm { Username = "op1", Password = "p", Name = "Op", Email = "op@e.com", Role = OperatorRole.OrdinaryOperator };
+        var form = new OperatorCreateForm { Username = "op1", Password = "p", Name = "Op", Email = "op@e.com", Role = OperatorRole.OrdinaryOperator };
         var expected = ModelBuilder.Operator();
 
         _repo.Setup(r => r.CreateOperatorAsync(form, Token)).ReturnsAsync(expected);
@@ -74,8 +74,8 @@ public class OperatorServiceTests
     [Fact]
     public async Task UpdateOperatorAsync_ValidArgs_ReturnsUpdatedOperator()
     {
-        var id       = Guid.NewGuid();
-        var form     = new OperatorUpdateForm { Name = "New Name" };
+        var id = Guid.NewGuid();
+        var form = new OperatorUpdateForm { Name = "New Name" };
         var expected = ModelBuilder.Operator(id);
 
         _repo.Setup(r => r.UpdateOperatorAsync(id, form, Token)).ReturnsAsync(expected);

@@ -10,9 +10,9 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class BookingServiceTests
 {
-    private readonly Mock<IBookingRepository> _repo    = new();
-    private readonly Mock<ISessionService>    _session = new();
-    private readonly IBookingService          _sut;
+    private readonly Mock<IBookingRepository> _repo = new();
+    private readonly Mock<ISessionService> _session = new();
+    private readonly IBookingService _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -27,7 +27,7 @@ public class BookingServiceTests
     [Fact]
     public async Task GetMyBookingsAsync_ValidQuery_ReturnsBookings()
     {
-        var query    = new BookingSearchQuery { PageNumber = 1, PageSize = 10 };
+        var query = new BookingSearchQuery { PageNumber = 1, PageSize = 10 };
         var expected = new List<SklaDinya_desktop_BL_component.Models.BookingModel> { ModelBuilder.Booking() };
 
         _repo.Setup(r => r.GetMyBookingsAsync(query, Token)).ReturnsAsync(expected);
@@ -43,7 +43,7 @@ public class BookingServiceTests
     [Fact]
     public async Task CreateBookingAsync_ValidForm_ReturnsBookingAndSavesReceipt()
     {
-        var form    = new BookingCreateForm { StorageId = Guid.NewGuid(), CellIds = [Guid.NewGuid()], StartTime = DateTime.UtcNow, BookingTime = TimeSpan.FromHours(2) };
+        var form = new BookingCreateForm { StorageId = Guid.NewGuid(), CellIds = [Guid.NewGuid()], StartTime = DateTime.UtcNow, BookingTime = TimeSpan.FromHours(2) };
         var receipt = ModelBuilder.BookingReceipt();
 
         _repo.Setup(r => r.CreateBookingAsync(form, Token)).ReturnsAsync(receipt);
@@ -51,7 +51,7 @@ public class BookingServiceTests
         var result = await _sut.CreateBookingAsync(form);
 
         Assert.Equal(receipt.Booking, result);
-        Assert.Equal(receipt,         _sut.LastReceipt);
+        Assert.Equal(receipt, _sut.LastReceipt);
         _repo.Verify(r => r.CreateBookingAsync(form, Token), Times.Once);
     }
 
@@ -88,7 +88,7 @@ public class BookingServiceTests
     [Fact]
     public async Task GetStorageBookingsAsync_ValidQuery_ReturnsOperatorBookings()
     {
-        var query    = new OperatorBookingSearchQuery { StartBooking = DateTime.UtcNow, EndBooking = DateTime.UtcNow.AddDays(1), PageNumber = 1, PageSize = 10 };
+        var query = new OperatorBookingSearchQuery { StartBooking = DateTime.UtcNow, EndBooking = DateTime.UtcNow.AddDays(1), PageNumber = 1, PageSize = 10 };
         var expected = new List<SklaDinya_desktop_BL_component.Models.BookingOperatorModel> { ModelBuilder.BookingOperator() };
 
         _repo.Setup(r => r.GetStorageBookingsAsync(query, Token)).ReturnsAsync(expected);

@@ -17,9 +17,9 @@ public class AuthServiceIntegrationTests
     [Fact]
     public async Task LoginAsync_ServerReturnsToken_TokenSavedInSession()
     {
-        var token   = FakeDto.Token();
+        var token = FakeDto.Token();
         var session = ServiceFactory.Session();
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateOk(token), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(token), session);
 
         await sut.LoginAsync(new LoginForm { Username = "user", Password = "pass" });
 
@@ -31,7 +31,7 @@ public class AuthServiceIntegrationTests
     public async Task LoginAsync_ServerReturnsUnauthorized_ThrowsUnauthorizedExceptionAndSessionEmpty()
     {
         var session = ServiceFactory.Session();
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateUnauthorized(), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateUnauthorized(), session);
 
         await Assert.ThrowsAsync<UnauthorizedException>(
             () => sut.LoginAsync(new LoginForm { Username = "wrong", Password = "wrong" }));
@@ -44,9 +44,9 @@ public class AuthServiceIntegrationTests
     [Fact]
     public async Task RegisterAsync_ServerReturnsToken_TokenSavedInSession()
     {
-        var token   = FakeDto.Token();
+        var token = FakeDto.Token();
         var session = ServiceFactory.Session();
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateOk(token), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(token), session);
 
         await sut.RegisterAsync(new RegistrationForm { Username = "new", Password = "pass", Name = "N", Email = "e@e.com" });
 
@@ -58,7 +58,7 @@ public class AuthServiceIntegrationTests
     public async Task RegisterAsync_ServerReturnsConflict_ThrowsConflictExceptionAndSessionEmpty()
     {
         var session = ServiceFactory.Session();
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateConflict(), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateConflict(), session);
 
         await Assert.ThrowsAsync<ConflictException>(
             () => sut.RegisterAsync(new RegistrationForm { Username = "existing", Password = "p", Name = "N", Email = "e@e.com" }));
@@ -72,7 +72,7 @@ public class AuthServiceIntegrationTests
     public void Logout_AfterLogin_SessionCleared()
     {
         var session = ServiceFactory.Session(FakeDto.Token());
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateOk(), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(), session);
 
         sut.Logout();
 
@@ -86,7 +86,7 @@ public class AuthServiceIntegrationTests
     public void IsAuthenticated_WithToken_ReturnsTrue()
     {
         var session = ServiceFactory.Session(FakeDto.Token());
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateOk(), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(), session);
 
         Assert.True(sut.IsAuthenticated());
     }
@@ -95,7 +95,7 @@ public class AuthServiceIntegrationTests
     public void IsAuthenticated_WithoutToken_ReturnsFalse()
     {
         var session = ServiceFactory.Session();
-        var sut     = ServiceFactory.Auth(MockHttpFactory.CreateOk(), session);
+        var sut = ServiceFactory.Auth(MockHttpFactory.CreateOk(), session);
 
         Assert.False(sut.IsAuthenticated());
     }

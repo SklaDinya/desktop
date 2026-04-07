@@ -17,7 +17,7 @@ public class SessionServiceTests
 
         _sut.SetToken(token);
 
-        Assert.Equal(token,          _sut.Token);
+        Assert.Equal(token, _sut.Token);
         Assert.NotNull(_sut.Payload);
         Assert.Equal(UserRole.Client, _sut.CurrentRole);
     }

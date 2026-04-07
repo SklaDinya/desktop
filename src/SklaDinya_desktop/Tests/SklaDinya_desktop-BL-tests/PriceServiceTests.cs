@@ -9,9 +9,9 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class PriceServiceTests
 {
-    private readonly Mock<IPriceRepository> _repo    = new();
-    private readonly Mock<ISessionService>  _session = new();
-    private readonly IPriceService          _sut;
+    private readonly Mock<IPriceRepository> _repo = new();
+    private readonly Mock<ISessionService> _session = new();
+    private readonly IPriceService _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -27,7 +27,7 @@ public class PriceServiceTests
     public async Task GetPricesAsync_ValidStorageId_ReturnsPrices()
     {
         var storageId = Guid.NewGuid();
-        var expected  = new List<SklaDinya_desktop_BL_component.Models.PriceModel> { ModelBuilder.Price(storageId) };
+        var expected = new List<SklaDinya_desktop_BL_component.Models.PriceModel> { ModelBuilder.Price(storageId) };
 
         _repo.Setup(r => r.GetPricesAsync(storageId)).ReturnsAsync(expected);
 

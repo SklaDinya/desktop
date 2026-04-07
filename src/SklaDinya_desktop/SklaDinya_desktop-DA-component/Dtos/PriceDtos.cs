@@ -5,9 +5,9 @@ namespace SklaDinya_desktop_DA_component.Dtos;
 /// Price приходит как decimal128 (строка), парсинг — в маппере.
 /// </summary>
 public record PriceDto(
-    Guid     StorageId,
-    string   CellClass,
-    string   Price,
+    Guid StorageId,
+    string CellClass,
+    string Price,
     DateTime CreatedAt);
 
 /// <summary>

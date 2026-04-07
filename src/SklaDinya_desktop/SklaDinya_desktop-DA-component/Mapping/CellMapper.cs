@@ -1,4 +1,3 @@
-using SklaDinya_desktop_BL_component.Exceptions;
 using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
@@ -11,14 +10,14 @@ internal static partial class Mapper
 
     public static CellModel ToCell(CellDto dto)
     {
-        var name      = RequireNonEmpty(dto.Name,      "cell.name");
+        var name = RequireNonEmpty(dto.Name, "cell.name");
         var cellClass = RequireNonEmpty(dto.CellClass, "cell.cellClass");
 
         return new CellModel
         {
-            Id        = dto.Id,
+            Id = dto.Id,
             StorageId = dto.StorageId,
-            Name      = name,
+            Name = name,
             CellClass = cellClass,
             CreatedAt = dto.CreatedAt,
         };

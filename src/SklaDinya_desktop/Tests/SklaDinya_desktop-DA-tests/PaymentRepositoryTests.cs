@@ -14,7 +14,7 @@ public class PaymentRepositoryTests
     [Fact]
     public async Task PayNoopAsync_ServerReturnsOk_ReturnsPaidBookings()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new PaymentRepository(MockHttpFactory.CreateOk(new[] { FakeDto.BookingForUser(id) }));
         var form = new PaymentForm { Receipt = "receipt.jwt" };
 
@@ -47,7 +47,7 @@ public class PaymentRepositoryTests
     [Fact]
     public async Task PayRandomAsync_ServerReturnsOk_ReturnsPaidBookings()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new PaymentRepository(MockHttpFactory.CreateOk(new[] { FakeDto.BookingForUser(id) }));
         var form = new PaymentForm { Receipt = "receipt.jwt" };
 

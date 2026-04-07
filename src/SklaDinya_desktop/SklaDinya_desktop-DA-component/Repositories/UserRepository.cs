@@ -25,12 +25,12 @@ public class UserRepository(ApiClient client) : IUserRepository
             : (Enums.UserRoleDto?)null;
 
         var url = new QueryBuilder("/api/v1/users")
-            .Add("username",   query.Username)
-            .Add("name",       query.Name)
-            .Add("email",      query.Email)
-            .AddEnum("role",   roleDto)
+            .Add("username", query.Username)
+            .Add("name", query.Name)
+            .Add("email", query.Email)
+            .AddEnum("role", roleDto)
             .Add("pageNumber", query.PageNumber)
-            .Add("pageSize",   query.PageSize)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<UserDto>>(url, token);
@@ -44,7 +44,7 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToUserCreateRequest(form);
-        var dto  = await client.PostAsync<UserDto>("/api/v1/users", body, token);
+        var dto = await client.PostAsync<UserDto>("/api/v1/users", body, token);
         return Mapper.ToUser(dto);
     }
 
@@ -64,7 +64,7 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToUserUpdateRequest(form);
-        var dto  = await client.PatchAsync<UserDto>($"/api/v1/users/{userId}", body, token);
+        var dto = await client.PatchAsync<UserDto>($"/api/v1/users/{userId}", body, token);
         return Mapper.ToUser(dto);
     }
 
@@ -83,7 +83,7 @@ public class UserRepository(ApiClient client) : IUserRepository
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
-        var body     = Mapper.ToMeUpdateRequest(form);
+        var body = Mapper.ToMeUpdateRequest(form);
         var newToken = await client.PatchAsync<string>("/api/v1/users/me", body, token);
 
         if (string.IsNullOrWhiteSpace(newToken))

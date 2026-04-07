@@ -12,15 +12,15 @@ internal static partial class Mapper
 
     public static BookingModel ToBooking(BookingUserDto dto) => new()
     {
-        Id          = dto.Id,
-        UserId      = dto.UserId,
-        StorageId   = dto.StorageId,
-        Storage     = ToStorage(dto.Storage),
-        Cells       = dto.Cells.Select(ToCell).ToList(),
-        StartTime   = dto.StartTime,
+        Id = dto.Id,
+        UserId = dto.UserId,
+        StorageId = dto.StorageId,
+        Storage = ToStorage(dto.Storage),
+        Cells = dto.Cells.Select(ToCell).ToList(),
+        StartTime = dto.StartTime,
         BookingTime = dto.BookingTime,
-        CreatedAt   = dto.CreatedAt,
-        Status      = ToBookingStatus(dto.Status),
+        CreatedAt = dto.CreatedAt,
+        Status = ToBookingStatus(dto.Status),
     };
 
     public static List<BookingModel> ToBookingList(List<BookingUserDto> dtos) =>
@@ -28,15 +28,15 @@ internal static partial class Mapper
 
     public static BookingOperatorModel ToBookingOperator(BookingOperatorDto dto) => new()
     {
-        Id          = dto.Id,
-        UserId      = dto.UserId,
-        User        = ToBookingUser(dto.User),
-        StorageId   = dto.StorageId,
-        Cells       = dto.Cells.Select(ToCell).ToList(),
-        StartTime   = dto.StartTime,
+        Id = dto.Id,
+        UserId = dto.UserId,
+        User = ToBookingUser(dto.User),
+        StorageId = dto.StorageId,
+        Cells = dto.Cells.Select(ToCell).ToList(),
+        StartTime = dto.StartTime,
         BookingTime = dto.BookingTime,
-        CreatedAt   = dto.CreatedAt,
-        Status      = ToBookingStatus(dto.Status),
+        CreatedAt = dto.CreatedAt,
+        Status = ToBookingStatus(dto.Status),
     };
 
     public static List<BookingOperatorModel> ToBookingOperatorList(List<BookingOperatorDto> dtos) =>
@@ -44,8 +44,8 @@ internal static partial class Mapper
 
     public static BookingUserModel ToBookingUser(BookingUserInfoDto dto) => new()
     {
-        Id    = dto.Id,
-        Name  = dto.Name,
+        Id = dto.Id,
+        Name = dto.Name,
         Email = dto.Email,
     };
 
@@ -62,11 +62,11 @@ internal static partial class Mapper
 
     public static BookingStatusDto ToBookingStatusDto(BookingStatus status) => status switch
     {
-        BookingStatus.Created   => BookingStatusDto.Created,
-        BookingStatus.Paid      => BookingStatusDto.Paid,
+        BookingStatus.Created => BookingStatusDto.Created,
+        BookingStatus.Paid => BookingStatusDto.Paid,
         BookingStatus.InProcess => BookingStatusDto.InProcess,
-        BookingStatus.Finished  => BookingStatusDto.Finished,
-        BookingStatus.Canceled  => BookingStatusDto.Canceled,
+        BookingStatus.Finished => BookingStatusDto.Finished,
+        BookingStatus.Canceled => BookingStatusDto.Canceled,
         _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный BookingStatus: {status}")
     };
 
@@ -74,11 +74,11 @@ internal static partial class Mapper
 
     private static BookingStatus ToBookingStatus(BookingStatusDto status) => status switch
     {
-        BookingStatusDto.Created   => BookingStatus.Created,
-        BookingStatusDto.Paid      => BookingStatus.Paid,
+        BookingStatusDto.Created => BookingStatus.Created,
+        BookingStatusDto.Paid => BookingStatus.Paid,
         BookingStatusDto.InProcess => BookingStatus.InProcess,
-        BookingStatusDto.Finished  => BookingStatus.Finished,
-        BookingStatusDto.Canceled  => BookingStatus.Canceled,
+        BookingStatusDto.Finished => BookingStatus.Finished,
+        BookingStatusDto.Canceled => BookingStatus.Canceled,
         _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный BookingStatusDto: {status}")
     };
 }

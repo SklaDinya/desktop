@@ -19,15 +19,15 @@ public class OperatorServiceIntegrationTests
     [Fact]
     public async Task GetOperatorsAsync_ServerReturnsOk_ReturnsMappedList()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(
+        var sut = ServiceFactory.Operator(
             MockHttpFactory.CreateOk(new[] { FakeDto.Operator(id) }), session);
 
         var result = await sut.GetOperatorsAsync(new OperatorSearchQuery { PageNumber = 1, PageSize = 10 });
 
         Assert.Single(result);
-        Assert.Equal(id,                           result[0].Id);
+        Assert.Equal(id, result[0].Id);
         Assert.Equal(OperatorRole.OrdinaryOperator, result[0].Role);
     }
 
@@ -35,7 +35,7 @@ public class OperatorServiceIntegrationTests
     public async Task GetOperatorsAsync_ServerReturnsForbidden_ThrowsForbiddenException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateForbidden(), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateForbidden(), session);
 
         await Assert.ThrowsAsync<ForbiddenException>(
             () => sut.GetOperatorsAsync(new OperatorSearchQuery()));
@@ -46,14 +46,17 @@ public class OperatorServiceIntegrationTests
     [Fact]
     public async Task CreateOperatorAsync_ServerReturnsOk_ReturnsMappedOperator()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateOk(FakeDto.Operator(id)), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateOk(FakeDto.Operator(id)), session);
 
         var result = await sut.CreateOperatorAsync(new OperatorCreateForm
         {
-            Username = "op", Password = "p", Name = "N",
-            Email    = "e@e.com", Role = OperatorRole.OrdinaryOperator
+            Username = "op",
+            Password = "p",
+            Name = "N",
+            Email = "e@e.com",
+            Role = OperatorRole.OrdinaryOperator
         });
 
         Assert.Equal(id, result.Id);
@@ -63,12 +66,15 @@ public class OperatorServiceIntegrationTests
     public async Task CreateOperatorAsync_ServerReturnsConflict_ThrowsConflictException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateConflict(), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateConflict(), session);
 
         await Assert.ThrowsAsync<ConflictException>(() => sut.CreateOperatorAsync(new OperatorCreateForm
         {
-            Username = "existing", Password = "p", Name = "N",
-            Email    = "e@e.com", Role = OperatorRole.OrdinaryOperator
+            Username = "existing",
+            Password = "p",
+            Name = "N",
+            Email = "e@e.com",
+            Role = OperatorRole.OrdinaryOperator
         }));
     }
 
@@ -77,13 +83,13 @@ public class OperatorServiceIntegrationTests
     [Fact]
     public async Task GetOperatorByIdAsync_ServerReturnsOk_ReturnsMappedOperator()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateOk(FakeDto.Operator(id)), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateOk(FakeDto.Operator(id)), session);
 
         var result = await sut.GetOperatorByIdAsync(id);
 
-        Assert.Equal(id,          result.Id);
+        Assert.Equal(id, result.Id);
         Assert.Equal("operator1", result.Username);
     }
 
@@ -91,7 +97,7 @@ public class OperatorServiceIntegrationTests
     public async Task GetOperatorByIdAsync_ServerReturnsNotFound_ThrowsNotFoundException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateNotFound(), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateNotFound(), session);
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.GetOperatorByIdAsync(Guid.NewGuid()));
@@ -102,9 +108,9 @@ public class OperatorServiceIntegrationTests
     [Fact]
     public async Task UpdateOperatorAsync_ServerReturnsOk_ReturnsMappedOperator()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateOk(FakeDto.Operator(id)), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateOk(FakeDto.Operator(id)), session);
 
         var result = await sut.UpdateOperatorAsync(id, new OperatorUpdateForm { Name = "Updated" });
 
@@ -115,7 +121,7 @@ public class OperatorServiceIntegrationTests
     public async Task UpdateOperatorAsync_ServerReturnsNotFound_ThrowsNotFoundException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Operator(MockHttpFactory.CreateNotFound(), session);
+        var sut = ServiceFactory.Operator(MockHttpFactory.CreateNotFound(), session);
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.UpdateOperatorAsync(Guid.NewGuid(), new OperatorUpdateForm { Name = "Updated" }));

@@ -1,10 +1,10 @@
+using SklaDinya_desktop_BL_component.Exceptions;
+using SklaDinya_desktop_DA_component.Converters;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SklaDinya_desktop_BL_component.Exceptions;
-using SklaDinya_desktop_DA_component.Converters;
 
 namespace SklaDinya_desktop_DA_component.Http;
 
@@ -18,7 +18,7 @@ public class ApiClient(HttpClient http)
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy        = JsonNamingPolicy.CamelCase,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters =
         {
             new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
@@ -30,7 +30,7 @@ public class ApiClient(HttpClient http)
 
     public async Task<T> GetAsync<T>(string url, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Get, url, token);
+        using var request = BuildRequest(HttpMethod.Get, url, token);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
         return await DeserializeAsync<T>(response);
@@ -40,7 +40,7 @@ public class ApiClient(HttpClient http)
 
     public async Task<T> PostAsync<T>(string url, object body, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Post, url, token, body);
+        using var request = BuildRequest(HttpMethod.Post, url, token, body);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
         return await DeserializeAsync<T>(response);
@@ -48,7 +48,7 @@ public class ApiClient(HttpClient http)
 
     public async Task PostAsync(string url, object body, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Post, url, token, body);
+        using var request = BuildRequest(HttpMethod.Post, url, token, body);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
     }
@@ -57,7 +57,7 @@ public class ApiClient(HttpClient http)
 
     public async Task<T> PatchAsync<T>(string url, object body, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Patch, url, token, body);
+        using var request = BuildRequest(HttpMethod.Patch, url, token, body);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
         return await DeserializeAsync<T>(response);
@@ -66,7 +66,7 @@ public class ApiClient(HttpClient http)
     /// <summary>PATCH без тела — для эндпоинтов вроде /approve</summary>
     public async Task<T> PatchAsync<T>(string url, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Patch, url, token);
+        using var request = BuildRequest(HttpMethod.Patch, url, token);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
         return await DeserializeAsync<T>(response);
@@ -76,7 +76,7 @@ public class ApiClient(HttpClient http)
 
     public async Task<T> DeleteAsync<T>(string url, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Delete, url, token);
+        using var request = BuildRequest(HttpMethod.Delete, url, token);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
         return await DeserializeAsync<T>(response);
@@ -84,7 +84,7 @@ public class ApiClient(HttpClient http)
 
     public async Task DeleteAsync(string url, string? token = null)
     {
-        using var request  = BuildRequest(HttpMethod.Delete, url, token);
+        using var request = BuildRequest(HttpMethod.Delete, url, token);
         using var response = await http.SendAsync(request);
         await EnsureSuccessAsync(response);
     }
@@ -135,19 +135,19 @@ public class ApiClient(HttpClient http)
 
         throw response.StatusCode switch
         {
-            HttpStatusCode.BadRequest          => new ApiException(400,
+            HttpStatusCode.BadRequest => new ApiException(400,
                 msg ?? "Некорректные данные запроса."),
-            HttpStatusCode.Unauthorized        => new UnauthorizedException(
+            HttpStatusCode.Unauthorized => new UnauthorizedException(
                 msg ?? "Пользователь не авторизован."),
-            HttpStatusCode.Forbidden           => new ForbiddenException(
+            HttpStatusCode.Forbidden => new ForbiddenException(
                 msg ?? "Доступ запрещён."),
-            HttpStatusCode.NotFound            => new NotFoundException(
+            HttpStatusCode.NotFound => new NotFoundException(
                 msg ?? "Ресурс не найден."),
-            HttpStatusCode.MethodNotAllowed    => new ReadOnlyModeException(
+            HttpStatusCode.MethodNotAllowed => new ReadOnlyModeException(
                 msg ?? "Сервер запущен в режиме только для чтения."),
-            HttpStatusCode.Conflict            => new ConflictException(
+            HttpStatusCode.Conflict => new ConflictException(
                 msg ?? "Конфликт данных."),
-            (HttpStatusCode)418                => new PaymentFailedException(
+            (HttpStatusCode)418 => new PaymentFailedException(
                 msg ?? "Оплата не прошла. Попробуйте ещё раз."),
             HttpStatusCode.InternalServerError => new ServerException(
                 msg ?? "Внутренняя ошибка сервера."),

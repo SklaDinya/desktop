@@ -12,12 +12,12 @@ internal static partial class Mapper
 
     public static OperatorModel ToOperator(OperatorDto dto) => new()
     {
-        Id        = dto.Id,
-        Username  = dto.Username,
-        Name      = dto.Name,
-        Email     = dto.Email,
-        Role      = ToOperatorRole(dto.Role),
-        Banned    = dto.Banned,
+        Id = dto.Id,
+        Username = dto.Username,
+        Name = dto.Name,
+        Email = dto.Email,
+        Role = ToOperatorRole(dto.Role),
+        Banned = dto.Banned,
         CreatedAt = dto.CreatedAt,
         UpdatedAt = dto.UpdatedAt,
     };
@@ -44,7 +44,7 @@ internal static partial class Mapper
 
     public static OperatorRoleDto ToOperatorRoleDto(OperatorRole role) => role switch
     {
-        OperatorRole.MainOperator     => OperatorRoleDto.MainOperator,
+        OperatorRole.MainOperator => OperatorRoleDto.MainOperator,
         OperatorRole.OrdinaryOperator => OperatorRoleDto.OrdinaryOperator,
         _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный OperatorRole: {role}")
     };
@@ -53,7 +53,7 @@ internal static partial class Mapper
 
     private static OperatorRole ToOperatorRole(OperatorRoleDto role) => role switch
     {
-        OperatorRoleDto.MainOperator     => OperatorRole.MainOperator,
+        OperatorRoleDto.MainOperator => OperatorRole.MainOperator,
         OperatorRoleDto.OrdinaryOperator => OperatorRole.OrdinaryOperator,
         _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный OperatorRoleDto: {role}")
     };

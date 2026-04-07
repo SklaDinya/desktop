@@ -10,9 +10,9 @@ namespace SklaDinya_desktop_BL_tests;
 
 public class CellServiceTests
 {
-    private readonly Mock<ICellRepository> _repo    = new();
+    private readonly Mock<ICellRepository> _repo = new();
     private readonly Mock<ISessionService> _session = new();
-    private readonly ICellService          _sut;
+    private readonly ICellService _sut;
 
     private const string Token = "test.jwt.token";
 
@@ -28,8 +28,8 @@ public class CellServiceTests
     public async Task GetCellsAsync_ValidArgs_ReturnsCells()
     {
         var storageId = Guid.NewGuid();
-        var query     = new CellSearchQuery { StartBooking = DateTime.UtcNow, TimeBooking = TimeSpan.FromHours(1), PageNumber = 1, PageSize = 20 };
-        var expected  = new List<SklaDinya_desktop_BL_component.Models.CellModel> { ModelBuilder.Cell() };
+        var query = new CellSearchQuery { StartBooking = DateTime.UtcNow, TimeBooking = TimeSpan.FromHours(1), PageNumber = 1, PageSize = 20 };
+        var expected = new List<SklaDinya_desktop_BL_component.Models.CellModel> { ModelBuilder.Cell() };
 
         _repo.Setup(r => r.GetCellsAsync(storageId, query)).ReturnsAsync(expected);
 
@@ -44,7 +44,7 @@ public class CellServiceTests
     public async Task GetCellClassesAsync_ValidStorageId_ReturnsClasses()
     {
         var storageId = Guid.NewGuid();
-        var expected  = new List<string> { "Small", "Medium", "Large" };
+        var expected = new List<string> { "Small", "Medium", "Large" };
 
         _repo.Setup(r => r.GetCellClassesAsync(storageId)).ReturnsAsync(expected);
 
@@ -58,7 +58,7 @@ public class CellServiceTests
     [Fact]
     public async Task GetMyCellsAsync_ValidQuery_ReturnsCells()
     {
-        var query    = new MyCellSearchQuery { PageNumber = 1, PageSize = 10 };
+        var query = new MyCellSearchQuery { PageNumber = 1, PageSize = 10 };
         var expected = new List<SklaDinya_desktop_BL_component.Models.CellModel> { ModelBuilder.Cell() };
 
         _repo.Setup(r => r.GetMyCellsAsync(query, Token)).ReturnsAsync(expected);
@@ -89,7 +89,7 @@ public class CellServiceTests
     [Fact]
     public async Task CreateCellAsync_ValidForm_ReturnsCreatedCell()
     {
-        var form     = new CellCreateForm { Name = "A1", CellClass = "Small" };
+        var form = new CellCreateForm { Name = "A1", CellClass = "Small" };
         var expected = ModelBuilder.Cell();
 
         _repo.Setup(r => r.CreateCellAsync(form, Token)).ReturnsAsync(expected);
