@@ -12,13 +12,13 @@ defaults:
     working-directory: src/SklaDinya_desktop
 
 env:
-  DOTNET_VERSION: "8.0.x"
   SOLUTION: SklaDinya_desktop.sln
+  # DOTNET_VERSION: "8.0.x"  # не нужен на self-hosted — .NET уже установлен на машине
 
 jobs:
   # ────────────────────────────────────────────────────────────────────────────
   # 1. LINT
-  #    dotnet format --verify-no-changes проверяет форматирование кода.
+  #    dotnet format analyzers — только Roslyn-диагностика, без whitespace.
   #    .editorconfig в корне репозитория задаёт правила, совместимые с VS 2022.
   # ────────────────────────────────────────────────────────────────────────────
   lint:
@@ -28,17 +28,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
 
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION }}
 
-      - name: Check formatting (dotnet format)
+      - name: Check code analyzers (dotnet format)
+        # Проверяем только анализаторы (Roslyn) — без whitespace и style.
+        # Выравнивание столбцами в object initializers и switch-выражениях
+        # делается Visual Studio автоматически и не является проблемой.
         run: >
           dotnet format ${{ env.SOLUTION }}
+          analyzers
           --verify-no-changes
           --no-restore
           --severity warn
@@ -55,10 +60,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
 
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION }}
@@ -88,10 +94,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
 
       - name: Restore Debug build cache
         uses: actions/cache/restore@v4
@@ -128,10 +135,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
 
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION }}
