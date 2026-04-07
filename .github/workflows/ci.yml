@@ -1,0 +1,166 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+defaults:
+  run:
+    # Все команды запускаются из корня решения
+    working-directory: src/SklaDinya_desktop
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  SOLUTION: SklaDinya_desktop.sln
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  # 1. LINT
+  #    dotnet format --verify-no-changes проверяет форматирование кода.
+  #    .editorconfig в корне репозитория задаёт правила, совместимые с VS 2022.
+  # ────────────────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Check formatting (dotnet format)
+        run: >
+          dotnet format ${{ env.SOLUTION }}
+          --verify-no-changes
+          --no-restore
+          --severity warn
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 2. BUILD-DEBUG
+  #    Debug-сборка всего решения — основа для прогона тестов.
+  #    Артефакт передаётся в job test через cache по commit SHA.
+  # ────────────────────────────────────────────────────────────────────────────
+  build-debug:
+    name: Build (Debug)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build Debug
+        run: >
+          dotnet build ${{ env.SOLUTION }}
+          --configuration Debug
+          --no-restore
+
+      - name: Cache Debug build
+        uses: actions/cache/save@v4
+        with:
+          path: src/SklaDinya_desktop
+          key: debug-build-${{ github.sha }}
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 3. TEST
+  #    Прогон всех тестовых проектов (BL-tests, DA-tests, IntegrationalTests).
+  #    Использует кэшированную Debug-сборку предыдущего job.
+  # ────────────────────────────────────────────────────────────────────────────
+  test:
+    name: Test
+    runs-on: windows-latest
+    needs: build-debug
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore Debug build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: src/SklaDinya_desktop
+          key: debug-build-${{ github.sha }}
+
+      - name: Run tests
+        run: >
+          dotnet test ${{ env.SOLUTION }}
+          --configuration Debug
+          --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: src/SklaDinya_desktop/TestResults/*.trx
+          retention-days: 14
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 4. BUILD-RELEASE
+  #    Release-сборка запускается только после успешных тестов.
+  #    Публикует артефакты для каждого публикуемого проекта.
+  # ────────────────────────────────────────────────────────────────────────────
+  build-release:
+    name: Build (Release)
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build Release
+        run: >
+          dotnet build ${{ env.SOLUTION }}
+          --configuration Release
+          --no-restore
+
+      - name: Publish BL component
+        run: >
+          dotnet publish SklaDinya_desktop-BL-component/SklaDinya-desktop-BL-component.csproj
+          --configuration Release
+          --no-build
+          --output publish/BL
+
+      - name: Publish DA component
+        run: >
+          dotnet publish SklaDinya_desktop-DA-component/SklaDinya_desktop-DA-component.csproj
+          --configuration Release
+          --no-build
+          --output publish/DA
+
+      - name: Upload Release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.sha }}
+          path: |
+            src/SklaDinya_desktop/publish/BL/
+            src/SklaDinya_desktop/publish/DA/
+          retention-days: 30
