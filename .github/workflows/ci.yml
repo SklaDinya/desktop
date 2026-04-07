@@ -50,8 +50,8 @@ jobs:
 
   # ────────────────────────────────────────────────────────────────────────────
   # 2. BUILD-DEBUG
-  #    Debug-сборка всего решения — основа для прогона тестов.
-  #    Артефакт передаётся в job test через cache по commit SHA.
+  #    Debug-сборка всего решения.
+  #    Скомпилированные bin/ загружаются как артефакт и передаются в test.
   # ────────────────────────────────────────────────────────────────────────────
   build-debug:
     name: Build (Debug)
@@ -75,16 +75,23 @@ jobs:
           --configuration Debug
           --no-restore
 
-      - name: Cache Debug build
-        uses: actions/cache/save@v4
+      - name: Upload Debug build artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: src/SklaDinya_desktop
-          key: debug-build-${{ github.sha }}
+          name: debug-build-${{ github.sha }}
+          # Загружаем только bin/ тестовых проектов — этого достаточно для dotnet test --no-build
+          path: |
+            src/SklaDinya_desktop/SklaDinya_desktop-BL-component/bin/Debug/
+            src/SklaDinya_desktop/SklaDinya_desktop-DA-component/bin/Debug/
+            src/SklaDinya_desktop/Tests/SklaDinya_desktop-BL-tests/bin/Debug/
+            src/SklaDinya_desktop/Tests/SklaDinya_desktop-DA-tests/bin/Debug/
+            src/SklaDinya_desktop/Tests/SklaDinya_desktop-BL_DA-IntegrationalTests/bin/Debug/
+          retention-days: 1
 
   # ────────────────────────────────────────────────────────────────────────────
   # 3. TEST
   #    Прогон всех тестовых проектов (BL-tests, DA-tests, IntegrationalTests).
-  #    Использует кэшированную Debug-сборку предыдущего job.
+  #    Скачивает артефакт Debug-сборки — пересборка не нужна.
   # ────────────────────────────────────────────────────────────────────────────
   test:
     name: Test
@@ -100,11 +107,12 @@ jobs:
       #     dotnet-version: ${{ env.DOTNET_VERSION }}
       # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
 
-      - name: Restore Debug build cache
-        uses: actions/cache/restore@v4
+      - name: Download Debug build artifact
+        uses: actions/download-artifact@v4
         with:
+          name: debug-build-${{ github.sha }}
+          # Распаковываем в корень репозитория — структура папок сохраняется
           path: src/SklaDinya_desktop
-          key: debug-build-${{ github.sha }}
 
       - name: Run tests
         run: >
