@@ -1,8 +1,8 @@
-using System.Text;
-using System.Text.Json;
 using SklaDinya_desktop_BL_component.Enums;
 using SklaDinya_desktop_BL_component.Exceptions;
 using SklaDinya_desktop_BL_component.Models;
+using System.Text;
+using System.Text.Json;
 
 namespace SklaDinya_desktop_BL_component.Helpers;
 
@@ -59,9 +59,9 @@ public static class JwtHelper
 
         return new JwtPayload
         {
-            UserId       = userId,
-            UserRole     = userRole,
-            StorageId    = storageId,
+            UserId = userId,
+            UserRole = userRole,
+            StorageId = storageId,
             OperatorRole = operatorRole,
         };
     }

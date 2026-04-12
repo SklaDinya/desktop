@@ -12,13 +12,13 @@ internal static partial class Mapper
 
     public static StorageModel ToStorage(StorageDto dto) => new()
     {
-        Id          = dto.Id,
-        Name        = dto.Name,
-        Address     = dto.Address,
+        Id = dto.Id,
+        Name = dto.Name,
+        Address = dto.Address,
         Description = dto.Description,
-        Status      = ToStorageStatus(dto.Status),
-        CreatedAt   = dto.CreatedAt,
-        UpdatedAt   = dto.UpdatedAt,
+        Status = ToStorageStatus(dto.Status),
+        CreatedAt = dto.CreatedAt,
+        UpdatedAt = dto.UpdatedAt,
     };
 
     public static List<StorageModel> ToStorageList(List<StorageDto> dtos) =>
@@ -41,7 +41,7 @@ internal static partial class Mapper
     public static StorageStatusDto ToStorageStatusDto(StorageStatus status) => status switch
     {
         StorageStatus.Created => StorageStatusDto.Created,
-        StorageStatus.Active  => StorageStatusDto.Active,
+        StorageStatus.Active => StorageStatusDto.Active,
         _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный StorageStatus: {status}")
     };
 
@@ -50,7 +50,7 @@ internal static partial class Mapper
     private static StorageStatus ToStorageStatus(StorageStatusDto status) => status switch
     {
         StorageStatusDto.Created => StorageStatus.Created,
-        StorageStatusDto.Active  => StorageStatus.Active,
+        StorageStatusDto.Active => StorageStatus.Active,
         _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный StorageStatusDto: {status}")
     };
 }

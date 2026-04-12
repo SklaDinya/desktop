@@ -20,10 +20,10 @@ public class CellRepository(ApiClient client) : ICellRepository
 
         var url = new QueryBuilder($"/api/v1/storages/{storageId}/cells")
             .Add("startBooking", query.StartBooking.ToString("o"))
-            .Add("timeBooking",  System.Xml.XmlConvert.ToString(query.TimeBooking))
+            .Add("timeBooking", System.Xml.XmlConvert.ToString(query.TimeBooking))
             .AddList("cellClasses", query.CellClasses)
-            .Add("pageNumber",   query.PageNumber)
-            .Add("pageSize",     query.PageSize)
+            .Add("pageNumber", query.PageNumber)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<CellDto>>(url);
@@ -46,8 +46,8 @@ public class CellRepository(ApiClient client) : ICellRepository
 
         var url = new QueryBuilder("/api/v1/storages/my/cells")
             .AddList("cellClasses", query.CellClasses)
-            .Add("pageNumber",      query.PageNumber)
-            .Add("pageSize",        query.PageSize)
+            .Add("pageNumber", query.PageNumber)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<CellDto>>(url, token);
@@ -71,7 +71,7 @@ public class CellRepository(ApiClient client) : ICellRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToCellCreateRequest(form);
-        var dto  = await client.PostAsync<CellDto>("/api/v1/storages/my/cells", body, token);
+        var dto = await client.PostAsync<CellDto>("/api/v1/storages/my/cells", body, token);
         return Mapper.ToCell(dto);
     }
 }

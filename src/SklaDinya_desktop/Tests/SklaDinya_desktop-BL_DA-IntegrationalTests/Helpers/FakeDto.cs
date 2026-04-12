@@ -40,7 +40,7 @@ internal static class FakeDto
 
     private static string BuildJwt(string payloadJson)
     {
-        var header  = Base64Encode("{\"alg\":\"HS256\",\"typ\":\"JWT\"}"u8.ToArray());
+        var header = Base64Encode("{\"alg\":\"HS256\",\"typ\":\"JWT\"}"u8.ToArray());
         var payload = Base64Encode(System.Text.Encoding.UTF8.GetBytes(payloadJson));
         return $"{header}.{payload}.fakesig";
     }
@@ -51,13 +51,13 @@ internal static class FakeDto
     // ── Storage ────────────────────────────────────────────────────────────
 
     public static StorageDto Storage(Guid? id = null) => new(
-        Id:          id ?? Guid.NewGuid(),
-        Name:        "Test Storage",
-        Address:     "Test Address",
+        Id: id ?? Guid.NewGuid(),
+        Name: "Test Storage",
+        Address: "Test Address",
         Description: "Test Description",
-        Status:      StorageStatusDto.Active,
-        CreatedAt:   DateTime.UtcNow,
-        UpdatedAt:   DateTime.UtcNow);
+        Status: StorageStatusDto.Active,
+        CreatedAt: DateTime.UtcNow,
+        UpdatedAt: DateTime.UtcNow);
 
     public static List<StorageDto> StorageList(int count = 1)
         => Enumerable.Range(0, count).Select(_ => Storage()).ToList();
@@ -65,9 +65,9 @@ internal static class FakeDto
     // ── Cell ───────────────────────────────────────────────────────────────
 
     public static CellDto Cell(Guid? id = null, Guid? storageId = null) => new(
-        Id:        id        ?? Guid.NewGuid(),
+        Id: id ?? Guid.NewGuid(),
         StorageId: storageId ?? Guid.NewGuid(),
-        Name:      "A1",
+        Name: "A1",
         CellClass: "Small",
         CreatedAt: DateTime.UtcNow);
 
@@ -79,7 +79,7 @@ internal static class FakeDto
     public static PriceDto Price(Guid? storageId = null) => new(
         StorageId: storageId ?? Guid.NewGuid(),
         CellClass: "Small",
-        Price:     "99.99",
+        Price: "99.99",
         CreatedAt: DateTime.UtcNow);
 
     public static List<PriceDto> PriceList(int count = 1)
@@ -88,12 +88,12 @@ internal static class FakeDto
     // ── User ───────────────────────────────────────────────────────────────
 
     public static UserDto User(Guid? id = null) => new(
-        Id:        id ?? Guid.NewGuid(),
-        Username:  "testuser",
-        Name:      "Test User",
-        Email:     "test@example.com",
-        Role:      UserRoleDto.Client,
-        Banned:    false,
+        Id: id ?? Guid.NewGuid(),
+        Username: "testuser",
+        Name: "Test User",
+        Email: "test@example.com",
+        Role: UserRoleDto.Client,
+        Banned: false,
         CreatedAt: DateTime.UtcNow,
         UpdatedAt: DateTime.UtcNow);
 
@@ -101,21 +101,21 @@ internal static class FakeDto
         => Enumerable.Range(0, count).Select(_ => User()).ToList();
 
     public static MeDto Me(Guid? id = null) => new(
-        Id:       id ?? Guid.NewGuid(),
+        Id: id ?? Guid.NewGuid(),
         Username: "me",
-        Name:     "Me User",
-        Email:    "me@example.com",
-        Role:     UserRoleDto.Client);
+        Name: "Me User",
+        Email: "me@example.com",
+        Role: UserRoleDto.Client);
 
     // ── Operator ───────────────────────────────────────────────────────────
 
     public static OperatorDto Operator(Guid? id = null) => new(
-        Id:        id ?? Guid.NewGuid(),
-        Username:  "operator1",
-        Name:      "Operator One",
-        Email:     "op@example.com",
-        Role:      OperatorRoleDto.OrdinaryOperator,
-        Banned:    false,
+        Id: id ?? Guid.NewGuid(),
+        Username: "operator1",
+        Name: "Operator One",
+        Email: "op@example.com",
+        Role: OperatorRoleDto.OrdinaryOperator,
+        Banned: false,
         CreatedAt: DateTime.UtcNow,
         UpdatedAt: DateTime.UtcNow);
 
@@ -128,30 +128,30 @@ internal static class FakeDto
     {
         var storageId = Guid.NewGuid();
         return new(
-            Id:          id ?? Guid.NewGuid(),
-            UserId:      Guid.NewGuid(),
-            StorageId:   storageId,
-            Storage:     Storage(storageId),
-            Cells:       CellList(1),
-            StartTime:   DateTime.UtcNow,
+            Id: id ?? Guid.NewGuid(),
+            UserId: Guid.NewGuid(),
+            StorageId: storageId,
+            Storage: Storage(storageId),
+            Cells: CellList(1),
+            StartTime: DateTime.UtcNow,
             BookingTime: TimeSpan.FromHours(2),
-            CreatedAt:   DateTime.UtcNow,
-            Status:      BookingStatusDto.Paid);
+            CreatedAt: DateTime.UtcNow,
+            Status: BookingStatusDto.Paid);
     }
 
     public static List<BookingUserDto> BookingForUserList(int count = 1)
         => Enumerable.Range(0, count).Select(_ => BookingForUser()).ToList();
 
     public static BookingOperatorDto BookingForOperator(Guid? id = null) => new(
-        Id:          id ?? Guid.NewGuid(),
-        UserId:      Guid.NewGuid(),
-        User:        new BookingUserInfoDto(Guid.NewGuid(), "Client Name", "c@e.com"),
-        StorageId:   Guid.NewGuid(),
-        Cells:       CellList(1),
-        StartTime:   DateTime.UtcNow,
+        Id: id ?? Guid.NewGuid(),
+        UserId: Guid.NewGuid(),
+        User: new BookingUserInfoDto(Guid.NewGuid(), "Client Name", "c@e.com"),
+        StorageId: Guid.NewGuid(),
+        Cells: CellList(1),
+        StartTime: DateTime.UtcNow,
         BookingTime: TimeSpan.FromHours(1),
-        CreatedAt:   DateTime.UtcNow,
-        Status:      BookingStatusDto.Created);
+        CreatedAt: DateTime.UtcNow,
+        Status: BookingStatusDto.Created);
 
     public static List<BookingOperatorDto> BookingForOperatorList(int count = 1)
         => Enumerable.Range(0, count).Select(_ => BookingForOperator()).ToList();

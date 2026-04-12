@@ -15,14 +15,14 @@ public class CellRepositoryTests
     [Fact]
     public async Task GetCellsAsync_ServerReturnsOk_ReturnsMappedList()
     {
-        var id    = Guid.NewGuid();
-        var repo  = new CellRepository(MockHttpFactory.CreateOk(new[] { FakeDto.Cell(id) }));
+        var id = Guid.NewGuid();
+        var repo = new CellRepository(MockHttpFactory.CreateOk(new[] { FakeDto.Cell(id) }));
         var query = new CellSearchQuery { StartBooking = DateTime.UtcNow, TimeBooking = TimeSpan.FromHours(1), PageNumber = 1, PageSize = 10 };
 
         var result = await repo.GetCellsAsync(Guid.NewGuid(), query);
 
         Assert.Single(result);
-        Assert.Equal(id,      result[0].Id);
+        Assert.Equal(id, result[0].Id);
         Assert.Equal("Small", result[0].CellClass);
     }
 
@@ -52,8 +52,8 @@ public class CellRepositoryTests
     [Fact]
     public async Task GetMyCellsAsync_ValidArgs_ReturnsMappedList()
     {
-        var id    = Guid.NewGuid();
-        var repo  = new CellRepository(MockHttpFactory.CreateOk(new[] { FakeDto.Cell(id) }));
+        var id = Guid.NewGuid();
+        var repo = new CellRepository(MockHttpFactory.CreateOk(new[] { FakeDto.Cell(id) }));
         var query = new MyCellSearchQuery { PageNumber = 1, PageSize = 10 };
 
         var result = await repo.GetMyCellsAsync(query, Token);
@@ -65,7 +65,7 @@ public class CellRepositoryTests
     [Fact]
     public async Task GetMyCellsAsync_EmptyToken_ThrowsArgumentException()
     {
-        var repo  = new CellRepository(MockHttpFactory.CreateOk());
+        var repo = new CellRepository(MockHttpFactory.CreateOk());
         var query = new MyCellSearchQuery { PageNumber = 1, PageSize = 10 };
 
         await Assert.ThrowsAsync<ArgumentException>(() => repo.GetMyCellsAsync(query, ""));
@@ -97,13 +97,13 @@ public class CellRepositoryTests
     [Fact]
     public async Task CreateCellAsync_ValidArgs_ReturnsMappedCell()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new CellRepository(MockHttpFactory.CreateOk(FakeDto.Cell(id)));
         var form = new CellCreateForm { Name = "A1", CellClass = "Small" };
 
         var result = await repo.CreateCellAsync(form, Token);
 
-        Assert.Equal(id,      result.Id);
+        Assert.Equal(id, result.Id);
         Assert.Equal("Small", result.CellClass);
     }
 

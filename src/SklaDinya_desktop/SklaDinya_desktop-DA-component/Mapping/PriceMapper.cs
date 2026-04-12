@@ -1,8 +1,8 @@
-using System.Globalization;
 using SklaDinya_desktop_BL_component.Exceptions;
 using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_DA_component.Dtos;
+using System.Globalization;
 
 namespace SklaDinya_desktop_DA_component.Mapping;
 
@@ -13,13 +13,13 @@ internal static partial class Mapper
     public static PriceModel ToPrice(PriceDto dto)
     {
         var cellClass = RequireNonEmpty(dto.CellClass, "price.cellClass");
-        var price     = ParseDecimal(dto.Price,        "price.price");
+        var price = ParseDecimal(dto.Price, "price.price");
 
         return new PriceModel
         {
             StorageId = dto.StorageId,
             CellClass = cellClass,
-            Price     = price,
+            Price = price,
             CreatedAt = dto.CreatedAt,
         };
     }

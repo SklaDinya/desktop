@@ -13,8 +13,8 @@ public class AuthRepositoryTests
     public async Task LoginAsync_ServerReturnsToken_ReturnsToken()
     {
         var expected = "eyJhbGciOiJIUzI1NiJ9.payload.sig";
-        var repo     = new AuthRepository(MockHttpFactory.CreateOk(expected));
-        var form     = new LoginForm { Username = "user", Password = "pass" };
+        var repo = new AuthRepository(MockHttpFactory.CreateOk(expected));
+        var form = new LoginForm { Username = "user", Password = "pass" };
 
         var result = await repo.LoginAsync(form);
 
@@ -45,8 +45,8 @@ public class AuthRepositoryTests
     public async Task RegisterAsync_ServerReturnsToken_ReturnsToken()
     {
         var expected = "eyJhbGciOiJIUzI1NiJ9.payload.sig";
-        var repo     = new AuthRepository(MockHttpFactory.CreateOk(expected));
-        var form     = new RegistrationForm { Username = "newuser", Password = "pass123", Name = "Name", Email = "e@e.com" };
+        var repo = new AuthRepository(MockHttpFactory.CreateOk(expected));
+        var form = new RegistrationForm { Username = "newuser", Password = "pass123", Name = "Name", Email = "e@e.com" };
 
         var result = await repo.RegisterAsync(form);
 

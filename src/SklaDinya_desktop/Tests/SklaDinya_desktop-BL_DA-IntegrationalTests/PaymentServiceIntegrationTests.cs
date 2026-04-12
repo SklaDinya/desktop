@@ -25,18 +25,18 @@ public class PaymentServiceIntegrationTests
         var session = ServiceFactory.Session(Token);
 
         // Шаг 1: создаём бронирование — нужен отдельный клиент с ответом чека
-        var bookingClient  = MockHttpFactory.CreateOk(FakeDto.BookingReceipt());
+        var bookingClient = MockHttpFactory.CreateOk(FakeDto.BookingReceipt());
         var bookingService = ServiceFactory.Booking(bookingClient, session);
         await bookingService.CreateBookingAsync(new BookingCreateForm
         {
-            StorageId   = Guid.NewGuid(),
-            CellIds     = [Guid.NewGuid()],
-            StartTime   = DateTime.UtcNow,
+            StorageId = Guid.NewGuid(),
+            CellIds = [Guid.NewGuid()],
+            StartTime = DateTime.UtcNow,
             BookingTime = TimeSpan.FromHours(2)
         });
 
         // Шаг 2: строим PaymentService с нужным статусом оплаты
-        var paymentClient  = MockHttpFactory.Create(paymentStatus,
+        var paymentClient = MockHttpFactory.Create(paymentStatus,
             paymentStatus == System.Net.HttpStatusCode.OK
                 ? (object?)new[] { FakeDto.BookingForUser() }
                 : null);
@@ -60,7 +60,7 @@ public class PaymentServiceIntegrationTests
     [Fact]
     public async Task PayNoopAsync_WithoutPriorCreateBooking_ThrowsInvalidOperationException()
     {
-        var session        = ServiceFactory.Session(Token);
+        var session = ServiceFactory.Session(Token);
         var bookingService = ServiceFactory.Booking(MockHttpFactory.CreateOk(), session);
         var paymentService = ServiceFactory.Payment(MockHttpFactory.CreateOk(), bookingService, session);
 
@@ -99,7 +99,7 @@ public class PaymentServiceIntegrationTests
     [Fact]
     public async Task PayRandomAsync_WithoutPriorCreateBooking_ThrowsInvalidOperationException()
     {
-        var session        = ServiceFactory.Session(Token);
+        var session = ServiceFactory.Session(Token);
         var bookingService = ServiceFactory.Booking(MockHttpFactory.CreateOk(), session);
         var paymentService = ServiceFactory.Payment(MockHttpFactory.CreateOk(), bookingService, session);
 

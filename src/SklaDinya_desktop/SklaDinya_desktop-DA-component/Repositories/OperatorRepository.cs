@@ -25,12 +25,12 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
             : (Enums.OperatorRoleDto?)null;
 
         var url = new QueryBuilder("/api/v1/storages/my/operators")
-            .Add("username",   query.Username)
-            .Add("name",       query.Name)
-            .Add("email",      query.Email)
-            .AddEnum("role",   roleDto)
+            .Add("username", query.Username)
+            .Add("name", query.Name)
+            .Add("email", query.Email)
+            .AddEnum("role", roleDto)
             .Add("pageNumber", query.PageNumber)
-            .Add("pageSize",   query.PageSize)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<OperatorDto>>(url, token);
@@ -44,7 +44,7 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToOperatorCreateRequest(form);
-        var dto  = await client.PostAsync<OperatorDto>(
+        var dto = await client.PostAsync<OperatorDto>(
             "/api/v1/storages/my/operators", body, token);
         return Mapper.ToOperator(dto);
     }
@@ -67,7 +67,7 @@ public class OperatorRepository(ApiClient client) : IOperatorRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToOperatorUpdateRequest(form);
-        var dto  = await client.PatchAsync<OperatorDto>(
+        var dto = await client.PatchAsync<OperatorDto>(
             $"/api/v1/storages/my/operators/{operatorId}", body, token);
         return Mapper.ToOperator(dto);
     }

@@ -1,8 +1,8 @@
-using System.Net;
-using System.Text.Json;
 using Moq;
 using Moq.Protected;
 using SklaDinya_desktop_DA_component.Http;
+using System.Net;
+using System.Text.Json;
 
 namespace SklaDinya_desktop_BL_DA_IntegrationalTests.Helpers;
 
@@ -14,7 +14,7 @@ internal static class MockHttpFactory
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy        = JsonNamingPolicy.CamelCase,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
         Converters =
         {
@@ -42,7 +42,7 @@ internal static class MockHttpFactory
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = statusCode,
-                Content    = content,
+                Content = content,
             });
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -54,9 +54,9 @@ internal static class MockHttpFactory
     }
 
     public static ApiClient CreateOk(object? body = null) => Create(HttpStatusCode.OK, body);
-    public static ApiClient CreateUnauthorized()          => Create(HttpStatusCode.Unauthorized);
-    public static ApiClient CreateNotFound()              => Create(HttpStatusCode.NotFound);
-    public static ApiClient CreateConflict()              => Create(HttpStatusCode.Conflict);
-    public static ApiClient CreateForbidden()             => Create(HttpStatusCode.Forbidden);
-    public static ApiClient CreatePaymentFailed()         => Create((HttpStatusCode)418);
+    public static ApiClient CreateUnauthorized() => Create(HttpStatusCode.Unauthorized);
+    public static ApiClient CreateNotFound() => Create(HttpStatusCode.NotFound);
+    public static ApiClient CreateConflict() => Create(HttpStatusCode.Conflict);
+    public static ApiClient CreateForbidden() => Create(HttpStatusCode.Forbidden);
+    public static ApiClient CreatePaymentFailed() => Create((HttpStatusCode)418);
 }

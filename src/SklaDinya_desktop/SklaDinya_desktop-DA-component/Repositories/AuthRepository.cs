@@ -16,7 +16,7 @@ public class AuthRepository(ApiClient client) : IAuthRepository
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var body  = Mapper.ToLoginRequest(form);
+        var body = Mapper.ToLoginRequest(form);
         var token = await client.PostAsync<string>("/api/v1/auth/login", body);
 
         if (string.IsNullOrWhiteSpace(token))
@@ -30,7 +30,7 @@ public class AuthRepository(ApiClient client) : IAuthRepository
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        var body  = Mapper.ToRegistrationRequest(form);
+        var body = Mapper.ToRegistrationRequest(form);
         var token = await client.PostAsync<string>("/api/v1/auth/register", body);
 
         if (string.IsNullOrWhiteSpace(token))

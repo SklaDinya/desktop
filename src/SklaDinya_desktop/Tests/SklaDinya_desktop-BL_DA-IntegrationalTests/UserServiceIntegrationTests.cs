@@ -14,7 +14,7 @@ namespace SklaDinya_desktop_BL_DA_IntegrationalTests;
 /// </summary>
 public class UserServiceIntegrationTests
 {
-    private static readonly string Token    = FakeDto.Token();
+    private static readonly string Token = FakeDto.Token();
     private static readonly string NewToken = FakeDto.Token();
 
     // ── GetUsersAsync ──────────────────────────────────────────────────────
@@ -22,15 +22,15 @@ public class UserServiceIntegrationTests
     [Fact]
     public async Task GetUsersAsync_ServerReturnsOk_ReturnsMappedList()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(
+        var sut = ServiceFactory.User(
             MockHttpFactory.CreateOk(new[] { FakeDto.User(id) }), session);
 
         var result = await sut.GetUsersAsync(new UserSearchQuery { PageNumber = 1, PageSize = 10 });
 
         Assert.Single(result);
-        Assert.Equal(id,         result[0].Id);
+        Assert.Equal(id, result[0].Id);
         Assert.Equal("testuser", result[0].Username);
         Assert.Equal(UserRole.Client, result[0].Role);
     }
@@ -39,7 +39,7 @@ public class UserServiceIntegrationTests
     public async Task GetUsersAsync_ServerReturnsForbidden_ThrowsForbiddenException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateForbidden(), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateForbidden(), session);
 
         await Assert.ThrowsAsync<ForbiddenException>(
             () => sut.GetUsersAsync(new UserSearchQuery()));
@@ -50,14 +50,17 @@ public class UserServiceIntegrationTests
     [Fact]
     public async Task CreateUserAsync_ServerReturnsOk_ReturnsMappedUser()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.User(id)), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.User(id)), session);
 
         var result = await sut.CreateUserAsync(new UserCreateForm
         {
-            Username = "u", Password = "p", Name = "N",
-            Email    = "e@e.com", Role = UserRole.Client
+            Username = "u",
+            Password = "p",
+            Name = "N",
+            Email = "e@e.com",
+            Role = UserRole.Client
         });
 
         Assert.Equal(id, result.Id);
@@ -67,12 +70,15 @@ public class UserServiceIntegrationTests
     public async Task CreateUserAsync_ServerReturnsConflict_ThrowsConflictException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateConflict(), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateConflict(), session);
 
         await Assert.ThrowsAsync<ConflictException>(() => sut.CreateUserAsync(new UserCreateForm
         {
-            Username = "existing", Password = "p", Name = "N",
-            Email    = "e@e.com", Role = UserRole.Client
+            Username = "existing",
+            Password = "p",
+            Name = "N",
+            Email = "e@e.com",
+            Role = UserRole.Client
         }));
     }
 
@@ -81,9 +87,9 @@ public class UserServiceIntegrationTests
     [Fact]
     public async Task GetUserByIdAsync_ServerReturnsOk_ReturnsMappedUser()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.User(id)), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.User(id)), session);
 
         var result = await sut.GetUserByIdAsync(id);
 
@@ -94,7 +100,7 @@ public class UserServiceIntegrationTests
     public async Task GetUserByIdAsync_ServerReturnsNotFound_ThrowsNotFoundException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateNotFound(), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateNotFound(), session);
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.GetUserByIdAsync(Guid.NewGuid()));
@@ -105,9 +111,9 @@ public class UserServiceIntegrationTests
     [Fact]
     public async Task UpdateUserAsync_ServerReturnsOk_ReturnsMappedUser()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.User(id)), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.User(id)), session);
 
         var result = await sut.UpdateUserAsync(id, new UserUpdateForm { Name = "Updated" });
 
@@ -118,7 +124,7 @@ public class UserServiceIntegrationTests
     public async Task UpdateUserAsync_ServerReturnsNotFound_ThrowsNotFoundException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateNotFound(), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateNotFound(), session);
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.UpdateUserAsync(Guid.NewGuid(), new UserUpdateForm { Name = "Updated" }));
@@ -129,13 +135,13 @@ public class UserServiceIntegrationTests
     [Fact]
     public async Task GetMeAsync_ServerReturnsOk_ReturnsMappedMe()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.Me(id)), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(FakeDto.Me(id)), session);
 
         var result = await sut.GetMeAsync();
 
-        Assert.Equal(id,   result.Id);
+        Assert.Equal(id, result.Id);
         Assert.Equal("me", result.Username);
         Assert.Equal(UserRole.Client, result.Role);
     }
@@ -144,7 +150,7 @@ public class UserServiceIntegrationTests
     public async Task GetMeAsync_ServerReturnsUnauthorized_ThrowsUnauthorizedException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateUnauthorized(), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateUnauthorized(), session);
 
         await Assert.ThrowsAsync<UnauthorizedException>(() => sut.GetMeAsync());
     }
@@ -155,15 +161,15 @@ public class UserServiceIntegrationTests
     public async Task UpdateMeAsync_ServerReturnsNewToken_NewTokenSavedInSession()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateOk(NewToken), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateOk(NewToken), session);
 
         await sut.UpdateMeAsync(new MeUpdateForm
         {
-            Username    = "newname",
+            Username = "newname",
             OldPassword = "old",
             NewPassword = "new123",
-            Name        = "New Name",
-            Email       = "new@e.com"
+            Name = "New Name",
+            Email = "new@e.com"
         });
 
         // Ключевая проверка интеграции: новый токен должен быть сохранён в сессии
@@ -174,11 +180,13 @@ public class UserServiceIntegrationTests
     public async Task UpdateMeAsync_ServerReturnsUnauthorized_ThrowsUnauthorizedException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.User(MockHttpFactory.CreateUnauthorized(), session);
+        var sut = ServiceFactory.User(MockHttpFactory.CreateUnauthorized(), session);
 
         await Assert.ThrowsAsync<UnauthorizedException>(() => sut.UpdateMeAsync(new MeUpdateForm
         {
-            Username = "u", OldPassword = "o", NewPassword = "n"
+            Username = "u",
+            OldPassword = "o",
+            NewPassword = "n"
         }));
 
         // Токен в сессии не должен измениться после ошибки

@@ -12,12 +12,12 @@ internal static partial class Mapper
 
     public static UserModel ToUser(UserDto dto) => new()
     {
-        Id        = dto.Id,
-        Username  = dto.Username,
-        Name      = dto.Name,
-        Email     = dto.Email,
-        Role      = ToUserRole(dto.Role),
-        Banned    = dto.Banned,
+        Id = dto.Id,
+        Username = dto.Username,
+        Name = dto.Name,
+        Email = dto.Email,
+        Role = ToUserRole(dto.Role),
+        Banned = dto.Banned,
         CreatedAt = dto.CreatedAt,
         UpdatedAt = dto.UpdatedAt,
     };
@@ -27,11 +27,11 @@ internal static partial class Mapper
 
     public static MeModel ToMe(MeDto dto) => new()
     {
-        Id       = dto.Id,
+        Id = dto.Id,
         Username = dto.Username,
-        Name     = dto.Name,
-        Email    = dto.Email,
-        Role     = ToUserRole(dto.Role),
+        Name = dto.Name,
+        Email = dto.Email,
+        Role = ToUserRole(dto.Role),
     };
 
     // ── BL → DA ────────────────────────────────────────────────────────────
@@ -51,9 +51,9 @@ internal static partial class Mapper
 
     public static UserRoleDto ToUserRoleDto(UserRole role) => role switch
     {
-        UserRole.Client          => UserRoleDto.Client,
+        UserRole.Client => UserRoleDto.Client,
         UserRole.StorageOperator => UserRoleDto.StorageOperator,
-        UserRole.Admin           => UserRoleDto.Admin,
+        UserRole.Admin => UserRoleDto.Admin,
         _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный UserRole: {role}")
     };
 
@@ -61,9 +61,9 @@ internal static partial class Mapper
 
     private static UserRole ToUserRole(UserRoleDto role) => role switch
     {
-        UserRoleDto.Client          => UserRole.Client,
+        UserRoleDto.Client => UserRole.Client,
         UserRoleDto.StorageOperator => UserRole.StorageOperator,
-        UserRoleDto.Admin           => UserRole.Admin,
+        UserRoleDto.Admin => UserRole.Admin,
         _ => throw new ArgumentOutOfRangeException(nameof(role), $"Неизвестный UserRoleDto: {role}")
     };
 }

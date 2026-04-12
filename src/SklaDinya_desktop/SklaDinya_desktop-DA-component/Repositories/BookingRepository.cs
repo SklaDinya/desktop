@@ -22,7 +22,7 @@ public class BookingRepository(ApiClient client) : IBookingRepository
 
         var url = new QueryBuilder("/api/v1/users/me/bookings")
             .Add("pageNumber", query.PageNumber)
-            .Add("pageSize",   query.PageSize)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<BookingUserDto>>(url, token);
@@ -37,7 +37,7 @@ public class BookingRepository(ApiClient client) : IBookingRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToBookingCreateRequest(form);
-        var dto  = await client.PostAsync<BookingReceiptDto>(
+        var dto = await client.PostAsync<BookingReceiptDto>(
             "/api/v1/users/me/bookings", body, token);
         return Mapper.ToBookingReceipt(dto);
     }
@@ -74,11 +74,11 @@ public class BookingRepository(ApiClient client) : IBookingRepository
             .ToList();
 
         var url = new QueryBuilder("/api/v1/storages/my/bookings")
-            .Add("startBooking",     query.StartBooking.ToString("o"))
-            .Add("endBooking",       query.EndBooking.ToString("o"))
+            .Add("startBooking", query.StartBooking.ToString("o"))
+            .Add("endBooking", query.EndBooking.ToString("o"))
             .AddEnumList("statuses", statusesDto)
-            .Add("pageNumber",       query.PageNumber)
-            .Add("pageSize",         query.PageSize)
+            .Add("pageNumber", query.PageNumber)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<BookingOperatorDto>>(url, token);

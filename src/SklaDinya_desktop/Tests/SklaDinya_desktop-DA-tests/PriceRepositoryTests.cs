@@ -20,7 +20,7 @@ public class PriceRepositoryTests
 
         Assert.Single(result);
         Assert.Equal("Small", result[0].CellClass);
-        Assert.Equal(99.99m,  result[0].Price);
+        Assert.Equal(99.99m, result[0].Price);
     }
 
     [Fact]

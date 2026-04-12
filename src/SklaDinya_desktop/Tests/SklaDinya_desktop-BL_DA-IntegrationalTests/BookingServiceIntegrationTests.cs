@@ -19,9 +19,9 @@ public class BookingServiceIntegrationTests
     [Fact]
     public async Task GetMyBookingsAsync_ServerReturnsOk_ReturnsMappedBookings()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(
+        var sut = ServiceFactory.Booking(
             MockHttpFactory.CreateOk(new[] { FakeDto.BookingForUser(id) }), session);
 
         var result = await sut.GetMyBookingsAsync(new BookingSearchQuery { PageNumber = 1, PageSize = 10 });
@@ -36,7 +36,7 @@ public class BookingServiceIntegrationTests
     public async Task GetMyBookingsAsync_ServerReturnsUnauthorized_ThrowsUnauthorizedException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(MockHttpFactory.CreateUnauthorized(), session);
+        var sut = ServiceFactory.Booking(MockHttpFactory.CreateUnauthorized(), session);
 
         await Assert.ThrowsAsync<UnauthorizedException>(
             () => sut.GetMyBookingsAsync(new BookingSearchQuery()));
@@ -48,15 +48,15 @@ public class BookingServiceIntegrationTests
     public async Task CreateBookingAsync_ServerReturnsOk_ReturnsBookingAndSavesLastReceipt()
     {
         var bookingId = Guid.NewGuid();
-        var session   = ServiceFactory.Session(Token);
-        var sut       = ServiceFactory.Booking(
+        var session = ServiceFactory.Session(Token);
+        var sut = ServiceFactory.Booking(
             MockHttpFactory.CreateOk(FakeDto.BookingReceipt(bookingId)), session);
 
         var result = await sut.CreateBookingAsync(new BookingCreateForm
         {
-            StorageId   = Guid.NewGuid(),
-            CellIds     = [Guid.NewGuid()],
-            StartTime   = DateTime.UtcNow,
+            StorageId = Guid.NewGuid(),
+            CellIds = [Guid.NewGuid()],
+            StartTime = DateTime.UtcNow,
             BookingTime = TimeSpan.FromHours(2)
         });
 
@@ -69,13 +69,13 @@ public class BookingServiceIntegrationTests
     public async Task CreateBookingAsync_ServerReturnsConflict_ThrowsConflictException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(MockHttpFactory.CreateConflict(), session);
+        var sut = ServiceFactory.Booking(MockHttpFactory.CreateConflict(), session);
 
         await Assert.ThrowsAsync<ConflictException>(() => sut.CreateBookingAsync(new BookingCreateForm
         {
-            StorageId   = Guid.NewGuid(),
-            CellIds     = [Guid.NewGuid()],
-            StartTime   = DateTime.UtcNow,
+            StorageId = Guid.NewGuid(),
+            CellIds = [Guid.NewGuid()],
+            StartTime = DateTime.UtcNow,
             BookingTime = TimeSpan.FromHours(1)
         }));
     }
@@ -85,9 +85,9 @@ public class BookingServiceIntegrationTests
     [Fact]
     public async Task GetMyBookingByIdAsync_ServerReturnsOk_ReturnsMappedBooking()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(
+        var sut = ServiceFactory.Booking(
             MockHttpFactory.CreateOk(FakeDto.BookingForUser(id)), session);
 
         var result = await sut.GetMyBookingByIdAsync(id);
@@ -100,7 +100,7 @@ public class BookingServiceIntegrationTests
     public async Task GetMyBookingByIdAsync_ServerReturnsNotFound_ThrowsNotFoundException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(MockHttpFactory.CreateNotFound(), session);
+        var sut = ServiceFactory.Booking(MockHttpFactory.CreateNotFound(), session);
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.GetMyBookingByIdAsync(Guid.NewGuid()));
@@ -111,9 +111,9 @@ public class BookingServiceIntegrationTests
     [Fact]
     public async Task CancelMyBookingAsync_ServerReturnsOk_ReturnsCancelledBooking()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(
+        var sut = ServiceFactory.Booking(
             MockHttpFactory.CreateOk(FakeDto.BookingForUser(id)), session);
 
         var result = await sut.CancelMyBookingAsync(id);
@@ -125,7 +125,7 @@ public class BookingServiceIntegrationTests
     public async Task CancelMyBookingAsync_ServerReturnsNotFound_ThrowsNotFoundException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(MockHttpFactory.CreateNotFound(), session);
+        var sut = ServiceFactory.Booking(MockHttpFactory.CreateNotFound(), session);
 
         await Assert.ThrowsAsync<NotFoundException>(
             () => sut.CancelMyBookingAsync(Guid.NewGuid()));
@@ -136,17 +136,17 @@ public class BookingServiceIntegrationTests
     [Fact]
     public async Task GetStorageBookingsAsync_ServerReturnsOk_ReturnsMappedOperatorBookings()
     {
-        var id      = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(
+        var sut = ServiceFactory.Booking(
             MockHttpFactory.CreateOk(new[] { FakeDto.BookingForOperator(id) }), session);
 
         var result = await sut.GetStorageBookingsAsync(new OperatorBookingSearchQuery
         {
             StartBooking = DateTime.UtcNow,
-            EndBooking   = DateTime.UtcNow.AddDays(1),
-            PageNumber   = 1,
-            PageSize     = 10
+            EndBooking = DateTime.UtcNow.AddDays(1),
+            PageNumber = 1,
+            PageSize = 10
         });
 
         Assert.Single(result);
@@ -158,13 +158,13 @@ public class BookingServiceIntegrationTests
     public async Task GetStorageBookingsAsync_ServerReturnsForbidden_ThrowsForbiddenException()
     {
         var session = ServiceFactory.Session(Token);
-        var sut     = ServiceFactory.Booking(MockHttpFactory.CreateForbidden(), session);
+        var sut = ServiceFactory.Booking(MockHttpFactory.CreateForbidden(), session);
 
         await Assert.ThrowsAsync<ForbiddenException>(
             () => sut.GetStorageBookingsAsync(new OperatorBookingSearchQuery
             {
                 StartBooking = DateTime.UtcNow,
-                EndBooking   = DateTime.UtcNow.AddDays(1)
+                EndBooking = DateTime.UtcNow.AddDays(1)
             }));
     }
 }

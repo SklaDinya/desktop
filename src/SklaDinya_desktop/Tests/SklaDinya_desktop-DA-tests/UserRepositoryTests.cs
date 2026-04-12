@@ -9,7 +9,7 @@ namespace SklaDinya_desktop_DA_tests;
 
 public class UserRepositoryTests
 {
-    private const string Token    = "valid.jwt.token";
+    private const string Token = "valid.jwt.token";
     private const string NewToken = "eyJhbGciOiJIUzI1NiJ9.newpayload.sig";
 
     // ── GetUsersAsync ──────────────────────────────────────────────────────
@@ -17,21 +17,21 @@ public class UserRepositoryTests
     [Fact]
     public async Task GetUsersAsync_ServerReturnsOk_ReturnsMappedList()
     {
-        var id    = Guid.NewGuid();
-        var repo  = new UserRepository(MockHttpFactory.CreateOk(new[] { FakeDto.User(id) }));
+        var id = Guid.NewGuid();
+        var repo = new UserRepository(MockHttpFactory.CreateOk(new[] { FakeDto.User(id) }));
         var query = new UserSearchQuery { PageNumber = 1, PageSize = 10 };
 
         var result = await repo.GetUsersAsync(query, Token);
 
         Assert.Single(result);
-        Assert.Equal(id,         result[0].Id);
+        Assert.Equal(id, result[0].Id);
         Assert.Equal("testuser", result[0].Username);
     }
 
     [Fact]
     public async Task GetUsersAsync_ServerReturnsForbidden_ThrowsForbiddenException()
     {
-        var repo  = new UserRepository(MockHttpFactory.CreateForbidden());
+        var repo = new UserRepository(MockHttpFactory.CreateForbidden());
         var query = new UserSearchQuery { PageNumber = 1, PageSize = 10 };
 
         await Assert.ThrowsAsync<ForbiddenException>(() => repo.GetUsersAsync(query, Token));
@@ -42,7 +42,7 @@ public class UserRepositoryTests
     [Fact]
     public async Task CreateUserAsync_ValidArgs_ReturnsMappedUser()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new UserRepository(MockHttpFactory.CreateOk(FakeDto.User(id)));
         var form = new UserCreateForm { Username = "u", Password = "p", Name = "N", Email = "e@e.com", Role = UserRole.Client };
 
@@ -65,7 +65,7 @@ public class UserRepositoryTests
     [Fact]
     public async Task GetUserByIdAsync_ValidArgs_ReturnsMappedUser()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new UserRepository(MockHttpFactory.CreateOk(FakeDto.User(id)));
 
         var result = await repo.GetUserByIdAsync(id, Token);
@@ -94,7 +94,7 @@ public class UserRepositoryTests
     [Fact]
     public async Task UpdateUserAsync_ValidArgs_ReturnsMappedUser()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new UserRepository(MockHttpFactory.CreateOk(FakeDto.User(id)));
         var form = new UserUpdateForm { Name = "Updated" };
 
@@ -117,12 +117,12 @@ public class UserRepositoryTests
     [Fact]
     public async Task GetMeAsync_ValidToken_ReturnsMappedMe()
     {
-        var id   = Guid.NewGuid();
+        var id = Guid.NewGuid();
         var repo = new UserRepository(MockHttpFactory.CreateOk(FakeDto.Me(id)));
 
         var result = await repo.GetMeAsync(Token);
 
-        Assert.Equal(id,   result.Id);
+        Assert.Equal(id, result.Id);
         Assert.Equal("me", result.Username);
     }
 

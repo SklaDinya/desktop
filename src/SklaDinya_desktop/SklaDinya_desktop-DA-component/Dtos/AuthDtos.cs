@@ -5,7 +5,7 @@ public record LoginRequest(
     string Password);
 
 public record RegistrationRequest(
-    string  Username,
-    string  Password,
-    string  Name,
+    string Username,
+    string Password,
+    string Name,
     string? Email);

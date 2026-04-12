@@ -19,10 +19,10 @@ public class StorageRepository(ApiClient client) : IStorageRepository
         ArgumentNullException.ThrowIfNull(query, nameof(query));
 
         var url = new QueryBuilder("/api/v1/storages")
-            .Add("name",       query.Name)
-            .Add("address",    query.Address)
+            .Add("name", query.Name)
+            .Add("address", query.Address)
             .Add("pageNumber", query.PageNumber)
-            .Add("pageSize",   query.PageSize)
+            .Add("pageSize", query.PageSize)
             .Build();
 
         var dtos = await client.GetAsync<List<StorageDto>>(url);
@@ -55,7 +55,7 @@ public class StorageRepository(ApiClient client) : IStorageRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToStorageUpdateRequest(form);
-        var dto  = await client.PatchAsync<StorageDto>(
+        var dto = await client.PatchAsync<StorageDto>(
             $"/api/v1/storages/{storageId}", body, token);
         return Mapper.ToStorage(dto);
     }
@@ -94,7 +94,7 @@ public class StorageRepository(ApiClient client) : IStorageRepository
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToStorageUpdateRequest(form);
-        var dto  = await client.PatchAsync<StorageDto>("/api/v1/storages/my", body, token);
+        var dto = await client.PatchAsync<StorageDto>("/api/v1/storages/my", body, token);
         return Mapper.ToStorage(dto);
     }
 }
