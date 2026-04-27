@@ -1,4 +1,3 @@
-using SklaDinya_desktop_BL_component.Exceptions;
 using SklaDinya_desktop_BL_component.Forms;
 using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_BL_component.Queries;
@@ -7,22 +6,19 @@ using SklaDinya_desktop_UI_component.Helpers;
 
 namespace SklaDinya_desktop_UI_component.Screens.Main;
 
-/// <summary>
-/// Экран бронирования: выбор ячеек, времени, способа оплаты
-/// </summary>
 public class BookingScreen : UserControl
 {
     private readonly StorageModel _storage;
-    private readonly CheckedListBox _cellList;
-    private readonly DateTimePicker _startTimePicker;
+    private readonly DataGridView _grid;
+    private readonly DateTimePicker _startPicker;
     private readonly NumericUpDown _hoursUpDown;
-    private readonly RoundedButton _payNoopButton;
-    private readonly RoundedButton _payRandomButton;
-    private readonly Label _priceInfoLabel;
-    private readonly RoundedButton _searchCellsButton;
-    private readonly Label _titleLabel;
+    private readonly ComboBox _classCombo;
+    private readonly RoundedButton _filterButton;
+    private readonly RoundedButton _payButton;
+    private List<PriceModel> _prices = [];
+    private List<CellModel> _allCells = [];
 
-    public event EventHandler? BookingCompleted;
+    public event EventHandler<BookingCreateForm>? ProceedToPayment;
     public event EventHandler? BackRequested;
 
     public BookingScreen(StorageModel storage)
@@ -30,248 +26,153 @@ public class BookingScreen : UserControl
         _storage = storage;
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
-        AutoScroll = true;
-        Padding = new Padding(40, 20, 40, 20);
 
-        int y = 20;
+        // ── Top panel ───────────────────────────────────────────────────
+        var topPanel = new Panel { Dock = DockStyle.Top, Height = 240, Padding = new Padding(24, 8, 24, 4) };
 
-        var backBtn = new RoundedButton
-        {
-            Text = "← Назад",
-            BackColor = AppTheme.TextMuted,
-            Width = 100,
-            Height = 32,
-            Location = new Point(20, y),
-        };
+        var backBtn = new RoundedButton { Text = "← Назад", ButtonColor = AppTheme.TextMuted, Size = new Size(100, 32), Location = new Point(24, 8) };
         backBtn.Click += (_, _) => BackRequested?.Invoke(this, EventArgs.Empty);
-        Controls.Add(backBtn);
 
-        _titleLabel = new Label
-        {
-            Text = $"Бронирование — {storage.Name}",
-            Font = AppTheme.FontTitle,
-            ForeColor = AppTheme.Primary,
-            AutoSize = true,
-            Location = new Point(20, y + 44),
-        };
-        Controls.Add(_titleLabel);
-        y += 90;
+        var title = new Label { Text = $"Бронирование — {storage.Name}", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, AutoSize = true, Location = new Point(24, 48) };
 
-        // Время начала
-        var startLabel = new Label { Text = "Дата и время начала:", Font = AppTheme.FontMedium, AutoSize = true, Location = new Point(20, y) };
-        Controls.Add(startLabel);
-        y += 28;
-        _startTimePicker = new DateTimePicker
-        {
-            Format = DateTimePickerFormat.Custom,
-            CustomFormat = "dd.MM.yyyy HH:mm",
-            Location = new Point(20, y),
-            Width = 250,
-            Value = DateTime.Now.AddHours(1),
-        };
-        Controls.Add(_startTimePicker);
-        y += 40;
+        // Дата начала
+        topPanel.Controls.Add(new Label { Text = "Дата и время начала:", Font = AppTheme.FontMedium, AutoSize = true, Location = new Point(24, 88) });
+        _startPicker = new DateTimePicker { Format = DateTimePickerFormat.Custom, CustomFormat = "dd.MM.yyyy HH:mm", Location = new Point(24, 112), Width = 220, Value = DateTime.Now.AddHours(1) };
 
         // Длительность
-        var durationLabel = new Label { Text = "Длительность (часы):", Font = AppTheme.FontMedium, AutoSize = true, Location = new Point(20, y) };
-        Controls.Add(durationLabel);
-        y += 28;
-        _hoursUpDown = new NumericUpDown
-        {
-            Minimum = 1,
-            Maximum = 720,
-            Value = 2,
-            Location = new Point(20, y),
-            Width = 120,
-        };
-        Controls.Add(_hoursUpDown);
+        topPanel.Controls.Add(new Label { Text = "Длительность (часов):", Font = AppTheme.FontMedium, AutoSize = true, Location = new Point(270, 88) });
+        _hoursUpDown = new NumericUpDown { Minimum = 1, Maximum = 720, Value = 2, Location = new Point(270, 112), Width = 100 };
 
-        _searchCellsButton = new RoundedButton
+        // Фильтр по классу — выпадающий список
+        topPanel.Controls.Add(new Label { Text = "Класс ячейки:", Font = AppTheme.FontMedium, AutoSize = true, Location = new Point(24, 150) });
+        _classCombo = new ComboBox
         {
-            Text = "Найти свободные ячейки",
-            BackColor = AppTheme.Secondary,
-            Width = 220,
-            Height = 36,
-            Location = new Point(160, y - 2),
-        };
-        _searchCellsButton.Click += OnSearchCellsClick;
-        Controls.Add(_searchCellsButton);
-        y += 50;
-
-        // Список ячеек
-        var cellsLabel = new Label { Text = "Доступные ячейки (отметьте нужные):", Font = AppTheme.FontMedium, AutoSize = true, Location = new Point(20, y) };
-        Controls.Add(cellsLabel);
-        y += 28;
-        _cellList = new CheckedListBox
-        {
-            Location = new Point(20, y),
-            Width = 500,
-            Height = 180,
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Location = new Point(24, 174), Width = 200,
             Font = AppTheme.FontRegular,
-            BorderStyle = BorderStyle.FixedSingle,
         };
-        Controls.Add(_cellList);
-        y += 196;
+        _classCombo.Items.Add("Все классы");
+        _classCombo.SelectedIndex = 0;
 
-        // Информация о ценах
-        _priceInfoLabel = new Label
-        {
-            Text = "",
-            Font = AppTheme.FontSmall,
-            ForeColor = AppTheme.TextMuted,
-            AutoSize = true,
-            Location = new Point(20, y),
-        };
-        Controls.Add(_priceInfoLabel);
-        y += 30;
+        _filterButton = new RoundedButton { Text = "Фильтровать", ButtonColor = AppTheme.Primary, Size = new Size(130, 36), Location = new Point(240, 172) };
+        _filterButton.Click += (_, _) => ApplyFilter();
 
-        // Кнопки оплаты
-        _payNoopButton = new RoundedButton
-        {
-            Text = "Оплатить (гарантированно)",
-            BackColor = AppTheme.Secondary,
-            Width = 240,
-            Height = 40,
-            Location = new Point(20, y),
-            Enabled = false,
-        };
-        _payNoopButton.Click += OnPayNoopClick;
-        Controls.Add(_payNoopButton);
+        topPanel.Controls.AddRange([backBtn, title, _startPicker, _hoursUpDown, _classCombo, _filterButton]);
 
-        _payRandomButton = new RoundedButton
+        // ── Grid ────────────────────────────────────────────────────────
+        _grid = new DataGridView
         {
-            Text = "Оплатить (шанс 50%)",
-            BackColor = AppTheme.Accent,
-            Width = 200,
-            Height = 40,
-            Location = new Point(280, y),
-            Enabled = false,
+            Dock = DockStyle.Fill,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            AllowUserToAddRows = false, AllowUserToDeleteRows = false,
+            ReadOnly = false,
+            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            MultiSelect = true,
+            BackgroundColor = AppTheme.PanelBackground, BorderStyle = BorderStyle.None,
+            Font = AppTheme.FontRegular, RowHeadersVisible = false,
+            ColumnHeadersDefaultCellStyle = { BackColor = AppTheme.Primary, ForeColor = Color.White, Font = AppTheme.FontMedium, Alignment = DataGridViewContentAlignment.MiddleCenter },
+            EnableHeadersVisualStyles = false,
+            EditMode = DataGridViewEditMode.EditOnEnter,
         };
-        _payRandomButton.Click += OnPayRandomClick;
-        Controls.Add(_payRandomButton);
+
+        var colCheck = new DataGridViewCheckBoxColumn
+        {
+            HeaderText = "Выбор", Width = 60, Name = "colSelect",
+            DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleCenter },
+        };
+        _grid.Columns.Add(colCheck);
+        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Название", Name = "colName", ReadOnly = true });
+        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Класс", Name = "colClass", ReadOnly = true });
+        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Цена (₽/ч)", Name = "colPrice", ReadOnly = true });
+
+        // Клик по любой ячейке строки — переключает чекбокс
+        _grid.CellClick += (_, args) =>
+        {
+            if (args.RowIndex < 0) return;
+            var checkCell = _grid.Rows[args.RowIndex].Cells["colSelect"];
+            if (args.ColumnIndex != 0)
+                checkCell.Value = checkCell.Value is true ? (object)false : true;
+            _grid.InvalidateRow(args.RowIndex);
+        };
+
+        // ── Bottom bar ──────────────────────────────────────────────────
+        var bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 56, Padding = new Padding(24, 8, 24, 8) };
+        _payButton = new RoundedButton { Text = "Оплатить", ButtonColor = AppTheme.Secondary, Size = new Size(160, 40) };
+        _payButton.Click += OnPayClick;
+        bottomPanel.Controls.Add(_payButton);
+        bottomPanel.Resize += (_, _) => _payButton.Location = new Point(bottomPanel.Width - _payButton.Width - 24, 8);
+
+        var gridWrapper = new Panel { Dock = DockStyle.Fill, Padding = new Padding(24, 0, 24, 0) };
+        gridWrapper.Controls.Add(_grid);
+
+        Controls.Add(gridWrapper);
+        Controls.Add(bottomPanel);
+        Controls.Add(topPanel);
+
+        Load += async (_, _) => await LoadCellsAsync();
     }
 
-    private async void OnSearchCellsClick(object? sender, EventArgs e)
+    private async Task LoadCellsAsync()
     {
-        _searchCellsButton.Enabled = false;
-        _cellList.Items.Clear();
+        _filterButton.Enabled = false;
 
         var query = new CellSearchQuery
         {
-            StartBooking = _startTimePicker.Value.ToUniversalTime(),
+            StartBooking = _startPicker.Value.ToUniversalTime(),
             TimeBooking = TimeSpan.FromHours((double)_hoursUpDown.Value),
-            PageNumber = 0,
-            PageSize = 50,
+            PageNumber = 0, PageSize = 50,
         };
 
-        var cells = await ErrorHelper.TryAsync(
-            () => ServiceLocator.CellService.GetCellsAsync(_storage.Id, query));
+        _allCells = await ErrorHelper.TryAsync(() => ServiceLocator.CellService.GetCellsAsync(_storage.Id, query)) ?? [];
+        _prices = await ErrorHelper.TryAsync(() => ServiceLocator.PriceService.GetPricesAsync(_storage.Id)) ?? [];
 
-        if (cells is not null)
-        {
-            foreach (var cell in cells)
-                _cellList.Items.Add(cell, false);
-            _cellList.DisplayMember = nameof(CellModel.Name);
+        // Заполнить ComboBox классами
+        var classes = _allCells.Select(c => c.CellClass).Distinct().OrderBy(c => c).ToList();
+        _classCombo.Items.Clear();
+        _classCombo.Items.Add("Все классы");
+        foreach (var cls in classes) _classCombo.Items.Add(cls);
+        _classCombo.SelectedIndex = 0;
 
-            // Загрузить цены
-            var prices = await ErrorHelper.TryAsync(
-                () => ServiceLocator.PriceService.GetPricesAsync(_storage.Id));
-            if (prices is not null && prices.Count > 0)
-            {
-                var info = string.Join(", ", prices.Select(p => $"{p.CellClass}: {p.Price}₴/ч"));
-                _priceInfoLabel.Text = $"Тарифы: {info}";
-            }
-        }
-
-        _searchCellsButton.Enabled = true;
-        _payNoopButton.Enabled = _cellList.Items.Count > 0;
-        _payRandomButton.Enabled = _cellList.Items.Count > 0;
+        ApplyFilter();
+        _filterButton.Enabled = true;
     }
 
-    private async Task CreateBookingAndPay(bool guaranteed)
+    private void ApplyFilter()
     {
-        var selectedCells = _cellList.CheckedItems.Cast<CellModel>().ToList();
-        if (selectedCells.Count == 0)
-        {
-            MessageBox.Show("Выберите хотя бы одну ячейку.", "Внимание",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
+        _grid.Rows.Clear();
+        var filter = _classCombo.SelectedIndex <= 0 ? null : _classCombo.SelectedItem?.ToString();
+        var filtered = filter is null ? _allCells : _allCells.Where(c => c.CellClass == filter).ToList();
 
+        foreach (var cell in filtered)
+        {
+            var price = _prices.FirstOrDefault(p => p.CellClass == cell.CellClass);
+            var priceStr = price is not null ? $"{price.Price:F2} ₽" : "—";
+            var idx = _grid.Rows.Add(false, cell.Name, cell.CellClass, priceStr);
+            _grid.Rows[idx].Tag = cell;
+        }
+    }
+
+    private void OnPayClick(object? sender, EventArgs e)
+    {
         if (!ServiceLocator.SessionService.IsAuthenticated())
-        {
-            MessageBox.Show("Для бронирования необходимо войти в систему.", "Внимание",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
+        { MessageBox.Show("Необходимо войти в систему.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-        _payNoopButton.Enabled = false;
-        _payRandomButton.Enabled = false;
+        _grid.EndEdit();
 
-        var form = new BookingCreateForm
+        var selectedCells = new List<CellModel>();
+        foreach (DataGridViewRow row in _grid.Rows)
+            if (row.Cells["colSelect"].Value is true && row.Tag is CellModel cell)
+                selectedCells.Add(cell);
+
+        if (selectedCells.Count == 0)
+        { MessageBox.Show("Выберите хотя бы одну ячейку.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+        ProceedToPayment?.Invoke(this, new BookingCreateForm
         {
             StorageId = _storage.Id,
             CellIds = selectedCells.Select(c => c.Id).ToList(),
-            StartTime = _startTimePicker.Value.ToUniversalTime(),
+            StartTime = _startPicker.Value.ToUniversalTime(),
             BookingTime = TimeSpan.FromHours((double)_hoursUpDown.Value),
-        };
-
-        var booking = await ErrorHelper.TryAsync(
-            () => ServiceLocator.BookingService.CreateBookingAsync(form));
-        if (booking is null)
-        {
-            _payNoopButton.Enabled = true;
-            _payRandomButton.Enabled = true;
-            return;
-        }
-
-        // Оплата
-        bool payOk;
-        if (guaranteed)
-        {
-            payOk = await ErrorHelper.TryAsync(
-                () => ServiceLocator.PaymentService.PayNoopAsync(),
-                "Бронирование успешно оплачено!");
-        }
-        else
-        {
-            try
-            {
-                await ServiceLocator.PaymentService.PayRandomAsync();
-                MessageBox.Show("Бронирование успешно оплачено!", "Успех",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                payOk = true;
-            }
-            catch (PaymentFailedException)
-            {
-                MessageBox.Show(
-                    "Оплата не прошла. Попробуйте ещё раз или выберите гарантированную оплату.",
-                    "Оплата не удалась", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                _payNoopButton.Enabled = true;
-                _payRandomButton.Enabled = true;
-                return;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                _payNoopButton.Enabled = true;
-                _payRandomButton.Enabled = true;
-                return;
-            }
-        }
-
-        if (payOk)
-            BookingCompleted?.Invoke(this, EventArgs.Empty);
-        else
-        {
-            _payNoopButton.Enabled = true;
-            _payRandomButton.Enabled = true;
-        }
+        });
     }
-
-    private async void OnPayNoopClick(object? sender, EventArgs e)
-        => await CreateBookingAndPay(guaranteed: true);
-
-    private async void OnPayRandomClick(object? sender, EventArgs e)
-        => await CreateBookingAndPay(guaranteed: false);
 }

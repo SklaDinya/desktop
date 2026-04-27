@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36518.9
@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya-desktop-BL-compon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-DA-component", "SklaDinya_desktop-DA-component\SklaDinya_desktop-DA-component.csproj", "{F14D81D0-75F3-3C1F-3387-A79998E1FCC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-UI-component", "SklaDinya_desktop-UI-component\SklaDinya_desktop-UI-component.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-Main", "SklaDinya_desktop-Main\SklaDinya_desktop-Main.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-BackendMock", "SklaDinya_desktop-BackendMock\SklaDinya_desktop-BackendMock.csproj", "{D1E2F3A4-B5C6-7890-ABCD-EF1234567892}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-BL-tests", "Tests\SklaDinya_desktop-BL-tests\SklaDinya_desktop-BL-tests.csproj", "{6637C122-3544-40F4-9CB2-418CBE0A09BF}"
@@ -14,10 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-DA-tests", "Tests\SklaDinya_desktop-DA-tests\SklaDinya_desktop-DA-tests.csproj", "{E6F67AD7-AF96-438D-BB21-761BC5EE435D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-BL_DA-IntegrationalTests", "Tests\SklaDinya_desktop-BL_DA-IntegrationalTests\SklaDinya_desktop-BL_DA-IntegrationalTests.csproj", "{9DD72B4E-F78C-4AB0-BD3F-6632BD9C336B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-UI-component", "SklaDinya_desktop-UI-component\SklaDinya_desktop-UI-component.csproj", "{88F41600-860F-4DBE-B7A5-1C5E4CB545F1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SklaDinya_desktop-Main", "SklaDinya_desktop-Main\SklaDinya_desktop-Main.csproj", "{4F10568B-5278-4DD4-BA52-6EC25E3F901C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,18 @@ Global
 		{F14D81D0-75F3-3C1F-3387-A79998E1FCC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F14D81D0-75F3-3C1F-3387-A79998E1FCC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F14D81D0-75F3-3C1F-3387-A79998E1FCC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E2F3A4-B5C6-7890-ABCD-EF1234567892}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E2F3A4-B5C6-7890-ABCD-EF1234567892}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E2F3A4-B5C6-7890-ABCD-EF1234567892}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E2F3A4-B5C6-7890-ABCD-EF1234567892}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6637C122-3544-40F4-9CB2-418CBE0A09BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6637C122-3544-40F4-9CB2-418CBE0A09BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6637C122-3544-40F4-9CB2-418CBE0A09BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,14 +59,6 @@ Global
 		{9DD72B4E-F78C-4AB0-BD3F-6632BD9C336B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DD72B4E-F78C-4AB0-BD3F-6632BD9C336B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DD72B4E-F78C-4AB0-BD3F-6632BD9C336B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88F41600-860F-4DBE-B7A5-1C5E4CB545F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88F41600-860F-4DBE-B7A5-1C5E4CB545F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88F41600-860F-4DBE-B7A5-1C5E4CB545F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88F41600-860F-4DBE-B7A5-1C5E4CB545F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F10568B-5278-4DD4-BA52-6EC25E3F901C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F10568B-5278-4DD4-BA52-6EC25E3F901C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F10568B-5278-4DD4-BA52-6EC25E3F901C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F10568B-5278-4DD4-BA52-6EC25E3F901C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,7 +8,6 @@ namespace SklaDinya_desktop_DA_component.Http;
 /// </summary>
 public class QueryBuilder(string baseUrl)
 {
-    private readonly string _baseUrl;
     private readonly List<(string Key, string Value)> _params = [];
 
     public QueryBuilder Add(string key, string? value)
@@ -48,12 +47,12 @@ public class QueryBuilder(string baseUrl)
 
     public string Build()
     {
-        if (_params.Count == 0) return _baseUrl;
+        if (_params.Count == 0) return baseUrl;
 
         var query = string.Join("&",
             _params.Select(p =>
                 $"{HttpUtility.UrlEncode(p.Key)}={HttpUtility.UrlEncode(p.Value)}"));
 
-        return $"{_baseUrl}?{query}";
+        return $"{baseUrl}?{query}";
     }
 }

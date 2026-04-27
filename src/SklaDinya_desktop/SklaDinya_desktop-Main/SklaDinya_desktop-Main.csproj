@@ -22,6 +22,7 @@
     <ProjectReference Include="..\SklaDinya_desktop-BL-component\SklaDinya-desktop-BL-component.csproj" />
     <ProjectReference Include="..\SklaDinya_desktop-DA-component\SklaDinya_desktop-DA-component.csproj" />
     <ProjectReference Include="..\SklaDinya_desktop-UI-component\SklaDinya_desktop-UI-component.csproj" />
+    <ProjectReference Include="..\SklaDinya_desktop-BackendMock\SklaDinya_desktop-BackendMock.csproj" />
   </ItemGroup>
 
 </Project>

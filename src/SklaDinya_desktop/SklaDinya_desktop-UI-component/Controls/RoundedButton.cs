@@ -4,60 +4,92 @@ using System.Drawing.Drawing2D;
 namespace SklaDinya_desktop_UI_component.Controls;
 
 /// <summary>
-/// Кнопка со скруглёнными краями
+/// Кнопка со скруглёнными краями, реализованная как UserControl.
+/// Никакого наследования от Button — WinForms не рисует свои рамки.
 /// </summary>
-public class RoundedButton : Button
+public class RoundedButton : UserControl
 {
-    private Color _hoverBackColor;
     private bool _isHovered;
+    private bool _isPressed;
+    private string _text = string.Empty;
+    private Color _backFillColor;
 
     public RoundedButton()
     {
-        FlatStyle = FlatStyle.Flat;
-        FlatAppearance.BorderSize = 0;
-        BackColor = AppTheme.Primary;
+        SetStyle(
+            ControlStyles.UserPaint |
+            ControlStyles.AllPaintingInWmPaint |
+            ControlStyles.OptimizedDoubleBuffer |
+            ControlStyles.SupportsTransparentBackColor,
+            true);
+
+        BackColor = Color.Transparent;
+        _backFillColor = AppTheme.Primary;
         ForeColor = AppTheme.TextLight;
         Font = AppTheme.FontMedium;
         Cursor = Cursors.Hand;
         Height = AppTheme.ButtonHeight;
-        _hoverBackColor = ControlPaint.Dark(BackColor, 0.1f);
     }
 
-    protected override void OnBackColorChanged(EventArgs e)
+    /// <summary>Цвет заливки кнопки (не путать с BackColor, который прозрачный)</summary>
+    public Color ButtonColor
     {
-        base.OnBackColorChanged(e);
-        _hoverBackColor = ControlPaint.Dark(BackColor, 0.1f);
+        get => _backFillColor;
+        set { _backFillColor = value; Invalidate(); }
     }
 
-    protected override void OnMouseEnter(EventArgs e)
+    // Для совместимости: BackColor = устанавливает ButtonColor
+    public new Color BackColor
     {
-        _isHovered = true;
-        Invalidate();
-        base.OnMouseEnter(e);
+        get => base.BackColor;
+        set
+        {
+            if (value != Color.Transparent)
+                _backFillColor = value;
+            base.BackColor = Color.Transparent;
+            Invalidate();
+        }
     }
 
-    protected override void OnMouseLeave(EventArgs e)
+    public override string Text
     {
-        _isHovered = false;
-        Invalidate();
-        base.OnMouseLeave(e);
+        get => _text;
+        set { _text = value ?? string.Empty; Invalidate(); }
     }
+
+    public new bool Enabled
+    {
+        get => base.Enabled;
+        set { base.Enabled = value; Invalidate(); }
+    }
+
+    protected override void OnMouseEnter(EventArgs e) { _isHovered = true; Invalidate(); base.OnMouseEnter(e); }
+    protected override void OnMouseLeave(EventArgs e) { _isHovered = false; _isPressed = false; Invalidate(); base.OnMouseLeave(e); }
+    protected override void OnMouseDown(MouseEventArgs e) { _isPressed = true; Invalidate(); base.OnMouseDown(e); }
+    protected override void OnMouseUp(MouseEventArgs e) { _isPressed = false; Invalidate(); base.OnMouseUp(e); }
 
     protected override void OnPaint(PaintEventArgs e)
     {
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        e.Graphics.Clear(Parent?.BackColor ?? AppTheme.Background);
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.Clear(Parent?.BackColor ?? AppTheme.Background);
 
         var rect = new Rectangle(0, 0, Width - 1, Height - 1);
         using var path = RoundedRenderer.RoundedRect(rect, AppTheme.CornerRadius);
-        using var brush = new SolidBrush(_isHovered ? _hoverBackColor : BackColor);
 
-        e.Graphics.FillPath(brush, path);
+        var color = _backFillColor;
+        if (!Enabled) color = ControlPaint.LightLight(color);
+        else if (_isPressed) color = ControlPaint.Dark(color, 0.15f);
+        else if (_isHovered) color = ControlPaint.Dark(color, 0.06f);
 
-        var textSize = e.Graphics.MeasureString(Text, Font);
-        float x = (Width - textSize.Width) / 2;
-        float y = (Height - textSize.Height) / 2;
-        using var textBrush = new SolidBrush(ForeColor);
-        e.Graphics.DrawString(Text, Font, textBrush, x, y);
+        using (var brush = new SolidBrush(color))
+            g.FillPath(brush, path);
+
+        // Текст по центру
+        var textSize = g.MeasureString(_text, Font);
+        var x = (Width - textSize.Width) / 2;
+        var y = (Height - textSize.Height) / 2;
+        using (var brush = new SolidBrush(ForeColor))
+            g.DrawString(_text, Font, brush, x, y);
     }
 }

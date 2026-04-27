@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using SklaDinya_desktop_BL_component.Interfaces.Repositories;
 using SklaDinya_desktop_BL_component.Interfaces.Services;
 using SklaDinya_desktop_BL_component.Services;
+using SklaDinya_desktop_BackendMock;
 using SklaDinya_desktop_DA_component.Http;
 using SklaDinya_desktop_DA_component.Repositories;
 using SklaDinya_desktop_UI_component;
@@ -22,23 +23,49 @@ internal static class Program
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
             .Build();
 
-        var baseUrl = config["Api:BaseUrl"] ?? "http://localhost";
-        var port = int.TryParse(config["Api:Port"], out var p) ? p : 8080;
-        var apiAddress = $"{baseUrl.TrimEnd('/')}:{port}";
+        var useMock = bool.TryParse(config["Api:UseMock"], out var m) && m;
 
-        // ── HTTP-клиент и ApiClient ─────────────────────────────────────
-        var httpClient = new HttpClient { BaseAddress = new Uri(apiAddress) };
-        var apiClient = new ApiClient(httpClient);
+        IAuthRepository authRepo;
+        IBookingRepository bookingRepo;
+        ICellRepository cellRepo;
+        IOperatorRepository operatorRepo;
+        IPaymentRepository paymentRepo;
+        IPriceRepository priceRepo;
+        IStorageRepository storageRepo;
+        IUserRepository userRepo;
 
-        // ── Репозитории (DA) ────────────────────────────────────────────
-        IAuthRepository authRepo = new AuthRepository(apiClient);
-        IBookingRepository bookingRepo = new BookingRepository(apiClient);
-        ICellRepository cellRepo = new CellRepository(apiClient);
-        IOperatorRepository operatorRepo = new OperatorRepository(apiClient);
-        IPaymentRepository paymentRepo = new PaymentRepository(apiClient);
-        IPriceRepository priceRepo = new PriceRepository(apiClient);
-        IStorageRepository storageRepo = new StorageRepository(apiClient);
-        IUserRepository userRepo = new UserRepository(apiClient);
+        if (useMock)
+        {
+            // ── Заглушка (без сервера) ──────────────────────────────────
+            var mockBookingRepo = new MockBookingRepository();
+            authRepo = new MockAuthRepository();
+            bookingRepo = mockBookingRepo;
+            cellRepo = new MockCellRepository();
+            operatorRepo = new MockOperatorRepository();
+            paymentRepo = new MockPaymentRepository(mockBookingRepo);
+            priceRepo = new MockPriceRepository();
+            storageRepo = new MockStorageRepository();
+            userRepo = new MockUserRepository();
+        }
+        else
+        {
+            // ── Реальный API-сервер ─────────────────────────────────────
+            var baseUrl = config["Api:BaseUrl"] ?? "http://localhost";
+            var port = int.TryParse(config["Api:Port"], out var p) ? p : 8080;
+            var apiAddress = $"{baseUrl.TrimEnd('/')}:{port}";
+
+            var httpClient = new HttpClient { BaseAddress = new Uri(apiAddress) };
+            var apiClient = new ApiClient(httpClient);
+
+            authRepo = new AuthRepository(apiClient);
+            bookingRepo = new BookingRepository(apiClient);
+            cellRepo = new CellRepository(apiClient);
+            operatorRepo = new OperatorRepository(apiClient);
+            paymentRepo = new PaymentRepository(apiClient);
+            priceRepo = new PriceRepository(apiClient);
+            storageRepo = new StorageRepository(apiClient);
+            userRepo = new UserRepository(apiClient);
+        }
 
         // ── Сервисы (BL) ────────────────────────────────────────────────
         ISessionService session = new SessionService();

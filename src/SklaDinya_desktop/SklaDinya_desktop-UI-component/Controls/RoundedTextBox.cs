@@ -4,21 +4,20 @@ using System.Drawing.Drawing2D;
 namespace SklaDinya_desktop_UI_component.Controls;
 
 /// <summary>
-/// Текстовое поле со скруглёнными краями.
-/// Содержит внутренний TextBox для ввода текста.
+/// Текстовое поле со скруглёнными краями и видимым placeholder.
+/// Когда поле пустое и не в фокусе — внутренний TextBox скрыт,
+/// placeholder рисуется графикой. При фокусе — TextBox показывается.
 /// </summary>
 public class RoundedTextBox : UserControl
 {
     private readonly TextBox _innerTextBox;
     private string _placeholder = string.Empty;
-    private bool _showPlaceholder;
+    private bool _isPasswordField;
 
     public RoundedTextBox()
     {
-        Height = AppTheme.FieldHeight;
         BackColor = AppTheme.FieldBackground;
-        Padding = new Padding(14, 0, 14, 0);
-        DoubleBuffered = true;
+        SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
 
         _innerTextBox = new TextBox
         {
@@ -26,42 +25,34 @@ public class RoundedTextBox : UserControl
             Font = AppTheme.FontRegular,
             BackColor = AppTheme.FieldBackground,
             ForeColor = AppTheme.TextDark,
-            Anchor = AnchorStyles.Left | AnchorStyles.Right,
         };
-        _innerTextBox.TextChanged += (_, _) => OnTextChanged(EventArgs.Empty);
-        _innerTextBox.GotFocus += (_, _) => { HidePlaceholder(); Invalidate(); };
-        _innerTextBox.LostFocus += (_, _) => { ShowPlaceholderIfEmpty(); Invalidate(); };
+        _innerTextBox.TextChanged += (_, _) => { OnTextChanged(EventArgs.Empty); UpdateVisibility(); };
+        _innerTextBox.GotFocus += (_, _) => { _innerTextBox.Visible = true; Invalidate(); };
+        _innerTextBox.LostFocus += (_, _) => { UpdateVisibility(); Invalidate(); };
         Controls.Add(_innerTextBox);
+
+        // Клик по пустой области — передать фокус внутреннему полю
+        Click += (_, _) => { _innerTextBox.Visible = true; _innerTextBox.Focus(); };
+
+        Height = AppTheme.FieldHeight;
     }
 
     public override string Text
     {
-        get => _showPlaceholder ? string.Empty : _innerTextBox.Text;
-        set
-        {
-            _innerTextBox.Text = value;
-            if (string.IsNullOrEmpty(value) && !_innerTextBox.Focused)
-                ShowPlaceholderIfEmpty();
-            else
-                HidePlaceholder();
-        }
+        get => _innerTextBox.Text;
+        set { _innerTextBox.Text = value ?? string.Empty; UpdateVisibility(); }
     }
 
     public string Placeholder
     {
         get => _placeholder;
-        set
-        {
-            _placeholder = value;
-            if (!_innerTextBox.Focused && string.IsNullOrEmpty(_innerTextBox.Text))
-                ShowPlaceholderIfEmpty();
-        }
+        set { _placeholder = value ?? string.Empty; Invalidate(); }
     }
 
     public bool UsePasswordChar
     {
-        get => _innerTextBox.UseSystemPasswordChar;
-        set => _innerTextBox.UseSystemPasswordChar = value;
+        get => _isPasswordField;
+        set { _isPasswordField = value; _innerTextBox.UseSystemPasswordChar = value; }
     }
 
     public bool ReadOnly
@@ -70,25 +61,13 @@ public class RoundedTextBox : UserControl
         set => _innerTextBox.ReadOnly = value;
     }
 
-    private void ShowPlaceholderIfEmpty()
-    {
-        if (string.IsNullOrEmpty(_innerTextBox.Text) && !string.IsNullOrEmpty(_placeholder))
-        {
-            _showPlaceholder = true;
-            _innerTextBox.UseSystemPasswordChar = false;
-            _innerTextBox.Text = _placeholder;
-            _innerTextBox.ForeColor = AppTheme.TextMuted;
-        }
-    }
+    private bool ShowPlaceholder => !_innerTextBox.Focused && string.IsNullOrEmpty(_innerTextBox.Text) && _placeholder.Length > 0;
 
-    private void HidePlaceholder()
+    private void UpdateVisibility()
     {
-        if (_showPlaceholder)
-        {
-            _showPlaceholder = false;
-            _innerTextBox.Text = string.Empty;
-            _innerTextBox.ForeColor = AppTheme.TextDark;
-        }
+        // Прячем TextBox когда показываем placeholder, чтобы он не закрывал рисованный текст
+        _innerTextBox.Visible = !ShowPlaceholder;
+        Invalidate();
     }
 
     protected override void OnLayout(LayoutEventArgs e)
@@ -101,23 +80,44 @@ public class RoundedTextBox : UserControl
 
     protected override void OnPaint(PaintEventArgs e)
     {
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        e.Graphics.Clear(Parent?.BackColor ?? AppTheme.Background);
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
 
+        // Фон родителя для прозрачности углов
+        var parentBg = Parent?.BackColor ?? AppTheme.Background;
+        using (var bgBrush = new SolidBrush(parentBg))
+            g.FillRectangle(bgBrush, ClientRectangle);
+
+        // Скруглённый фон поля
         var rect = new Rectangle(0, 0, Width - 1, Height - 1);
         using var path = RoundedRenderer.RoundedRect(rect, AppTheme.CornerRadius);
-        using var fillBrush = new SolidBrush(AppTheme.FieldBackground);
-        e.Graphics.FillPath(fillBrush, path);
+        using (var fillBrush = new SolidBrush(AppTheme.FieldBackground))
+            g.FillPath(fillBrush, path);
 
-        if (_innerTextBox is null) return;
-        var borderColor = _innerTextBox.Focused ? AppTheme.Primary : AppTheme.Border;
-        using var pen = new Pen(borderColor, 1.5f);
-        e.Graphics.DrawPath(pen, path);
+        // Граница
+        var borderColor = _innerTextBox is not null && _innerTextBox.Focused ? AppTheme.Primary : AppTheme.Border;
+        using (var pen = new Pen(borderColor, 1.5f))
+            g.DrawPath(pen, path);
+
+        // Placeholder
+        if (ShowPlaceholder)
+        {
+            var phY = (Height - g.MeasureString(_placeholder, AppTheme.FontRegular).Height) / 2;
+            using var brush = new SolidBrush(AppTheme.TextMuted);
+            g.DrawString(_placeholder, AppTheme.FontRegular, brush, 14, phY);
+        }
     }
 
     protected override void OnResize(EventArgs e)
     {
         base.OnResize(e);
+        Invalidate();
+    }
+
+    protected override void OnParentChanged(EventArgs e)
+    {
+        base.OnParentChanged(e);
+        UpdateVisibility();
         Invalidate();
     }
 }
