@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>SklaDinya_desktop_UI_component</RootNamespace>
+    <AssemblyName>SklaDinya_desktop_UI_component</AssemblyName>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="Controls\" />
+    <Folder Include="Screens\Auth\" />
+    <Folder Include="Screens\Main\" />
+    <Folder Include="Screens\Account\" />
+    <Folder Include="Screens\Storage\" />
+    <Folder Include="Screens\Admin\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SklaDinya_desktop-BL-component\SklaDinya-desktop-BL-component.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\skladinya.png" CopyToOutputDirectory="PreserveNewest" Link="Resources\skladinya.png" />
+  </ItemGroup>
+
+</Project>
