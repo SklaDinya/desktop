@@ -72,7 +72,14 @@ public class RoundedButton : UserControl
     {
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        g.Clear(Parent?.BackColor ?? AppTheme.Background);
+
+        // ВАЖНО: g.Clear(Color.Transparent) рисует ЧЁРНЫЙ фон,
+        // т.к. Graphics не поддерживает прозрачную заливку. Поэтому
+        // поднимаемся вверх по дереву родителей, пока не найдём
+        // непрозрачный фон, и заливаем его за нашими скруглёнными углами.
+        var bg = ResolveOpaqueBackground();
+        using (var bgBrush = new SolidBrush(bg))
+            g.FillRectangle(bgBrush, ClientRectangle);
 
         var rect = new Rectangle(0, 0, Width - 1, Height - 1);
         using var path = RoundedRenderer.RoundedRect(rect, AppTheme.CornerRadius);
@@ -91,5 +98,38 @@ public class RoundedButton : UserControl
         var y = (Height - textSize.Height) / 2;
         using (var brush = new SolidBrush(ForeColor))
             g.DrawString(_text, Font, brush, x, y);
+    }
+
+    /// <summary>
+    /// Возвращает фактический непрозрачный цвет, на котором нужно рисовать кнопку.
+    /// Кнопка часто стоит внутри карточки с BackColor = Color.Transparent —
+    /// в этом случае нельзя брать BackColor родителя, надо подниматься выше,
+    /// либо нарисовать цвет панели карточки (PanelBackground).
+    /// </summary>
+    private Color ResolveOpaqueBackground()
+    {
+        var p = Parent;
+        while (p is not null)
+        {
+            // Color.Transparent имеет A=0 — пропускаем.
+            if (p.BackColor.A != 0)
+            {
+                // Если попали в карточку, у которой реально нарисована
+                // светлая панель (PanelBackground), но BackColor родителя =
+                // фон формы — кнопка визуально стоит на PanelBackground.
+                // Эвристика: если непосредственный Parent — UserControl с
+                // прозрачным фоном (карточка, рисующая панель в OnPaint), —
+                // используем PanelBackground.
+                if (Parent is UserControl uc &&
+                    uc.BackColor.A == 0 &&
+                    !ReferenceEquals(uc, p))
+                {
+                    return AppTheme.PanelBackground;
+                }
+                return p.BackColor;
+            }
+            p = p.Parent;
+        }
+        return AppTheme.Background;
     }
 }

@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <Folder Include="Dtos\" />
-    <Folder Include="Http\" />
     <Folder Include="Mapping\" />
     <Folder Include="Repositories\" />
     <Folder Include="Converters\" />

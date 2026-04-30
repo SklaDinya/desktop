@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using SklaDinya_desktop_BL_component.Interfaces.Logging;
 using SklaDinya_desktop_BL_component.Interfaces.Repositories;
 using SklaDinya_desktop_BL_component.Interfaces.Services;
 using SklaDinya_desktop_BL_component.Services;
@@ -78,11 +79,15 @@ internal static class Program
         IStorageService storageService = new StorageService(storageRepo, session);
         IUserService userService = new UserService(userRepo, session);
 
+        // ── Инфраструктура: логгер (реализация в DA, контракт в BL) ─────
+        IAppLogger logger = new FileLoggerAdapter();
+
         // ── Инициализация ServiceLocator для UI ─────────────────────────
         ServiceLocator.Initialize(
             authService, session,
             bookingService, cellService, operatorService,
-            paymentService, priceService, storageService, userService);
+            paymentService, priceService, storageService, userService,
+            logger);
 
         // ── Запуск главного окна ────────────────────────────────────────
         Application.Run(new MainForm());

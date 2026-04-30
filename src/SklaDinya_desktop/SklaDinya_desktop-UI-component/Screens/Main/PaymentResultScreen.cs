@@ -16,18 +16,22 @@ public class PaymentResultScreen : UserControl
 
         var container = new Panel { Width = 500, BackColor = AppTheme.PanelBackground };
 
-        int y = 40;
+        // Увеличенный верхний отступ — иконка крупная и должна «дышать».
+        int y = 56;
 
+        // Иконке нужно больше высоты, чем 70px при шрифте 44pt + Bold —
+        // иначе нижние пиксели налезали на белую плашку с текстом.
         var icon = new Label
         {
             Text = success ? "✓" : "✗",
             Font = new Font("Segoe UI", 44f, FontStyle.Bold),
             ForeColor = success ? AppTheme.Secondary : AppTheme.Danger,
             TextAlign = ContentAlignment.MiddleCenter,
-            Size = new Size(500, 70),
+            Size = new Size(500, 110),
             Location = new Point(0, y),
         };
-        y += 80;
+        // Гарантированный воздух между иконкой и заголовком.
+        y += 110 + 16;
 
         var msg = new Label
         {
@@ -35,7 +39,7 @@ public class PaymentResultScreen : UserControl
             Font = AppTheme.FontTitle,
             ForeColor = success ? AppTheme.Secondary : AppTheme.Danger,
             TextAlign = ContentAlignment.MiddleCenter,
-            Size = new Size(500, 36),
+            Size = new Size(500, 40),
             Location = new Point(0, y),
         };
         y += 56;
@@ -83,7 +87,7 @@ public class PaymentResultScreen : UserControl
             y += 52;
         }
 
-        container.Height = y + 24;
+        container.Height = y + 32;
         Controls.Add(container);
 
         Resize += (_, _) =>

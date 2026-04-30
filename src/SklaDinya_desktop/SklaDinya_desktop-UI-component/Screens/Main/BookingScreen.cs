@@ -83,7 +83,7 @@ public class BookingScreen : UserControl
         _grid.Columns.Add(colCheck);
         _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Название", Name = "colName", ReadOnly = true });
         _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Класс", Name = "colClass", ReadOnly = true });
-        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Цена (₽/ч)", Name = "colPrice", ReadOnly = true });
+        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Цена", Name = "colPrice", ReadOnly = true });
 
         // Клик по любой ячейке строки — переключает чекбокс
         _grid.CellClick += (_, args) =>
@@ -97,7 +97,7 @@ public class BookingScreen : UserControl
 
         // ── Bottom bar ──────────────────────────────────────────────────
         var bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 56, Padding = new Padding(24, 8, 24, 8) };
-        _payButton = new RoundedButton { Text = "Оплатить", ButtonColor = AppTheme.Secondary, Size = new Size(160, 40) };
+        _payButton = new RoundedButton { Text = "К оплате", ButtonColor = AppTheme.Secondary, Size = new Size(160, 40) };
         _payButton.Click += OnPayClick;
         bottomPanel.Controls.Add(_payButton);
         bottomPanel.Resize += (_, _) => _payButton.Location = new Point(bottomPanel.Width - _payButton.Width - 24, 8);
@@ -146,7 +146,7 @@ public class BookingScreen : UserControl
         foreach (var cell in filtered)
         {
             var price = _prices.FirstOrDefault(p => p.CellClass == cell.CellClass);
-            var priceStr = price is not null ? $"{price.Price:F2} ₽" : "—";
+            var priceStr = price is not null ? $"{price.Price:F2} ₽/час" : "—";
             var idx = _grid.Rows.Add(false, cell.Name, cell.CellClass, priceStr);
             _grid.Rows[idx].Tag = cell;
         }

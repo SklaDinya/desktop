@@ -49,8 +49,8 @@ public class AccountScreen : UserControl
         var role = ServiceLocator.SessionService.CurrentRole;
         var controls = new List<Control>();
 
-        // ── Группа: Личный кабинет ──────────────────────────────────────
-        controls.Add(new SideMenuGroupHeader("Личный кабинет"));
+        // ── Группа: Личные данные ───────────────────────────────────────
+        controls.Add(new SideMenuGroupHeader("Личные данные"));
         controls.Add(MakeItem("Мои данные", () => new ProfileTab()));
 
         // ── Группа: Бронирования ────────────────────────────────────────

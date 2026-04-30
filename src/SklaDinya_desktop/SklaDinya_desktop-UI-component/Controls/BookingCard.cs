@@ -38,7 +38,9 @@ public class BookingCard : UserControl
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        var parentBg = Parent?.BackColor ?? AppTheme.Background;
+        // Под скруглёнными углами рисуем цвет фактического непрозрачного
+        // предка, иначе углы получаются чёрными (как у RoundedButton).
+        var parentBg = ResolveOpaqueParentBackground();
         using (var bgBrush = new SolidBrush(parentBg))
             g.FillRectangle(bgBrush, ClientRectangle);
 
@@ -72,5 +74,16 @@ public class BookingCard : UserControl
         };
         using var statusBrush = new SolidBrush(statusColor);
         g.DrawString($"Статус: {statusText}", AppTheme.FontMedium, statusBrush, 16, 62);
+    }
+
+    private Color ResolveOpaqueParentBackground()
+    {
+        var p = Parent;
+        while (p is not null)
+        {
+            if (p.BackColor.A != 0) return p.BackColor;
+            p = p.Parent;
+        }
+        return AppTheme.Background;
     }
 }

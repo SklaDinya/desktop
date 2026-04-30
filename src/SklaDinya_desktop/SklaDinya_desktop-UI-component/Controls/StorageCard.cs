@@ -17,7 +17,9 @@ public class StorageCard : UserControl
     public StorageCard(StorageModel storage)
     {
         Storage = storage;
-        Size = new Size(700, 110);
+        // Высота увеличена со 110 до 140, чтобы описание помещалось
+        // на две строки и не обрезалось при переносе.
+        Size = new Size(700, 140);
         Margin = new Padding(0, 0, 0, 12);
         BackColor = Color.Transparent;
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
@@ -27,7 +29,8 @@ public class StorageCard : UserControl
             Text = "Забронировать",
             ButtonColor = AppTheme.Secondary,
             Size = new Size(130, 34),
-            Location = new Point(Width - 150, 38),
+            // Кнопку центрируем по вертикали относительно новой высоты карточки
+            Location = new Point(Width - 150, (140 - 34) / 2),
         };
         _bookBtn.Click += (_, _) => BookClicked?.Invoke(this, EventArgs.Empty);
         Controls.Add(_bookBtn);
@@ -37,7 +40,12 @@ public class StorageCard : UserControl
     {
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        g.Clear(Parent?.BackColor ?? AppTheme.Background);
+
+        // Фон под скруглёнными углами рисуем цветом фактического (непрозрачного)
+        // предка — иначе угол будет чёрным, как у RoundedButton.
+        var parentBg = ResolveOpaqueParentBackground();
+        using (var bgBrush = new SolidBrush(parentBg))
+            g.FillRectangle(bgBrush, ClientRectangle);
 
         var rect = new Rectangle(0, 0, Width - 1, Height - 1);
         using var path = RoundedRenderer.RoundedRect(rect, 14);
@@ -55,7 +63,30 @@ public class StorageCard : UserControl
         if (!string.IsNullOrEmpty(Storage.Description))
         {
             using var mutedBrush = new SolidBrush(AppTheme.TextMuted);
-            g.DrawString(Storage.Description, AppTheme.FontSmall, mutedBrush, new RectangleF(20, 64, Width - 200, 36));
+            // Область под описание: было 36px, теперь 64px — на 2 строки.
+            // Также включаем перенос слов и обрезку по символам.
+            using var fmt = new StringFormat
+            {
+                Trimming = StringTrimming.EllipsisWord,
+                FormatFlags = 0, // word wrap включён по умолчанию
+            };
+            g.DrawString(
+                Storage.Description,
+                AppTheme.FontSmall,
+                mutedBrush,
+                new RectangleF(20, 66, Width - 200, 64),
+                fmt);
         }
+    }
+
+    private Color ResolveOpaqueParentBackground()
+    {
+        var p = Parent;
+        while (p is not null)
+        {
+            if (p.BackColor.A != 0) return p.BackColor;
+            p = p.Parent;
+        }
+        return AppTheme.Background;
     }
 }
