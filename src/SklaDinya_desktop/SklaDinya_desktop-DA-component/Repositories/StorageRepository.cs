@@ -30,6 +30,24 @@ public class StorageRepository(ApiClient client) : IStorageRepository
     }
 
     /// <inheritdoc/>
+    public async Task<List<StorageModel>> GetStorageRequestsAsync(
+        StorageSearchQuery query, string token)
+    {
+        ArgumentNullException.ThrowIfNull(query, nameof(query));
+        ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
+
+        var url = new QueryBuilder("/api/v1/storages/requests")
+            .Add("name", query.Name)
+            .Add("address", query.Address)
+            .Add("pageNumber", query.PageNumber)
+            .Add("pageSize", query.PageSize)
+            .Build();
+
+        var dtos = await client.GetAsync<List<StorageDto>>(url, token);
+        return Mapper.ToStorageList(dtos);
+    }
+
+    /// <inheritdoc/>
     public async Task CreateStorageAsync(StorageCreateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));

@@ -18,7 +18,7 @@ public class BookingScreen : UserControl
     private List<PriceModel> _prices = [];
     private List<CellModel> _allCells = [];
 
-    public event EventHandler<BookingCreateForm>? ProceedToPayment;
+    public event EventHandler<BookingProceedEventArgs>? ProceedToPayment;
     public event EventHandler? BackRequested;
 
     public BookingScreen(StorageModel storage)
@@ -167,12 +167,39 @@ public class BookingScreen : UserControl
         if (selectedCells.Count == 0)
         { MessageBox.Show("Выберите хотя бы одну ячейку.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-        ProceedToPayment?.Invoke(this, new BookingCreateForm
+        var hours = (decimal)_hoursUpDown.Value;
+        // Сумма = (тариф каждой выбранной ячейки) × часы. Если тарифа для класса
+        // ячейки в _prices не нашлось — считаем 0 и не блокируем переход
+        // (пользователь увидит сумму на странице оплаты).
+        var totalPrice = selectedCells
+            .Select(c => _prices.FirstOrDefault(p => p.CellClass == c.CellClass)?.Price ?? 0m)
+            .Sum() * hours;
+
+        var form = new BookingCreateForm
         {
             StorageId = _storage.Id,
             CellIds = selectedCells.Select(c => c.Id).ToList(),
             StartTime = _startPicker.Value.ToUniversalTime(),
             BookingTime = TimeSpan.FromHours((double)_hoursUpDown.Value),
-        });
+        };
+
+        ProceedToPayment?.Invoke(this, new BookingProceedEventArgs(form, totalPrice));
+    }
+}
+
+/// <summary>
+/// Аргументы события «перейти к оплате»: форма для создания бронирования
+/// плюс заранее посчитанная итоговая стоимость, чтобы экран оплаты мог
+/// её показать без повторного запроса тарифов.
+/// </summary>
+public sealed class BookingProceedEventArgs : EventArgs
+{
+    public BookingCreateForm Form { get; }
+    public decimal TotalPrice { get; }
+
+    public BookingProceedEventArgs(BookingCreateForm form, decimal totalPrice)
+    {
+        Form = form;
+        TotalPrice = totalPrice;
     }
 }

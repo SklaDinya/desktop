@@ -8,6 +8,7 @@ namespace SklaDinya_desktop_UI_component.Screens.Main;
 public class PaymentScreen : UserControl
 {
     private readonly BookingCreateForm _form;
+    private readonly decimal _totalPrice;
     private readonly RadioButton _radioNoop;
     private readonly RadioButton _radioRandom;
     private readonly RoundedButton _payButton;
@@ -17,9 +18,10 @@ public class PaymentScreen : UserControl
     public event EventHandler? PaymentFailed;
     public event EventHandler? BackRequested;
 
-    public PaymentScreen(BookingCreateForm form)
+    public PaymentScreen(BookingCreateForm form, decimal totalPrice)
     {
         _form = form;
+        _totalPrice = totalPrice;
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
 
@@ -33,6 +35,9 @@ public class PaymentScreen : UserControl
         AddInfoLine(container, "Количество ячеек:", $"{form.CellIds.Count}", ref y);
         AddInfoLine(container, "Начало:", $"{form.StartTime.ToLocalTime():dd.MM.yyyy HH:mm}", ref y);
         AddInfoLine(container, "Длительность:", $"{form.BookingTime.TotalHours:F0} ч.", ref y);
+        // Итоговая стоимость — посчитана на странице бронирования как
+        // (сумма тарифов выбранных ячеек) × длительность в часах.
+        AddInfoLine(container, "Итого к оплате:", $"{_totalPrice:F2} ₽", ref y, valueIsAccent: true);
         y += 12;
 
         var methodLabel = new Label { Text = "Способ оплаты:", Font = AppTheme.FontMedium, ForeColor = AppTheme.TextDark, AutoSize = true, Location = new Point(32, y) };
@@ -62,10 +67,19 @@ public class PaymentScreen : UserControl
         };
     }
 
-    private void AddInfoLine(Panel container, string label, string value, ref int y)
+    private void AddInfoLine(Panel container, string label, string value, ref int y, bool valueIsAccent = false)
     {
         container.Controls.Add(new Label { Text = label, Font = AppTheme.FontMedium, ForeColor = AppTheme.TextMuted, AutoSize = true, Location = new Point(32, y) });
-        container.Controls.Add(new Label { Text = value, Font = AppTheme.FontMedium, ForeColor = AppTheme.TextDark, AutoSize = true, Location = new Point(200, y) });
+        // Итоговую сумму выделяем — другой шрифт и акцентный цвет.
+        var valueLabel = new Label
+        {
+            Text = value,
+            Font = valueIsAccent ? AppTheme.FontBold : AppTheme.FontMedium,
+            ForeColor = valueIsAccent ? AppTheme.Primary : AppTheme.TextDark,
+            AutoSize = true,
+            Location = new Point(200, y),
+        };
+        container.Controls.Add(valueLabel);
         y += 26;
     }
 

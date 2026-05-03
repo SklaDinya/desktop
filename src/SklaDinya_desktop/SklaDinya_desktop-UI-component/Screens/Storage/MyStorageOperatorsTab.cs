@@ -20,6 +20,8 @@ public class MyStorageOperatorsTab : UserControl
     {
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
+        // Внешний отступ от бокового меню и краёв страницы.
+        Padding = new Padding(24, 0, 24, 24);
 
         var title = new Label
         {
@@ -28,10 +30,10 @@ public class MyStorageOperatorsTab : UserControl
             ForeColor = AppTheme.Primary,
             Dock = DockStyle.Top,
             Height = 50,
-            Padding = new Padding(24, 14, 0, 0),
+            Padding = new Padding(0, 14, 0, 0),
         };
 
-        var toolbar = new Panel { Dock = DockStyle.Top, Height = 50, Padding = new Padding(24, 8, 24, 8) };
+        var toolbar = new Panel { Dock = DockStyle.Top, Height = 50, Padding = new Padding(0, 8, 0, 8) };
         _addButton = new RoundedButton
         {
             Text = "Добавить оператора",

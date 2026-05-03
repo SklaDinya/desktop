@@ -173,17 +173,17 @@ public class MockPaymentRepository : IPaymentRepository
         _bookingRepo = bookingRepo;
     }
 
-    public Task<List<BookingModel>> PayNoopAsync(PaymentForm form, string token)
+    public Task<BookingModel> PayNoopAsync(PaymentForm form, string token)
     {
-        // Помечаем последнее Created-бронирование как Paid
-        return Task.FromResult(MockData.Bookings.Select(b =>
-        {
-            if (b.Status == BookingStatus.Created) b.Status = BookingStatus.Paid;
-            return b;
-        }).ToList());
+        // Помечаем последнее Created-бронирование как Paid и возвращаем его —
+        // как делает реальный бэкенд, см. IPaymentRepository.
+        var booking = MockData.Bookings.LastOrDefault(b => b.Status == BookingStatus.Created)
+                      ?? MockData.Bookings.Last();
+        booking.Status = BookingStatus.Paid;
+        return Task.FromResult(booking);
     }
 
-    public Task<List<BookingModel>> PayRandomAsync(PaymentForm form, string token)
+    public Task<BookingModel> PayRandomAsync(PaymentForm form, string token)
     {
         // 50% шанс
         if (Random.Shared.Next(2) == 0)
@@ -231,6 +231,18 @@ public class MockStorageRepository : IStorageRepository
     public Task<List<StorageModel>> GetStoragesAsync(StorageSearchQuery query)
     {
         var result = _storages.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(query.Name))
+            result = result.Where(s => s.Name.Contains(query.Name, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(query.Address))
+            result = result.Where(s => s.Address.Contains(query.Address, StringComparison.OrdinalIgnoreCase));
+        return Task.FromResult(result.ToList());
+    }
+
+    public Task<List<StorageModel>> GetStorageRequestsAsync(StorageSearchQuery query, string token)
+    {
+        // В реальном API заявки — это пункты в статусе Created, ожидающие
+        // одобрения. Мок возвращает их соответственно.
+        var result = _storages.Where(s => s.Status == StorageStatus.Created);
         if (!string.IsNullOrWhiteSpace(query.Name))
             result = result.Where(s => s.Name.Contains(query.Name, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrWhiteSpace(query.Address))

@@ -2,18 +2,22 @@ namespace SklaDinya_desktop_DA_component.Dtos;
 
 /// <summary>
 /// Ответ API: тариф.
-/// Price приходит как decimal128 (строка), парсинг — в маппере.
+/// Бэкенд возвращает Price как обычное JSON-число (например, 400.00),
+/// а не строку — поэтому десериализуем сразу в decimal.
+/// PriceId возвращается сервером, но в BL-модель пока не пробрасываем —
+/// храним в DTO для полноты картины при отладке.
 /// </summary>
 public record PriceDto(
+    Guid PriceId,
     Guid StorageId,
     string CellClass,
-    string Price,
+    decimal Price,
     DateTime CreatedAt);
 
 /// <summary>
 /// Запрос создания тарифа.
-/// Price отправляется как строка в формате decimal128.
+/// Сервер принимает Price как обычное JSON-число.
 /// </summary>
 public record PriceCreateRequest(
     string CellClass,
-    string Price);
+    decimal Price);

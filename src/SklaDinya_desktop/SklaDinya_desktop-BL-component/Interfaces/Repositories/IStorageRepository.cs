@@ -14,6 +14,12 @@ public interface IStorageRepository
     /// <summary>Найти пункты хранения — публичный поиск, токен не нужен</summary>
     Task<List<StorageModel>> GetStoragesAsync(StorageSearchQuery query);
 
+    /// <summary>
+    /// Найти заявки на создание пунктов хранения — для администратора.
+    /// Соответствует GET /api/v1/storages/requests (требует JWT).
+    /// </summary>
+    Task<List<StorageModel>> GetStorageRequestsAsync(StorageSearchQuery query, string token);
+
     /// <summary>Создать пункт хранения (заявка, без авторизации)</summary>
     Task CreateStorageAsync(StorageCreateForm form);
 

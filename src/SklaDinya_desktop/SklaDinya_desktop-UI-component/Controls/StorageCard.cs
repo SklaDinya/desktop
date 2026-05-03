@@ -28,9 +28,12 @@ public class StorageCard : UserControl
         {
             Text = "Забронировать",
             ButtonColor = AppTheme.Secondary,
-            Size = new Size(130, 34),
-            // Кнопку центрируем по вертикали относительно новой высоты карточки
-            Location = new Point(Width - 150, (140 - 34) / 2),
+            // Ширина увеличена со 130 до 144 (~10%), чтобы текст
+            // выглядел просторнее, без впритык.
+            Size = new Size(144, 34),
+            // Кнопку центрируем по вертикали относительно новой высоты карточки.
+            // Правый отступ от края сохраняем 20 px.
+            Location = new Point(Width - 164, (140 - 34) / 2),
         };
         _bookBtn.Click += (_, _) => BookClicked?.Invoke(this, EventArgs.Empty);
         Controls.Add(_bookBtn);
@@ -74,7 +77,9 @@ public class StorageCard : UserControl
                 Storage.Description,
                 AppTheme.FontSmall,
                 mutedBrush,
-                new RectangleF(20, 66, Width - 200, 64),
+                // Ширину области описания подгоняем под расширенную кнопку:
+                // кнопка теперь 144 px + 20 px правый отступ = резерв 184 px.
+                new RectangleF(20, 66, Width - 184, 64),
                 fmt);
         }
     }

@@ -10,14 +10,14 @@ public interface IPaymentService
 {
     /// <summary>
     /// Провести гарантированную оплату последнего созданного бронирования.
-    /// Возвращает список оплаченных бронирований.
+    /// Возвращает оплаченное бронирование.
     /// </summary>
-    Task<List<BookingModel>> PayNoopAsync();
+    Task<BookingModel> PayNoopAsync();
 
     /// <summary>
     /// Провести оплату последнего созданного бронирования с шансом 50%.
-    /// Возвращает список оплаченных бронирований при успехе.
+    /// Возвращает оплаченное бронирование при успехе.
     /// Выбрасывает <see cref="Exceptions.PaymentFailedException"/> при неудаче.
     /// </summary>
-    Task<List<BookingModel>> PayRandomAsync();
+    Task<BookingModel> PayRandomAsync();
 }

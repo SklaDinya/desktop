@@ -10,18 +10,22 @@ namespace SklaDinya_desktop_DA_component.Repositories;
 /// <summary>
 /// Репозиторий для проведения оплаты бронирований.
 /// </summary>
+/// <remarks>
+/// Бэкенд возвращает одно оплаченное бронирование (несмотря на то, что в swagger
+/// заявлен массив). Поэтому десериализуем напрямую в <see cref="BookingUserDto"/>.
+/// </remarks>
 public class PaymentRepository(ApiClient client) : IPaymentRepository
 {
     /// <inheritdoc/>
-    public async Task<List<BookingModel>> PayNoopAsync(PaymentForm form, string token)
+    public async Task<BookingModel> PayNoopAsync(PaymentForm form, string token)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToPaymentNoopRequest(form);
-        var dtos = await client.PostAsync<List<BookingUserDto>>(
+        var dto = await client.PostAsync<BookingUserDto>(
             "/api/v1/payments/noop", body, token);
-        return Mapper.ToBookingList(dtos);
+        return Mapper.ToBooking(dto);
     }
 
     /// <inheritdoc/>
@@ -29,14 +33,14 @@ public class PaymentRepository(ApiClient client) : IPaymentRepository
     /// При HTTP 418 сервер сигнализирует о неудаче моковой оплаты —
     /// <see cref="ApiClient"/> выбросит <see cref="SklaDinya_desktop_BL_component.Exceptions.PaymentFailedException"/>.
     /// </remarks>
-    public async Task<List<BookingModel>> PayRandomAsync(PaymentForm form, string token)
+    public async Task<BookingModel> PayRandomAsync(PaymentForm form, string token)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
         ArgumentException.ThrowIfNullOrWhiteSpace(token, nameof(token));
 
         var body = Mapper.ToPaymentRandomRequest(form);
-        var dtos = await client.PostAsync<List<BookingUserDto>>(
+        var dto = await client.PostAsync<BookingUserDto>(
             "/api/v1/payments/random", body, token);
-        return Mapper.ToBookingList(dtos);
+        return Mapper.ToBooking(dto);
     }
 }

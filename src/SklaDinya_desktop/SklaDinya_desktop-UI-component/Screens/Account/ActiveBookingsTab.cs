@@ -61,13 +61,21 @@ public class ActiveBookingsTab : UserControl
 
         foreach (var b in active)
         {
-            var card = new BookingCard(b, showCancelButton: true);
-            card.CancelClicked += async (_, _) =>
+            // Кнопка «Отменить» показывается только для бронирований, которые
+            // ещё не были оплачены (статус Created). Уже оплаченные/идущие
+            // бронирования отменить через эту кнопку нельзя — их жизненный
+            // цикл управляется иначе (через оператора пункта).
+            var canCancel = b.Status == BookingStatus.Created;
+            var card = new BookingCard(b, showCancelButton: canCancel);
+            if (canCancel)
             {
-                if (MessageBox.Show("Отменить?", "Подтверждение", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-                var ok = await ErrorHelper.TryAsync(() => ServiceLocator.BookingService.CancelMyBookingAsync(b.Id), "Отменено.");
-                if (ok) await LoadAsync();
-            };
+                card.CancelClicked += async (_, _) =>
+                {
+                    if (MessageBox.Show("Отменить?", "Подтверждение", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+                    var ok = await ErrorHelper.TryAsync(() => ServiceLocator.BookingService.CancelMyBookingAsync(b.Id), "Отменено.");
+                    if (ok) await LoadAsync();
+                };
+            }
             _listPanel.Controls.Add(card);
         }
         CenterCards();

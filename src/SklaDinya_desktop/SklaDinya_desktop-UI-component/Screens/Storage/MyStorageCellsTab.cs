@@ -21,6 +21,10 @@ public class MyStorageCellsTab : UserControl
     {
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
+        // Внешний отступ от бокового меню и краёв страницы; все Dock-дети
+        // (заголовок, панель добавления, таблица) автоматически отрисуются
+        // в этом «прямоугольнике с полями».
+        Padding = new Padding(24, 0, 24, 24);
 
         var title = new Label
         {
@@ -29,11 +33,11 @@ public class MyStorageCellsTab : UserControl
             ForeColor = AppTheme.Primary,
             Dock = DockStyle.Top,
             Height = 50,
-            Padding = new Padding(24, 14, 0, 0),
+            Padding = new Padding(0, 14, 0, 0),
         };
 
         // ── Панель добавления ───────────────────────────────────────────
-        var addPanel = new Panel { Dock = DockStyle.Top, Height = 56, Padding = new Padding(24, 8, 24, 8) };
+        var addPanel = new Panel { Dock = DockStyle.Top, Height = 56, Padding = new Padding(0, 8, 0, 8) };
 
         _nameField = new RoundedTextBox { Placeholder = "Название ячейки", Width = 200, Location = new Point(0, 8) };
         _classField = new RoundedTextBox { Placeholder = "Класс ячейки", Width = 180, Location = new Point(212, 8) };

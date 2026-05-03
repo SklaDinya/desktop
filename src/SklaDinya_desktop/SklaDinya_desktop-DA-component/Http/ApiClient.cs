@@ -22,8 +22,18 @@ public class ApiClient(HttpClient http)
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters =
         {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
+            // ВАЖНО: специфические конвертеры идут ПЕРЕД общим JsonStringEnumConverter,
+            // иначе общий перехватит тип первым (System.Text.Json берёт первый
+            // подходящий конвертер из коллекции).
+            //
+            // BookingStatusJsonConverter принимает обе формы — "Cancelled" (как
+            // шлёт реальный бэкенд) и "Canceled" (наше имя в C#).
+            new BookingStatusJsonConverter(),
             new TimeSpanIso8601Converter(),
+            // Общий enum-конвертер для прочих перечислений (StorageStatusDto,
+            // UserRoleDto, OperatorRoleDto). Case-insensitive по умолчанию,
+            // поэтому "Active"/"active" обрабатываются одинаково.
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
         },
     };
 
@@ -32,7 +42,7 @@ public class ApiClient(HttpClient http)
     public async Task<T> GetAsync<T>(string url, string? token = null)
     {
         using var request = BuildRequest(HttpMethod.Get, url, token);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, requestBodyJson: null);
         await EnsureSuccessAsync(response, request, requestBodyJson: null);
         return await DeserializeAsync<T>(response, request, requestBodyJson: null);
     }
@@ -43,7 +53,7 @@ public class ApiClient(HttpClient http)
     {
         var bodyJson = JsonSerializer.Serialize(body, JsonOptions);
         using var request = BuildRequest(HttpMethod.Post, url, token, bodyJson);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, bodyJson);
         await EnsureSuccessAsync(response, request, bodyJson);
         return await DeserializeAsync<T>(response, request, bodyJson);
     }
@@ -52,7 +62,7 @@ public class ApiClient(HttpClient http)
     {
         var bodyJson = JsonSerializer.Serialize(body, JsonOptions);
         using var request = BuildRequest(HttpMethod.Post, url, token, bodyJson);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, bodyJson);
         await EnsureSuccessAsync(response, request, bodyJson);
     }
 
@@ -62,7 +72,7 @@ public class ApiClient(HttpClient http)
     {
         var bodyJson = JsonSerializer.Serialize(body, JsonOptions);
         using var request = BuildRequest(HttpMethod.Patch, url, token, bodyJson);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, bodyJson);
         await EnsureSuccessAsync(response, request, bodyJson);
         return await DeserializeAsync<T>(response, request, bodyJson);
     }
@@ -71,7 +81,7 @@ public class ApiClient(HttpClient http)
     public async Task<T> PatchAsync<T>(string url, string? token = null)
     {
         using var request = BuildRequest(HttpMethod.Patch, url, token);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, requestBodyJson: null);
         await EnsureSuccessAsync(response, request, requestBodyJson: null);
         return await DeserializeAsync<T>(response, request, requestBodyJson: null);
     }
@@ -81,7 +91,7 @@ public class ApiClient(HttpClient http)
     public async Task<T> DeleteAsync<T>(string url, string? token = null)
     {
         using var request = BuildRequest(HttpMethod.Delete, url, token);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, requestBodyJson: null);
         await EnsureSuccessAsync(response, request, requestBodyJson: null);
         return await DeserializeAsync<T>(response, request, requestBodyJson: null);
     }
@@ -89,11 +99,65 @@ public class ApiClient(HttpClient http)
     public async Task DeleteAsync(string url, string? token = null)
     {
         using var request = BuildRequest(HttpMethod.Delete, url, token);
-        using var response = await http.SendAsync(request);
+        using var response = await LogRequestAndSendAsync(request, requestBodyJson: null);
         await EnsureSuccessAsync(response, request, requestBodyJson: null);
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Отправить запрос с записью в лог: до запроса — INFO с методом/URL/токеном,
+    /// после ответа — INFO со статусом. Сами тела запроса/ответа в INFO не пишем,
+    /// чтобы лог не разрастался; они попадают в ERROR-лог из <see cref="EnsureSuccessAsync"/>
+    /// при ненулевом статусе. Полный URL в логе можно скопировать в адресную строку
+    /// браузера (если запрос — GET без авторизации) или в curl-команду для проверки.
+    /// </summary>
+    private async Task<HttpResponseMessage> LogRequestAndSendAsync(
+        HttpRequestMessage request, string? requestBodyJson)
+    {
+        var fullUrl = ResolveFullUrl(request);
+        var auth = request.Headers.Authorization is { } a
+            ? $"{a.Scheme} {MaskToken(a.Parameter)}"
+            : "<none>";
+
+        FileLogger.Info(
+            $"HTTP запрос → {request.Method} {fullUrl} | Authorization: {auth}" +
+            (requestBodyJson is null ? "" : $" | Body: {requestBodyJson}"));
+
+        var response = await http.SendAsync(request);
+
+        FileLogger.Info(
+            $"HTTP ответ ← {(int)response.StatusCode} {response.StatusCode} " +
+            $"для {request.Method} {fullUrl}");
+
+        return response;
+    }
+
+    /// <summary>
+    /// Возвращает полный URL запроса. <see cref="HttpRequestMessage.RequestUri"/>
+    /// может быть относительным, если у <see cref="HttpClient"/> задан BaseAddress —
+    /// для лога склеиваем их вручную, чтобы было что копировать в браузер.
+    /// </summary>
+    private string ResolveFullUrl(HttpRequestMessage request)
+    {
+        var uri = request.RequestUri;
+        if (uri is null) return "<no-uri>";
+        if (uri.IsAbsoluteUri) return uri.ToString();
+        if (http.BaseAddress is { } baseAddr)
+            return new Uri(baseAddr, uri).ToString();
+        return uri.ToString();
+    }
+
+    /// <summary>
+    /// Маскирует JWT для лога: оставляет 8 первых и 4 последних символа,
+    /// между ними «…». Помогает по логу понять «один ли это токен» без раскрытия.
+    /// </summary>
+    private static string MaskToken(string? token)
+    {
+        if (string.IsNullOrWhiteSpace(token)) return "<empty>";
+        if (token.Length <= 16) return token[..Math.Min(4, token.Length)] + "…";
+        return token[..8] + "…" + token[^4..] + $" (len={token.Length})";
+    }
 
     private static HttpRequestMessage BuildRequest(
         HttpMethod method, string url, string? token, string? bodyJson = null)
@@ -126,7 +190,8 @@ public class ApiClient(HttpClient http)
         // ── Особый случай: ожидаем строку ──────────────────────────────
         // Сервер по контракту может вернуть JWT как plain text (без кавычек),
         // тогда JsonSerializer.Deserialize<string> упадёт. Обрабатываем оба
-        // варианта корректно.
+        // варианта корректно. ВАЖНО: возвращаем trimmed-значение —
+        // \r\n в конце ломает заголовок Authorization при следующем запросе.
         if (typeof(T) == typeof(string))
         {
             var trimmed = content?.Trim() ?? string.Empty;
@@ -138,17 +203,17 @@ public class ApiClient(HttpClient http)
                 try
                 {
                     var parsed = JsonSerializer.Deserialize<string>(trimmed, JsonOptions);
-                    return (T)(object)(parsed ?? string.Empty);
+                    return (T)(object)((parsed ?? string.Empty).Trim());
                 }
                 catch
                 {
                     // Падать не будем — отдадим как есть, без кавычек
-                    var unquoted = trimmed[1..^1];
+                    var unquoted = trimmed[1..^1].Trim();
                     return (T)(object)unquoted;
                 }
             }
 
-            return (T)(object)(content ?? string.Empty);
+            return (T)(object)trimmed;
         }
 
         // ── Обычная JSON-десериализация ────────────────────────────────

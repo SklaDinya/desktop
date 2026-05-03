@@ -3,7 +3,7 @@ using SklaDinya_desktop_BL_component.Interfaces.Logging;
 using SklaDinya_desktop_BL_component.Interfaces.Repositories;
 using SklaDinya_desktop_BL_component.Interfaces.Services;
 using SklaDinya_desktop_BL_component.Services;
-using SklaDinya_desktop_BackendMock;
+// using SklaDinya_desktop_BackendMock; // BackendMock отключён: бэкенд готов и работает.
 using SklaDinya_desktop_DA_component.Http;
 using SklaDinya_desktop_DA_component.Repositories;
 using SklaDinya_desktop_UI_component;
@@ -24,7 +24,11 @@ internal static class Program
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
             .Build();
 
-        var useMock = bool.TryParse(config["Api:UseMock"], out var m) && m;
+        // BackendMock отключён: бэкенд готов и работает.
+        // Флаг Api:UseMock из appsettings.json больше не учитывается;
+        // если потребуется снова включить мок — раскомментируйте блок ниже,
+        // верните using SklaDinya_desktop_BackendMock; и ссылку на проект
+        // SklaDinya_desktop-BackendMock в SklaDinya_desktop-Main.csproj.
 
         IAuthRepository authRepo;
         IBookingRepository bookingRepo;
@@ -35,20 +39,21 @@ internal static class Program
         IStorageRepository storageRepo;
         IUserRepository userRepo;
 
-        if (useMock)
-        {
-            // ── Заглушка (без сервера) ──────────────────────────────────
-            var mockBookingRepo = new MockBookingRepository();
-            authRepo = new MockAuthRepository();
-            bookingRepo = mockBookingRepo;
-            cellRepo = new MockCellRepository();
-            operatorRepo = new MockOperatorRepository();
-            paymentRepo = new MockPaymentRepository(mockBookingRepo);
-            priceRepo = new MockPriceRepository();
-            storageRepo = new MockStorageRepository();
-            userRepo = new MockUserRepository();
-        }
-        else
+        // var useMock = bool.TryParse(config["Api:UseMock"], out var m) && m;
+        // if (useMock)
+        // {
+        //     // ── Заглушка (без сервера) ──────────────────────────────────
+        //     var mockBookingRepo = new MockBookingRepository();
+        //     authRepo = new MockAuthRepository();
+        //     bookingRepo = mockBookingRepo;
+        //     cellRepo = new MockCellRepository();
+        //     operatorRepo = new MockOperatorRepository();
+        //     paymentRepo = new MockPaymentRepository(mockBookingRepo);
+        //     priceRepo = new MockPriceRepository();
+        //     storageRepo = new MockStorageRepository();
+        //     userRepo = new MockUserRepository();
+        // }
+        // else
         {
             // ── Реальный API-сервер ─────────────────────────────────────
             var baseUrl = config["Api:BaseUrl"] ?? "http://localhost";
@@ -79,7 +84,7 @@ internal static class Program
         IStorageService storageService = new StorageService(storageRepo, session);
         IUserService userService = new UserService(userRepo, session);
 
-        // ── Инфраструктура: логгер (реализация в DA, контракт в BL) ─────
+        // ── Инфраструктура: ─────────────────────────────────────────────
         IAppLogger logger = new FileLoggerAdapter();
 
         // ── Инициализация ServiceLocator для UI ─────────────────────────

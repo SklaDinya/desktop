@@ -13,15 +13,18 @@ public class StorageApplicationsTab : UserControl
     {
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
+        // Внешний отступ от бокового меню и краёв страницы — единый стиль с
+        // остальными вкладками личного кабинета.
+        Padding = new Padding(24, 0, 24, 24);
 
-        var title = new Label { Text = "Заявки на пункты хранения", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, Dock = DockStyle.Top, Height = 50, Padding = new Padding(24, 14, 0, 0) };
+        var title = new Label { Text = "Заявки на пункты хранения", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, Dock = DockStyle.Top, Height = 50, Padding = new Padding(0, 14, 0, 0) };
 
         var toolbar = new Panel { Dock = DockStyle.Top, Height = 52 };
-        var approveBtn = new RoundedButton { Text = "Одобрить", BackColor = AppTheme.Secondary, Size = new Size(130, 34), Location = new Point(24, 9) };
+        var approveBtn = new RoundedButton { Text = "Одобрить", BackColor = AppTheme.Secondary, Size = new Size(130, 34), Location = new Point(0, 9) };
         approveBtn.Click += OnApprove;
-        var rejectBtn = new RoundedButton { Text = "Отклонить", BackColor = AppTheme.Danger, Size = new Size(130, 34), Location = new Point(166, 9) };
+        var rejectBtn = new RoundedButton { Text = "Отклонить", BackColor = AppTheme.Danger, Size = new Size(130, 34), Location = new Point(142, 9) };
         rejectBtn.Click += OnReject;
-        var refreshBtn = new RoundedButton { Text = "Обновить", BackColor = AppTheme.Primary, Size = new Size(110, 34), Location = new Point(308, 9) };
+        var refreshBtn = new RoundedButton { Text = "Обновить", BackColor = AppTheme.Primary, Size = new Size(110, 34), Location = new Point(284, 9) };
         refreshBtn.Click += async (_, _) => await LoadAsync();
         toolbar.Controls.AddRange([approveBtn, rejectBtn, refreshBtn]);
 
@@ -44,10 +47,7 @@ public class StorageApplicationsTab : UserControl
             new DataGridViewTextBoxColumn { HeaderText = "Создан" }
         );
 
-        var gridWrapper = new Panel { Dock = DockStyle.Fill, Padding = new Padding(24, 0, 24, 16) };
-        gridWrapper.Controls.Add(_grid);
-
-        Controls.Add(gridWrapper);
+        Controls.Add(_grid);
         Controls.Add(toolbar);
         Controls.Add(title);
 
@@ -56,7 +56,12 @@ public class StorageApplicationsTab : UserControl
 
     private async Task LoadAsync()
     {
-        var storages = await ErrorHelper.TryAsync(() => ServiceLocator.StorageService.GetStoragesAsync(new StorageSearchQuery { PageNumber = 0, PageSize = 100 }));
+        // Используем новый эндпоинт /storages/requests (требует JWT) —
+        // на нём действительно лежат заявки. Раньше шли на /storages,
+        // который теперь отдаёт только подтверждённые пункты.
+        var storages = await ErrorHelper.TryAsync(() =>
+            ServiceLocator.StorageService.GetStorageRequestsAsync(
+                new StorageSearchQuery { PageNumber = 0, PageSize = 100 }));
         if (storages is null) return;
         _grid.Rows.Clear();
         foreach (var s in storages)

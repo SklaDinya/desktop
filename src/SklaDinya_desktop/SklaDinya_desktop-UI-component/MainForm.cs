@@ -100,13 +100,14 @@ public class MainForm : Form
         }
         var bookingScreen = new BookingScreen(storage);
         bookingScreen.BackRequested += (_, _) => NavigateHome();
-        bookingScreen.ProceedToPayment += (_, form) => ShowPaymentScreen(form, storage);
+        bookingScreen.ProceedToPayment += (_, args) =>
+            ShowPaymentScreen(args.Form, args.TotalPrice, storage);
         ShowScreen(bookingScreen);
     }
 
-    private void ShowPaymentScreen(BookingCreateForm form, StorageModel storage)
+    private void ShowPaymentScreen(BookingCreateForm form, decimal totalPrice, StorageModel storage)
     {
-        var payScreen = new PaymentScreen(form);
+        var payScreen = new PaymentScreen(form, totalPrice);
         payScreen.BackRequested += (_, _) => OnBookingRequested(this, storage);
         payScreen.PaymentSuccess += (_, _) =>
         {
@@ -119,7 +120,7 @@ public class MainForm : Form
         {
             var result = new PaymentResultScreen(false);
             result.GoHome += (_, _) => NavigateHome();
-            result.RetryPayment += (_, _) => ShowPaymentScreen(form, storage);
+            result.RetryPayment += (_, _) => ShowPaymentScreen(form, totalPrice, storage);
             ShowScreen(result);
         };
         ShowScreen(payScreen);
@@ -135,7 +136,10 @@ public class MainForm : Form
         { _homeScreen = new HomeScreen(); _homeScreen.BookingRequested += OnBookingRequested; ShowScreen(_homeScreen); }
         try
         {
-            var results = await ServiceLocator.StorageService.GetStoragesAsync(new StorageSearchQuery { Name = text, Address = text, PageNumber = 0, PageSize = 20 });
+            // Бэкенд не умеет «name OR address» одним запросом — реализация
+            // SearchStoragesAsync шлёт два запроса и объединяет результаты
+            // с дедупом по названию пункта.
+            var results = await ServiceLocator.StorageService.SearchStoragesAsync(text, pageNumber: 0, pageSize: 20);
             _homeScreen.ShowResults(results);
         }
         catch { _homeScreen.ShowResults([]); }

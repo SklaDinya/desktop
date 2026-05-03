@@ -19,6 +19,8 @@ public class MyStorageBookingsTab : UserControl
     {
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
+        // Внешний отступ от бокового меню и краёв страницы.
+        Padding = new Padding(24, 0, 24, 24);
 
         var title = new Label
         {
@@ -27,23 +29,28 @@ public class MyStorageBookingsTab : UserControl
             ForeColor = AppTheme.Primary,
             Dock = DockStyle.Top,
             Height = 50,
-            Padding = new Padding(24, 14, 0, 0),
+            Padding = new Padding(0, 14, 0, 0),
         };
 
-        // Фильтры
-        var filterPanel = new Panel { Dock = DockStyle.Top, Height = 50, Padding = new Padding(24, 8, 24, 8) };
+        // Фильтры — внутри отступ 8 px по вертикали; по горизонтали отдельные
+        // расстояния между лейблом и полем даты, чтобы они не наезжали друг на друга.
+        var filterPanel = new Panel { Dock = DockStyle.Top, Height = 50, Padding = new Padding(0, 8, 0, 8) };
         var fromLabel = new Label { Text = "С:", AutoSize = true, Location = new Point(0, 14), Font = AppTheme.FontMedium };
         _startPicker = new DateTimePicker
         {
             Format = DateTimePickerFormat.Short,
-            Location = new Point(24, 10), Width = 130,
+            // Сдвигаем сильнее вправо: «С:» с шрифтом FontMedium занимает ~22 px,
+            // плюс комфортный зазор 12 px = 34 px от начала панели.
+            Location = new Point(34, 10), Width = 160,
             Value = DateTime.Today,
         };
-        var toLabel = new Label { Text = "По:", AutoSize = true, Location = new Point(168, 14), Font = AppTheme.FontMedium };
+        var toLabel = new Label { Text = "По:", AutoSize = true, Location = new Point(210, 14), Font = AppTheme.FontMedium };
         _endPicker = new DateTimePicker
         {
             Format = DateTimePickerFormat.Short,
-            Location = new Point(200, 10), Width = 130,
+            // Аналогично: «По:» занимает ~28 px + зазор 12 px = смещение 40 px
+            // от своей метки (210 + 40 = 250).
+            Location = new Point(250, 10), Width = 160,
             Value = DateTime.Today.AddDays(30),
         };
         _searchButton = new RoundedButton
@@ -51,7 +58,8 @@ public class MyStorageBookingsTab : UserControl
             Text = "Найти",
             BackColor = AppTheme.Primary,
             Width = 100, Height = 34,
-            Location = new Point(350, 8),
+            // Сдвигаем кнопку вправо вслед за расширившимися полями.
+            Location = new Point(424, 8),
         };
         _searchButton.Click += async (_, _) => await LoadAsync();
         filterPanel.Controls.AddRange([fromLabel, _startPicker, toLabel, _endPicker, _searchButton]);

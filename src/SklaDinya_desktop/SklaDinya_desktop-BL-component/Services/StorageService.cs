@@ -19,6 +19,58 @@ public class StorageService(IStorageRepository storageRepository, ISessionServic
     }
 
     /// <inheritdoc/>
+    public async Task<List<StorageModel>> SearchStoragesAsync(
+        string text, int pageNumber = 0, int pageSize = 20)
+    {
+        // Пустая строка — возвращаем общий список без фильтра.
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return await storageRepository.GetStoragesAsync(
+                new StorageSearchQuery { PageNumber = pageNumber, PageSize = pageSize });
+        }
+
+        var trimmed = text.Trim();
+
+        // Запускаем оба запроса параллельно — это вдвое быстрее, чем
+        // последовательно, и для пользователя выглядит как один поиск.
+        var byNameTask = storageRepository.GetStoragesAsync(new StorageSearchQuery
+        {
+            Name = trimmed,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+        });
+        var byAddressTask = storageRepository.GetStoragesAsync(new StorageSearchQuery
+        {
+            Address = trimmed,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+        });
+
+        // Если хотя бы один запрос упал — пробрасываем исключение наверх,
+        // частичный результат не выдаём (это сбило бы пользователя с толку).
+        var results = await Task.WhenAll(byNameTask, byAddressTask);
+
+        // Объединяем с дедупом по названию пункта (договорённость с бэкендером).
+        // Сравнение регистронезависимое — «Хранилище Х» и «хранилище х»
+        // считаются одним и тем же объявлением.
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var merged = new List<StorageModel>(capacity: results[0].Count + results[1].Count);
+        foreach (var storage in results.SelectMany(r => r))
+        {
+            if (seen.Add(storage.Name))
+                merged.Add(storage);
+        }
+        return merged;
+    }
+
+    /// <inheritdoc/>
+    public Task<List<StorageModel>> GetStorageRequestsAsync(StorageSearchQuery query)
+    {
+        ArgumentNullException.ThrowIfNull(query, nameof(query));
+        return storageRepository.GetStorageRequestsAsync(query, session.Token!);
+    }
+
+    /// <inheritdoc/>
     public Task CreateStorageAsync(StorageCreateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
