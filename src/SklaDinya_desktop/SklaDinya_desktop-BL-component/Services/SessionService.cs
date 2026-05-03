@@ -7,8 +7,6 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Реализация сессии приложения.
-/// Хранит JWT-токен и распарсенный payload в памяти процесса.
-/// При установке токена автоматически извлекает из него роль и остальные данные.
 /// </summary>
 public class SessionService : ISessionService
 {

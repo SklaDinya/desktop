@@ -175,11 +175,6 @@ public class BookingScreen : UserControl
             BookingTime = TimeSpan.FromHours((double)_hoursUpDown.Value),
         };
 
-        // Создаём бронирование прямо здесь — это даёт нам цену, посчитанную
-        // на сервере (поле booking.Price), и сохранённый в BookingService
-        // LastReceipt для последующего вызова оплаты. Раньше создание
-        // выполнялось внутри PaymentScreen.OnPayClick, но тогда цену
-        // приходилось считать на клиенте — теперь это не нужно.
         _payButton.Enabled = false;
         var booking = await ErrorHelper.TryAsync(
             () => ServiceLocator.BookingService.CreateBookingAsync(form));
@@ -193,8 +188,6 @@ public class BookingScreen : UserControl
 
 /// <summary>
 /// Аргументы события «перейти к оплате»: уже созданное на сервере бронирование.
-/// Содержит итоговую стоимость <see cref="BookingModel.Price"/>, посчитанную
-/// бэкендом, и идентификатор — больше ничего повторно создавать не нужно.
 /// </summary>
 public sealed class BookingProceedEventArgs : EventArgs
 {

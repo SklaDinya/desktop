@@ -17,8 +17,6 @@ public class UsersManagementTab : UserControl
         BackColor = AppTheme.Background;
 
         var title = new Label { Text = "Управление пользователями", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, Dock = DockStyle.Top, Height = 50, Padding = new Padding(24, 14, 0, 0) };
-
-        // Тулбар с отступом слева 24px
         var toolbar = new Panel { Dock = DockStyle.Top, Height = 52 };
         _searchField = new RoundedTextBox { Placeholder = "Поиск по имени...", Width = 220, Height = 34, Location = new Point(24, 8) };
         var searchBtn = new RoundedButton { Text = "Найти", BackColor = AppTheme.Primary, Size = new Size(90, 34), Location = new Point(256, 9) };

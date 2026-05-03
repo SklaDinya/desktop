@@ -61,10 +61,6 @@ public class ActiveBookingsTab : UserControl
 
         foreach (var b in active)
         {
-            // Кнопка «Отменить» показывается только для бронирований, которые
-            // ещё не были оплачены (статус Created). Уже оплаченные/идущие
-            // бронирования отменить через эту кнопку нельзя — их жизненный
-            // цикл управляется иначе (через оператора пункта).
             var canCancel = b.Status == BookingStatus.Created;
             var card = new BookingCard(b, showCancelButton: canCancel);
             if (canCancel)

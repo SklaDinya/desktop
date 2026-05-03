@@ -15,12 +15,7 @@ public class PaymentResultScreen : UserControl
         BackColor = AppTheme.Background;
 
         var container = new Panel { Width = 500, BackColor = AppTheme.PanelBackground };
-
-        // Увеличенный верхний отступ — иконка крупная и должна «дышать».
         int y = 56;
-
-        // Иконке нужно больше высоты, чем 70px при шрифте 44pt + Bold —
-        // иначе нижние пиксели налезали на белую плашку с текстом.
         var icon = new Label
         {
             Text = success ? "✓" : "✗",
@@ -30,7 +25,6 @@ public class PaymentResultScreen : UserControl
             Size = new Size(500, 110),
             Location = new Point(0, y),
         };
-        // Гарантированный воздух между иконкой и заголовком.
         y += 110 + 16;
 
         var msg = new Label

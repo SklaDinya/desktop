@@ -120,8 +120,6 @@ public class MainForm : Form
         {
             var result = new PaymentResultScreen(false);
             result.GoHome += (_, _) => NavigateHome();
-            // При повторе оплаты используем то же бронирование (оно уже создано
-            // на сервере, его Receipt сохранён в BookingService.LastReceipt).
             result.RetryPayment += (_, _) => ShowPaymentScreen(booking, storage);
             ShowScreen(result);
         };
@@ -138,9 +136,6 @@ public class MainForm : Form
         { _homeScreen = new HomeScreen(); _homeScreen.BookingRequested += OnBookingRequested; ShowScreen(_homeScreen); }
         try
         {
-            // Бэкенд не умеет «name OR address» одним запросом — реализация
-            // SearchStoragesAsync шлёт два запроса и объединяет результаты
-            // с дедупом по названию пункта.
             var results = await ServiceLocator.StorageService.SearchStoragesAsync(text, pageNumber: 0, pageSize: 20);
             _homeScreen.ShowResults(results);
         }

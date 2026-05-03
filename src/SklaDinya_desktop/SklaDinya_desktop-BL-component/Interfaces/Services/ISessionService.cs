@@ -5,7 +5,6 @@ namespace SklaDinya_desktop_BL_component.Interfaces.Services;
 
 /// <summary>
 /// Сервис сессии — хранит JWT-токен и данные из его payload.
-/// Используется сервисами для проверки роли и репозиториями для получения токена.
 /// </summary>
 public interface ISessionService
 {
@@ -20,7 +19,6 @@ public interface ISessionService
 
     /// <summary>
     /// Сохранить новый JWT-токен и распарсить его payload.
-    /// Вызывается после логина, регистрации и обновления профиля.
     /// </summary>
     void SetToken(string token);
 

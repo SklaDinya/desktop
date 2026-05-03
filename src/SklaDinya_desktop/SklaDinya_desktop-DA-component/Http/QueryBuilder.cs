@@ -4,7 +4,6 @@ namespace SklaDinya_desktop_DA_component.Http;
 
 /// <summary>
 /// Строитель URL с query-параметрами.
-/// Null-значения автоматически пропускаются — параметр не добавляется в строку запроса.
 /// </summary>
 public class QueryBuilder(string baseUrl)
 {

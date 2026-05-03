@@ -8,14 +8,11 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис для работы с бронированиями.
-/// Хранит чек последнего созданного бронирования — UI берёт его через
-/// <see cref="LastReceipt"/> и передаёт в <see cref="IPaymentService"/>.
 /// </summary>
 public class BookingService(IBookingRepository bookingRepository, ISessionService session) : IBookingService
 {
     /// <summary>
     /// Чек последнего созданного (но ещё не оплаченного) бронирования.
-    /// Сбрасывается при создании нового бронирования.
     /// </summary>
     public BookingReceiptModel? LastReceipt { get; private set; }
 
@@ -28,9 +25,7 @@ public class BookingService(IBookingRepository bookingRepository, ISessionServic
 
     /// <inheritdoc/>
     /// <remarks>
-    /// Чек сохраняется в <see cref="LastReceipt"/>. UI не должен хранить его самостоятельно —
-    /// для оплаты нужно вызвать <see cref="IPaymentService"/> передав
-    /// <c>new PaymentForm { Receipt = bookingService.LastReceipt!.Receipt }</c>.
+    /// Чек сохраняется в <see cref="LastReceipt"/>.
     /// </remarks>
     public async Task<BookingModel> CreateBookingAsync(BookingCreateForm form)
     {

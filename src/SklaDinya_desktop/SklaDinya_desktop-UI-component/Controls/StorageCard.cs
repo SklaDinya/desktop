@@ -17,8 +17,6 @@ public class StorageCard : UserControl
     public StorageCard(StorageModel storage)
     {
         Storage = storage;
-        // Высота увеличена со 110 до 140, чтобы описание помещалось
-        // на две строки и не обрезалось при переносе.
         Size = new Size(700, 140);
         Margin = new Padding(0, 0, 0, 12);
         BackColor = Color.Transparent;
@@ -28,11 +26,7 @@ public class StorageCard : UserControl
         {
             Text = "Забронировать",
             ButtonColor = AppTheme.Secondary,
-            // Ширина увеличена со 130 до 144 (~10%), чтобы текст
-            // выглядел просторнее, без впритык.
             Size = new Size(144, 34),
-            // Кнопку центрируем по вертикали относительно новой высоты карточки.
-            // Правый отступ от края сохраняем 20 px.
             Location = new Point(Width - 164, (140 - 34) / 2),
         };
         _bookBtn.Click += (_, _) => BookClicked?.Invoke(this, EventArgs.Empty);
@@ -44,8 +38,6 @@ public class StorageCard : UserControl
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // Фон под скруглёнными углами рисуем цветом фактического (непрозрачного)
-        // предка — иначе угол будет чёрным, как у RoundedButton.
         var parentBg = ResolveOpaqueParentBackground();
         using (var bgBrush = new SolidBrush(parentBg))
             g.FillRectangle(bgBrush, ClientRectangle);
@@ -66,19 +58,15 @@ public class StorageCard : UserControl
         if (!string.IsNullOrEmpty(Storage.Description))
         {
             using var mutedBrush = new SolidBrush(AppTheme.TextMuted);
-            // Область под описание: было 36px, теперь 64px — на 2 строки.
-            // Также включаем перенос слов и обрезку по символам.
             using var fmt = new StringFormat
             {
                 Trimming = StringTrimming.EllipsisWord,
-                FormatFlags = 0, // word wrap включён по умолчанию
+                FormatFlags = 0,
             };
             g.DrawString(
                 Storage.Description,
                 AppTheme.FontSmall,
                 mutedBrush,
-                // Ширину области описания подгоняем под расширенную кнопку:
-                // кнопка теперь 144 px + 20 px правый отступ = резерв 184 px.
                 new RectangleF(20, 66, Width - 184, 64),
                 fmt);
         }

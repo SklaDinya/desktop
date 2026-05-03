@@ -38,8 +38,6 @@ public class BookingCard : UserControl
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // Под скруглёнными углами рисуем цвет фактического непрозрачного
-        // предка, иначе углы получаются чёрными (как у RoundedButton).
         var parentBg = ResolveOpaqueParentBackground();
         using (var bgBrush = new SolidBrush(parentBg))
             g.FillRectangle(bgBrush, ClientRectangle);

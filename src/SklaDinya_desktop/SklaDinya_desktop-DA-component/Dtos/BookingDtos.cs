@@ -14,9 +14,6 @@ public record BookingCreateRequest(
 
 /// <summary>
 /// Ответ API: бронирование для пользователя.
-/// Поле <c>price</c> теперь возвращается сервером — клиент больше не считает
-/// стоимость самостоятельно. Тип <see cref="decimal"/> подходит и для целых
-/// (993), и для дробных значений (4.50).
 /// </summary>
 public record BookingUserDto(
     Guid Id,
@@ -33,8 +30,6 @@ public record BookingUserDto(
 
 /// <summary>
 /// Ответ API: бронирование для оператора.
-/// По swagger поле <c>price</c> здесь не помечено как required, но фактически
-/// присутствует — десериализуем так же, как в <see cref="BookingUserDto"/>.
 /// </summary>
 public record BookingOperatorDto(
     Guid Id,

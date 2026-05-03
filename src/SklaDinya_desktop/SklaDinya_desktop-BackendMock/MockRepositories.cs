@@ -240,8 +240,6 @@ public class MockStorageRepository : IStorageRepository
 
     public Task<List<StorageModel>> GetStorageRequestsAsync(StorageSearchQuery query, string token)
     {
-        // В реальном API заявки — это пункты в статусе Created, ожидающие
-        // одобрения. Мок возвращает их соответственно.
         var result = _storages.Where(s => s.Status == StorageStatus.Created);
         if (!string.IsNullOrWhiteSpace(query.Name))
             result = result.Where(s => s.Name.Contains(query.Name, StringComparison.OrdinalIgnoreCase));

@@ -7,7 +7,6 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис для проведения оплаты бронирований.
-/// Чек берётся из <see cref="IBookingService.LastReceipt"/> — UI не должен передавать его вручную.
 /// </summary>
 public class PaymentService(
     IPaymentRepository paymentRepository,

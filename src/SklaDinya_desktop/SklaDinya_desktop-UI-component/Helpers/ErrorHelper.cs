@@ -4,20 +4,6 @@ namespace SklaDinya_desktop_UI_component.Helpers;
 
 /// <summary>
 /// Обёртка для безопасного выполнения асинхронных операций с показом ошибок пользователю.
-/// При любом исключении пишет полную информацию через <see cref="ServiceLocator.Logger"/>,
-/// который реализован в DA-компоненте, но используется здесь только через интерфейс из BL.
-/// </summary>
-/// <remarks>
-/// Сигнатуры публичных методов (число и порядок параметров) намеренно совпадают с
-/// исходным <see cref="ErrorHelper"/>. Соблазн добавить
-/// <see cref="System.Runtime.CompilerServices.CallerMemberNameAttribute"/> и
-/// <see cref="System.Runtime.CompilerServices.CallerFilePathAttribute"/>
-/// сюда сильный, но добавление таких параметров со значениями по умолчанию
-/// сместит разрешение перегрузок: компилятор начнёт выбирать generic-вариант
-/// для вызовов вида <c>TryAsync(() =&gt; SomethingAsync(), "Готово.")</c>,
-/// и появятся CS0029 в местах, где ожидается <see cref="bool"/>. Поэтому
-/// caller-информацию мы получаем из <see cref="System.Diagnostics.StackTrace"/>
-/// внутри метода — это совместимо с существующими вызовами и не ломает сборку.
 /// </remarks>
 public static class ErrorHelper
 {
@@ -80,7 +66,6 @@ public static class ErrorHelper
     private static void LogUiError(Exception ex)
     {
         var (caller, file) = ResolveCaller();
-        // ServiceLocator.Logger — IAppLogger из BL. UI к DA напрямую не обращается.
         ServiceLocator.Logger.Error(
             $"Ошибка в UI-операции ({caller})",
             ex,
@@ -91,12 +76,6 @@ public static class ErrorHelper
             });
     }
 
-    /// <summary>
-    /// Достаёт первый кадр стека, который не принадлежит самому
-    /// <see cref="ErrorHelper"/> — это и есть UI-метод, вызвавший
-    /// <c>TryAsync</c>. Полностью без изменения сигнатур публичных методов,
-    /// поэтому не ломает разрешение перегрузок у вызывающего кода.
-    /// </summary>
     private static (string Member, string File) ResolveCaller()
     {
         try
@@ -110,8 +89,6 @@ public static class ErrorHelper
                 var declaringType = method.DeclaringType;
                 if (declaringType == typeof(ErrorHelper)) continue;
 
-                // Пропускаем компилятор-сгенерированные state machine async-методов:
-                // у них имена вида "<MoveNext>g__SomeName|0_0".
                 var typeName = declaringType?.FullName ?? "<unknown>";
                 if (typeName.Contains('+') &&
                     method.Name is "MoveNext" or "InvokeStub")

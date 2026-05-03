@@ -7,11 +7,6 @@ namespace SklaDinya_desktop_UI_component.Screens.Main;
 
 /// <summary>
 /// Экран оплаты уже созданного бронирования.
-/// На вход получает <see cref="BookingModel"/> — бронирование к этому моменту
-/// уже создано на сервере (см. <c>BookingScreen.OnPayClick</c>), и в нём есть
-/// поле <see cref="BookingModel.Price"/>, которое и показываем как «Итого к оплате».
-/// При клике «Оплатить» бронирование повторно не создаётся — сразу
-/// дёргается соответствующий метод <see cref="IPaymentService"/>.
 /// </summary>
 public class PaymentScreen : UserControl
 {
@@ -37,12 +32,9 @@ public class PaymentScreen : UserControl
         var title = new Label { Text = "Оплата бронирования", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, AutoSize = true, Location = new Point(32, y) };
         y += 50;
 
-        // Информация в столбец — берём всё из BookingModel, который уже
-        // получен от сервера и содержит итоговую цену.
         AddInfoLine(container, "Количество ячеек:", $"{booking.Cells.Count}", ref y);
         AddInfoLine(container, "Начало:", $"{booking.StartTime.ToLocalTime():dd.MM.yyyy HH:mm}", ref y);
         AddInfoLine(container, "Длительность:", $"{booking.BookingTime.TotalHours:F0} ч.", ref y);
-        // Итоговая стоимость — пришла от сервера в поле booking.Price.
         AddInfoLine(container, "Итого к оплате:", $"{booking.Price:F2} ₽", ref y, valueIsAccent: true);
         y += 12;
 
@@ -76,7 +68,6 @@ public class PaymentScreen : UserControl
     private void AddInfoLine(Panel container, string label, string value, ref int y, bool valueIsAccent = false)
     {
         container.Controls.Add(new Label { Text = label, Font = AppTheme.FontMedium, ForeColor = AppTheme.TextMuted, AutoSize = true, Location = new Point(32, y) });
-        // Итоговую сумму выделяем — другой шрифт и акцентный цвет.
         var valueLabel = new Label
         {
             Text = value,
@@ -94,8 +85,6 @@ public class PaymentScreen : UserControl
         _payButton.Enabled = false;
         _backButton.Enabled = false;
 
-        // Бронирование уже создано на предыдущем экране. Здесь только
-        // выполняем платёж по ранее сохранённому в BookingService.LastReceipt чеку.
         bool success;
         if (_radioNoop.Checked)
         {

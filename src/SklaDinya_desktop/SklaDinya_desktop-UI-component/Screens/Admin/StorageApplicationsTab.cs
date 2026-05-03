@@ -13,8 +13,6 @@ public class StorageApplicationsTab : UserControl
     {
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
-        // Внешний отступ от бокового меню и краёв страницы — единый стиль с
-        // остальными вкладками личного кабинета.
         Padding = new Padding(24, 0, 24, 24);
 
         var title = new Label { Text = "Заявки на пункты хранения", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, Dock = DockStyle.Top, Height = 50, Padding = new Padding(0, 14, 0, 0) };
@@ -56,9 +54,6 @@ public class StorageApplicationsTab : UserControl
 
     private async Task LoadAsync()
     {
-        // Используем новый эндпоинт /storages/requests (требует JWT) —
-        // на нём действительно лежат заявки. Раньше шли на /storages,
-        // который теперь отдаёт только подтверждённые пункты.
         var storages = await ErrorHelper.TryAsync(() =>
             ServiceLocator.StorageService.GetStorageRequestsAsync(
                 new StorageSearchQuery { PageNumber = 0, PageSize = 100 }));

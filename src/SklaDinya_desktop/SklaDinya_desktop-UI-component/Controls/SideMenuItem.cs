@@ -4,7 +4,6 @@ namespace SklaDinya_desktop_UI_component.Controls;
 
 /// <summary>
 /// Пункт бокового меню с подсветкой при выборе.
-/// Текст переносится если не помещается в ширину.
 /// </summary>
 public class SideMenuItem : Panel
 {

@@ -5,7 +5,6 @@ namespace SklaDinya_desktop_UI_component.Controls;
 
 /// <summary>
 /// Кнопка со скруглёнными краями, реализованная как UserControl.
-/// Никакого наследования от Button — WinForms не рисует свои рамки.
 /// </summary>
 public class RoundedButton : UserControl
 {
@@ -38,7 +37,6 @@ public class RoundedButton : UserControl
         set { _backFillColor = value; Invalidate(); }
     }
 
-    // Для совместимости: BackColor = устанавливает ButtonColor
     public new Color BackColor
     {
         get => base.BackColor;
@@ -73,10 +71,6 @@ public class RoundedButton : UserControl
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        // ВАЖНО: g.Clear(Color.Transparent) рисует ЧЁРНЫЙ фон,
-        // т.к. Graphics не поддерживает прозрачную заливку. Поэтому
-        // поднимаемся вверх по дереву родителей, пока не найдём
-        // непрозрачный фон, и заливаем его за нашими скруглёнными углами.
         var bg = ResolveOpaqueBackground();
         using (var bgBrush = new SolidBrush(bg))
             g.FillRectangle(bgBrush, ClientRectangle);
@@ -100,26 +94,13 @@ public class RoundedButton : UserControl
             g.DrawString(_text, Font, brush, x, y);
     }
 
-    /// <summary>
-    /// Возвращает фактический непрозрачный цвет, на котором нужно рисовать кнопку.
-    /// Кнопка часто стоит внутри карточки с BackColor = Color.Transparent —
-    /// в этом случае нельзя брать BackColor родителя, надо подниматься выше,
-    /// либо нарисовать цвет панели карточки (PanelBackground).
-    /// </summary>
     private Color ResolveOpaqueBackground()
     {
         var p = Parent;
         while (p is not null)
         {
-            // Color.Transparent имеет A=0 — пропускаем.
             if (p.BackColor.A != 0)
             {
-                // Если попали в карточку, у которой реально нарисована
-                // светлая панель (PanelBackground), но BackColor родителя =
-                // фон формы — кнопка визуально стоит на PanelBackground.
-                // Эвристика: если непосредственный Parent — UserControl с
-                // прозрачным фоном (карточка, рисующая панель в OnPaint), —
-                // используем PanelBackground.
                 if (Parent is UserControl uc &&
                     uc.BackColor.A == 0 &&
                     !ReferenceEquals(uc, p))

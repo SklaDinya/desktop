@@ -4,9 +4,6 @@ namespace SklaDinya_desktop_BL_component.Models;
 
 /// <summary>
 /// Данные, извлечённые из payload JWT-токена.
-/// Поля соответствуют тому, что кладёт бэкенд:
-///   userId, userRole — для всех пользователей;
-///   storageId, role  — дополнительно для операторов.
 /// </summary>
 public class JwtPayload
 {

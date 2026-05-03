@@ -6,8 +6,6 @@ namespace SklaDinya_desktop_DA_component.Mapping;
 internal static partial class Mapper
 {
     // ── BL → DA ────────────────────────────────────────────────────────────
-    // Auth не возвращает модели — сервер отдаёт JWT-строку напрямую.
-    // Направление DA → BL здесь отсутствует намеренно.
 
     public static LoginRequest ToLoginRequest(LoginForm form) =>
         new(form.Username, form.Password);

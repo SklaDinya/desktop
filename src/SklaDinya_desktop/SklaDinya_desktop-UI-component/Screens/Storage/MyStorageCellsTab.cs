@@ -21,9 +21,6 @@ public class MyStorageCellsTab : UserControl
     {
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
-        // Внешний отступ от бокового меню и краёв страницы; все Dock-дети
-        // (заголовок, панель добавления, таблица) автоматически отрисуются
-        // в этом «прямоугольнике с полями».
         Padding = new Padding(24, 0, 24, 24);
 
         var title = new Label

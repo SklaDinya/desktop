@@ -5,8 +5,6 @@ namespace SklaDinya_desktop_UI_component.Controls;
 
 /// <summary>
 /// Текстовое поле со скруглёнными краями и видимым placeholder.
-/// Когда поле пустое и не в фокусе — внутренний TextBox скрыт,
-/// placeholder рисуется графикой. При фокусе — TextBox показывается.
 /// </summary>
 public class RoundedTextBox : UserControl
 {
@@ -31,7 +29,6 @@ public class RoundedTextBox : UserControl
         _innerTextBox.LostFocus += (_, _) => { UpdateVisibility(); Invalidate(); };
         Controls.Add(_innerTextBox);
 
-        // Клик по пустой области — передать фокус внутреннему полю
         Click += (_, _) => { _innerTextBox.Visible = true; _innerTextBox.Focus(); };
 
         Height = AppTheme.FieldHeight;
@@ -65,7 +62,6 @@ public class RoundedTextBox : UserControl
 
     private void UpdateVisibility()
     {
-        // Прячем TextBox когда показываем placeholder, чтобы он не закрывал рисованный текст
         _innerTextBox.Visible = !ShowPlaceholder;
         Invalidate();
     }

@@ -29,8 +29,7 @@ public class BookingModel
     public TimeSpan BookingTime { get; set; }
 
     /// <summary>
-    /// Итоговая стоимость бронирования. Считается на бэкенде по тарифам
-    /// пункта хранения и длительности — клиент не пересчитывает.
+    /// Итоговая стоимость бронирования.
     /// </summary>
     public decimal Price { get; set; }
 

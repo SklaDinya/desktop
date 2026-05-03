@@ -5,8 +5,6 @@ namespace SklaDinya_desktop_UI_component.Helpers;
 
 /// <summary>
 /// Простой сервис-локатор для доступа к BL-сервисам и инфраструктуре из UI-компонентов.
-/// Инициализируется один раз при старте приложения. UI зависит только от BL-интерфейсов
-/// — конкретные реализации (репозитории, логгер) подставляет Main-проект.
 /// </summary>
 public static class ServiceLocator
 {
@@ -21,9 +19,7 @@ public static class ServiceLocator
     public static IUserService UserService { get; private set; } = null!;
 
     /// <summary>
-    /// Логгер приложения. Реализация передаётся из Main (обычно — FileLoggerAdapter из DA).
-    /// До инициализации использует «пустую» реализацию, чтобы UI не падал, если ошибка
-    /// возникла раньше старта.
+    /// Логгер приложения.
     /// </summary>
     public static IAppLogger Logger { get; private set; } = new NullLogger();
 

@@ -22,17 +22,8 @@ public class ApiClient(HttpClient http)
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters =
         {
-            // ВАЖНО: специфические конвертеры идут ПЕРЕД общим JsonStringEnumConverter,
-            // иначе общий перехватит тип первым (System.Text.Json берёт первый
-            // подходящий конвертер из коллекции).
-            //
-            // BookingStatusJsonConverter принимает обе формы — "Cancelled" (как
-            // шлёт реальный бэкенд) и "Canceled" (наше имя в C#).
             new BookingStatusJsonConverter(),
             new TimeSpanIso8601Converter(),
-            // Общий enum-конвертер для прочих перечислений (StorageStatusDto,
-            // UserRoleDto, OperatorRoleDto). Case-insensitive по умолчанию,
-            // поэтому "Active"/"active" обрабатываются одинаково.
             new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
         },
     };
@@ -105,13 +96,6 @@ public class ApiClient(HttpClient http)
 
     // ─── Helpers ────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Отправить запрос с записью в лог: до запроса — INFO с методом/URL/токеном,
-    /// после ответа — INFO со статусом. Сами тела запроса/ответа в INFO не пишем,
-    /// чтобы лог не разрастался; они попадают в ERROR-лог из <see cref="EnsureSuccessAsync"/>
-    /// при ненулевом статусе. Полный URL в логе можно скопировать в адресную строку
-    /// браузера (если запрос — GET без авторизации) или в curl-команду для проверки.
-    /// </summary>
     private async Task<HttpResponseMessage> LogRequestAndSendAsync(
         HttpRequestMessage request, string? requestBodyJson)
     {
@@ -133,11 +117,6 @@ public class ApiClient(HttpClient http)
         return response;
     }
 
-    /// <summary>
-    /// Возвращает полный URL запроса. <see cref="HttpRequestMessage.RequestUri"/>
-    /// может быть относительным, если у <see cref="HttpClient"/> задан BaseAddress —
-    /// для лога склеиваем их вручную, чтобы было что копировать в браузер.
-    /// </summary>
     private string ResolveFullUrl(HttpRequestMessage request)
     {
         var uri = request.RequestUri;
@@ -148,10 +127,6 @@ public class ApiClient(HttpClient http)
         return uri.ToString();
     }
 
-    /// <summary>
-    /// Маскирует JWT для лога: оставляет 8 первых и 4 последних символа,
-    /// между ними «…». Помогает по логу понять «один ли это токен» без раскрытия.
-    /// </summary>
     private static string MaskToken(string? token)
     {
         if (string.IsNullOrWhiteSpace(token)) return "<empty>";
@@ -175,11 +150,6 @@ public class ApiClient(HttpClient http)
         return request;
     }
 
-    /// <summary>
-    /// Десериализация ответа с особой обработкой <see cref="string"/>:
-    /// бэкенд может вернуть «голую» строку (например, JWT) либо как plain text,
-    /// либо как JSON-строку в кавычках. Поддерживаем оба варианта.
-    /// </summary>
     private static async Task<T> DeserializeAsync<T>(
         HttpResponseMessage response,
         HttpRequestMessage request,
@@ -187,11 +157,6 @@ public class ApiClient(HttpClient http)
     {
         var content = await response.Content.ReadAsStringAsync();
 
-        // ── Особый случай: ожидаем строку ──────────────────────────────
-        // Сервер по контракту может вернуть JWT как plain text (без кавычек),
-        // тогда JsonSerializer.Deserialize<string> упадёт. Обрабатываем оба
-        // варианта корректно. ВАЖНО: возвращаем trimmed-значение —
-        // \r\n в конце ломает заголовок Authorization при следующем запросе.
         if (typeof(T) == typeof(string))
         {
             var trimmed = content?.Trim() ?? string.Empty;

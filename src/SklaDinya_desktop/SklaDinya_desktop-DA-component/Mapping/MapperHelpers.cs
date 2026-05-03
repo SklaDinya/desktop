@@ -9,8 +9,6 @@ internal static partial class Mapper
 {
     /// <summary>
     /// Проверяет что строка не пустая и возвращает её.
-    /// Компилятор видит возвращаемый тип <c>string</c> (non-nullable),
-    /// поэтому в месте вызова оператор <c>!</c> не нужен.
     /// </summary>
     private static string RequireNonEmpty(string value, string field)
     {
