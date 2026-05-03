@@ -6,11 +6,6 @@ namespace SklaDinya_desktop_BL_DA_IntegrationalTests.Helpers;
 /// <summary>
 /// Строитель тестовых DTO объектов DA-компонента для интеграционных тестов.
 /// Использует реальные публичные типы вместо анонимных объектов.
-///
-/// Token() генерирует userRole в PascalCase ("Client", "StorageOperator", "Admin") —
-/// JwtHelper.ParsePayload использует Enum.TryParse без ignoreCase.
-/// Поле оператора в JWT называется "OperatorRole" — совпадает с TryGetProperty("OperatorRole") в JwtHelper.
-/// Кодирование — обычный Base64 без URL-замен, как в JwtHelper.DecodeBase64Url.
 /// </summary>
 internal static class FakeDto
 {
@@ -18,8 +13,6 @@ internal static class FakeDto
 
     /// <summary>
     /// Генерирует JWT с нужной ролью.
-    /// userRole должен совпадать с именем члена enum UserRole:
-    /// "Client", "StorageOperator", "Admin".
     /// </summary>
     public static string Token(string userRole = "Client")
     {
@@ -77,9 +70,10 @@ internal static class FakeDto
     // ── Price ──────────────────────────────────────────────────────────────
 
     public static PriceDto Price(Guid? storageId = null) => new(
+        PriceId: Guid.NewGuid(),
         StorageId: storageId ?? Guid.NewGuid(),
         CellClass: "Small",
-        Price: "99.99",
+        Price: 99.99m,
         CreatedAt: DateTime.UtcNow);
 
     public static List<PriceDto> PriceList(int count = 1)
@@ -135,6 +129,7 @@ internal static class FakeDto
             Cells: CellList(1),
             StartTime: DateTime.UtcNow,
             BookingTime: TimeSpan.FromHours(2),
+            Price: 199.98m,
             CreatedAt: DateTime.UtcNow,
             Status: BookingStatusDto.Paid);
     }
@@ -150,6 +145,7 @@ internal static class FakeDto
         Cells: CellList(1),
         StartTime: DateTime.UtcNow,
         BookingTime: TimeSpan.FromHours(1),
+        Price: 99.99m,
         CreatedAt: DateTime.UtcNow,
         Status: BookingStatusDto.Created);
 

@@ -25,10 +25,7 @@ internal static class Program
             .Build();
 
         // BackendMock отключён: бэкенд готов и работает.
-        // Флаг Api:UseMock из appsettings.json больше не учитывается;
-        // если потребуется снова включить мок — раскомментируйте блок ниже,
-        // верните using SklaDinya_desktop_BackendMock; и ссылку на проект
-        // SklaDinya_desktop-BackendMock в SklaDinya_desktop-Main.csproj.
+        // Флаг Api:UseMock из appsettings.json больше не учитывается.
 
         IAuthRepository authRepo;
         IBookingRepository bookingRepo;
