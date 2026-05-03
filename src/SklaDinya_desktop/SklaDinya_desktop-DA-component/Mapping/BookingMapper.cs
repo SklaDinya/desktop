@@ -19,6 +19,7 @@ internal static partial class Mapper
         Cells = dto.Cells.Select(ToCell).ToList(),
         StartTime = dto.StartTime,
         BookingTime = dto.BookingTime,
+        Price = dto.Price,
         CreatedAt = dto.CreatedAt,
         Status = ToBookingStatus(dto.Status),
     };
@@ -35,6 +36,7 @@ internal static partial class Mapper
         Cells = dto.Cells.Select(ToCell).ToList(),
         StartTime = dto.StartTime,
         BookingTime = dto.BookingTime,
+        Price = dto.Price,
         CreatedAt = dto.CreatedAt,
         Status = ToBookingStatus(dto.Status),
     };

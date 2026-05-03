@@ -1,14 +1,21 @@
 using SklaDinya_desktop_BL_component.Exceptions;
-using SklaDinya_desktop_BL_component.Forms;
+using SklaDinya_desktop_BL_component.Models;
 using SklaDinya_desktop_UI_component.Controls;
 using SklaDinya_desktop_UI_component.Helpers;
 
 namespace SklaDinya_desktop_UI_component.Screens.Main;
 
+/// <summary>
+/// Экран оплаты уже созданного бронирования.
+/// На вход получает <see cref="BookingModel"/> — бронирование к этому моменту
+/// уже создано на сервере (см. <c>BookingScreen.OnPayClick</c>), и в нём есть
+/// поле <see cref="BookingModel.Price"/>, которое и показываем как «Итого к оплате».
+/// При клике «Оплатить» бронирование повторно не создаётся — сразу
+/// дёргается соответствующий метод <see cref="IPaymentService"/>.
+/// </summary>
 public class PaymentScreen : UserControl
 {
-    private readonly BookingCreateForm _form;
-    private readonly decimal _totalPrice;
+    private readonly BookingModel _booking;
     private readonly RadioButton _radioNoop;
     private readonly RadioButton _radioRandom;
     private readonly RoundedButton _payButton;
@@ -18,10 +25,9 @@ public class PaymentScreen : UserControl
     public event EventHandler? PaymentFailed;
     public event EventHandler? BackRequested;
 
-    public PaymentScreen(BookingCreateForm form, decimal totalPrice)
+    public PaymentScreen(BookingModel booking)
     {
-        _form = form;
-        _totalPrice = totalPrice;
+        _booking = booking;
         Dock = DockStyle.Fill;
         BackColor = AppTheme.Background;
 
@@ -31,13 +37,13 @@ public class PaymentScreen : UserControl
         var title = new Label { Text = "Оплата бронирования", Font = AppTheme.FontTitle, ForeColor = AppTheme.Primary, AutoSize = true, Location = new Point(32, y) };
         y += 50;
 
-        // Информация в столбец
-        AddInfoLine(container, "Количество ячеек:", $"{form.CellIds.Count}", ref y);
-        AddInfoLine(container, "Начало:", $"{form.StartTime.ToLocalTime():dd.MM.yyyy HH:mm}", ref y);
-        AddInfoLine(container, "Длительность:", $"{form.BookingTime.TotalHours:F0} ч.", ref y);
-        // Итоговая стоимость — посчитана на странице бронирования как
-        // (сумма тарифов выбранных ячеек) × длительность в часах.
-        AddInfoLine(container, "Итого к оплате:", $"{_totalPrice:F2} ₽", ref y, valueIsAccent: true);
+        // Информация в столбец — берём всё из BookingModel, который уже
+        // получен от сервера и содержит итоговую цену.
+        AddInfoLine(container, "Количество ячеек:", $"{booking.Cells.Count}", ref y);
+        AddInfoLine(container, "Начало:", $"{booking.StartTime.ToLocalTime():dd.MM.yyyy HH:mm}", ref y);
+        AddInfoLine(container, "Длительность:", $"{booking.BookingTime.TotalHours:F0} ч.", ref y);
+        // Итоговая стоимость — пришла от сервера в поле booking.Price.
+        AddInfoLine(container, "Итого к оплате:", $"{booking.Price:F2} ₽", ref y, valueIsAccent: true);
         y += 12;
 
         var methodLabel = new Label { Text = "Способ оплаты:", Font = AppTheme.FontMedium, ForeColor = AppTheme.TextDark, AutoSize = true, Location = new Point(32, y) };
@@ -88,9 +94,8 @@ public class PaymentScreen : UserControl
         _payButton.Enabled = false;
         _backButton.Enabled = false;
 
-        var booking = await ErrorHelper.TryAsync(() => ServiceLocator.BookingService.CreateBookingAsync(_form));
-        if (booking is null) { _payButton.Enabled = true; _backButton.Enabled = true; return; }
-
+        // Бронирование уже создано на предыдущем экране. Здесь только
+        // выполняем платёж по ранее сохранённому в BookingService.LastReceipt чеку.
         bool success;
         if (_radioNoop.Checked)
         {

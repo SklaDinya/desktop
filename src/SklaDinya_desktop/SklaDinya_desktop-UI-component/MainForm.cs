@@ -101,13 +101,13 @@ public class MainForm : Form
         var bookingScreen = new BookingScreen(storage);
         bookingScreen.BackRequested += (_, _) => NavigateHome();
         bookingScreen.ProceedToPayment += (_, args) =>
-            ShowPaymentScreen(args.Form, args.TotalPrice, storage);
+            ShowPaymentScreen(args.Booking, storage);
         ShowScreen(bookingScreen);
     }
 
-    private void ShowPaymentScreen(BookingCreateForm form, decimal totalPrice, StorageModel storage)
+    private void ShowPaymentScreen(BookingModel booking, StorageModel storage)
     {
-        var payScreen = new PaymentScreen(form, totalPrice);
+        var payScreen = new PaymentScreen(booking);
         payScreen.BackRequested += (_, _) => OnBookingRequested(this, storage);
         payScreen.PaymentSuccess += (_, _) =>
         {
@@ -120,7 +120,9 @@ public class MainForm : Form
         {
             var result = new PaymentResultScreen(false);
             result.GoHome += (_, _) => NavigateHome();
-            result.RetryPayment += (_, _) => ShowPaymentScreen(form, totalPrice, storage);
+            // При повторе оплаты используем то же бронирование (оно уже создано
+            // на сервере, его Receipt сохранён в BookingService.LastReceipt).
+            result.RetryPayment += (_, _) => ShowPaymentScreen(booking, storage);
             ShowScreen(result);
         };
         ShowScreen(payScreen);

@@ -12,7 +12,12 @@ public record BookingCreateRequest(
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan   BookingTime);
 
-/// <summary>Ответ API: бронирование для пользователя</summary>
+/// <summary>
+/// Ответ API: бронирование для пользователя.
+/// Поле <c>price</c> теперь возвращается сервером — клиент больше не считает
+/// стоимость самостоятельно. Тип <see cref="decimal"/> подходит и для целых
+/// (993), и для дробных значений (4.50).
+/// </summary>
 public record BookingUserDto(
     Guid Id,
     Guid UserId,
@@ -22,10 +27,15 @@ public record BookingUserDto(
     DateTime StartTime,
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan         BookingTime,
+    decimal Price,
     DateTime CreatedAt,
     BookingStatusDto Status);
 
-/// <summary>Ответ API: бронирование для оператора</summary>
+/// <summary>
+/// Ответ API: бронирование для оператора.
+/// По swagger поле <c>price</c> здесь не помечено как required, но фактически
+/// присутствует — десериализуем так же, как в <see cref="BookingUserDto"/>.
+/// </summary>
 public record BookingOperatorDto(
     Guid Id,
     Guid UserId,
@@ -35,6 +45,7 @@ public record BookingOperatorDto(
     DateTime StartTime,
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan           BookingTime,
+    decimal Price,
     DateTime CreatedAt,
     BookingStatusDto Status);
 

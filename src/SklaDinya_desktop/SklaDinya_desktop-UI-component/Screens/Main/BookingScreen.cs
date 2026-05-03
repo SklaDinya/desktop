@@ -152,7 +152,7 @@ public class BookingScreen : UserControl
         }
     }
 
-    private void OnPayClick(object? sender, EventArgs e)
+    private async void OnPayClick(object? sender, EventArgs e)
     {
         if (!ServiceLocator.SessionService.IsAuthenticated())
         { MessageBox.Show("Необходимо войти в систему.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
@@ -167,14 +167,6 @@ public class BookingScreen : UserControl
         if (selectedCells.Count == 0)
         { MessageBox.Show("Выберите хотя бы одну ячейку.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-        var hours = (decimal)_hoursUpDown.Value;
-        // Сумма = (тариф каждой выбранной ячейки) × часы. Если тарифа для класса
-        // ячейки в _prices не нашлось — считаем 0 и не блокируем переход
-        // (пользователь увидит сумму на странице оплаты).
-        var totalPrice = selectedCells
-            .Select(c => _prices.FirstOrDefault(p => p.CellClass == c.CellClass)?.Price ?? 0m)
-            .Sum() * hours;
-
         var form = new BookingCreateForm
         {
             StorageId = _storage.Id,
@@ -183,23 +175,33 @@ public class BookingScreen : UserControl
             BookingTime = TimeSpan.FromHours((double)_hoursUpDown.Value),
         };
 
-        ProceedToPayment?.Invoke(this, new BookingProceedEventArgs(form, totalPrice));
+        // Создаём бронирование прямо здесь — это даёт нам цену, посчитанную
+        // на сервере (поле booking.Price), и сохранённый в BookingService
+        // LastReceipt для последующего вызова оплаты. Раньше создание
+        // выполнялось внутри PaymentScreen.OnPayClick, но тогда цену
+        // приходилось считать на клиенте — теперь это не нужно.
+        _payButton.Enabled = false;
+        var booking = await ErrorHelper.TryAsync(
+            () => ServiceLocator.BookingService.CreateBookingAsync(form));
+        _payButton.Enabled = true;
+
+        if (booking is null) return;
+
+        ProceedToPayment?.Invoke(this, new BookingProceedEventArgs(booking));
     }
 }
 
 /// <summary>
-/// Аргументы события «перейти к оплате»: форма для создания бронирования
-/// плюс заранее посчитанная итоговая стоимость, чтобы экран оплаты мог
-/// её показать без повторного запроса тарифов.
+/// Аргументы события «перейти к оплате»: уже созданное на сервере бронирование.
+/// Содержит итоговую стоимость <see cref="BookingModel.Price"/>, посчитанную
+/// бэкендом, и идентификатор — больше ничего повторно создавать не нужно.
 /// </summary>
 public sealed class BookingProceedEventArgs : EventArgs
 {
-    public BookingCreateForm Form { get; }
-    public decimal TotalPrice { get; }
+    public BookingModel Booking { get; }
 
-    public BookingProceedEventArgs(BookingCreateForm form, decimal totalPrice)
+    public BookingProceedEventArgs(BookingModel booking)
     {
-        Form = form;
-        TotalPrice = totalPrice;
+        Booking = booking;
     }
 }
