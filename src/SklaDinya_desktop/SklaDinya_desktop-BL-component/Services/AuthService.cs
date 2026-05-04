@@ -6,8 +6,6 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис авторизации и регистрации.
-/// После успешного входа/регистрации сохраняет токен в сессии.
-/// Роль и данные пользователя извлекаются из payload токена — лишний запрос к API не нужен.
 /// </summary>
 public class AuthService(IAuthRepository authRepository, ISessionService session) : IAuthService
 {

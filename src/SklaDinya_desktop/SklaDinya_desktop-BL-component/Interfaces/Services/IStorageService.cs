@@ -12,6 +12,17 @@ public interface IStorageService
     /// <summary>Найти пункты хранения (публично)</summary>
     Task<List<StorageModel>> GetStoragesAsync(StorageSearchQuery query);
 
+    /// <summary>
+    /// Поиск пунктов по строке из единого поискового поля.
+    /// </summary>
+    Task<List<StorageModel>> SearchStoragesAsync(
+        string text, int pageNumber = 0, int pageSize = 20);
+
+    /// <summary>
+    /// Найти заявки на создание пунктов хранения — для администратора.
+    /// </summary>
+    Task<List<StorageModel>> GetStorageRequestsAsync(StorageSearchQuery query);
+
     /// <summary>Подать заявку на создание пункта хранения</summary>
     Task CreateStorageAsync(StorageCreateForm form);
 

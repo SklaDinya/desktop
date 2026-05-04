@@ -28,6 +28,11 @@ public class BookingModel
     /// <summary>Длительность бронирования</summary>
     public TimeSpan BookingTime { get; set; }
 
+    /// <summary>
+    /// Итоговая стоимость бронирования.
+    /// </summary>
+    public decimal Price { get; set; }
+
     /// <summary>Время создания бронирования</summary>
     public DateTime CreatedAt { get; set; }
 

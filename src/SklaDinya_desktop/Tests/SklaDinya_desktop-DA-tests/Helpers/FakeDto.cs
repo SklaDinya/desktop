@@ -7,13 +7,6 @@ namespace SklaDinya_desktop_DA_tests.Helpers;
 /// <summary>
 /// Строитель тестовых DTO объектов DA-компонента.
 /// Использует реальные публичные типы вместо анонимных объектов.
-///
-/// Ключевые правила:
-/// - bookingTime сериализуется как ISO 8601 duration (PT2H, P1D и т.п.) — именно
-///   такой формат разбирает TimeSpanIso8601Converter на стороне ApiClient.
-/// - enum-значения в DA слое (UserRoleDto, OperatorRoleDto и т.д.) сериализуются
-///   через JsonStringEnumConverter(CamelCase) в ApiClient: Client → "client".
-/// - price передаётся как строка ("99.99") — decimal128 формат бэкенда.
 /// </summary>
 internal static class FakeDto
 {
@@ -48,9 +41,10 @@ internal static class FakeDto
     // ── Price ──────────────────────────────────────────────────────────────
 
     public static PriceDto Price(Guid? storageId = null) => new(
+        PriceId: Guid.NewGuid(),
         StorageId: storageId ?? Guid.NewGuid(),
         CellClass: "Small",
-        Price: "99.99",
+        Price: 99.99m,
         CreatedAt: DateTime.UtcNow);
 
     public static List<PriceDto> PriceList(int count = 1)
@@ -106,6 +100,7 @@ internal static class FakeDto
             Cells: CellList(1),
             StartTime: DateTime.UtcNow,
             BookingTime: TimeSpan.FromHours(2),
+            Price: 199.98m,
             CreatedAt: DateTime.UtcNow,
             Status: BookingStatusDto.Paid);
     }
@@ -121,6 +116,7 @@ internal static class FakeDto
         Cells: CellList(1),
         StartTime: DateTime.UtcNow,
         BookingTime: TimeSpan.FromHours(1),
+        Price: 99.99m,
         CreatedAt: DateTime.UtcNow,
         Status: BookingStatusDto.Created);
 

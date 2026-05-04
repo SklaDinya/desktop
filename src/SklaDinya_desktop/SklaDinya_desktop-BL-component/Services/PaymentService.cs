@@ -7,7 +7,6 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис для проведения оплаты бронирований.
-/// Чек берётся из <see cref="IBookingService.LastReceipt"/> — UI не должен передавать его вручную.
 /// </summary>
 public class PaymentService(
     IPaymentRepository paymentRepository,
@@ -24,7 +23,7 @@ public class PaymentService(
     }
 
     /// <inheritdoc/>
-    public Task<List<BookingModel>> PayNoopAsync()
+    public Task<BookingModel> PayNoopAsync()
     {
         var form = GetReceiptForm();
         return paymentRepository.PayNoopAsync(form, session.Token!);
@@ -35,7 +34,7 @@ public class PaymentService(
     /// Выбрасывается, когда сервер вернул 418 — оплата не прошла.
     /// UI должен поймать это исключение и предложить попробовать снова.
     /// </exception>
-    public Task<List<BookingModel>> PayRandomAsync()
+    public Task<BookingModel> PayRandomAsync()
     {
         var form = GetReceiptForm();
         return paymentRepository.PayRandomAsync(form, session.Token!);

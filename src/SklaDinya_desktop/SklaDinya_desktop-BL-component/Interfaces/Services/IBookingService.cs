@@ -11,8 +11,6 @@ public interface IBookingService
 {
     /// <summary>
     /// Чек последнего созданного бронирования.
-    /// Заполняется после <see cref="CreateBookingAsync"/> и используется
-    /// сервисом оплаты для получения receipt JWT.
     /// </summary>
     BookingReceiptModel LastReceipt { get; }
 
@@ -21,7 +19,6 @@ public interface IBookingService
 
     /// <summary>
     /// Создать бронирование.
-    /// Чек сохраняется в <see cref="LastReceipt"/> — передавать его в UI не нужно.
     /// </summary>
     Task<BookingModel> CreateBookingAsync(BookingCreateForm form);
 

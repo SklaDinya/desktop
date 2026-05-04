@@ -12,7 +12,9 @@ public record BookingCreateRequest(
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan   BookingTime);
 
-/// <summary>Ответ API: бронирование для пользователя</summary>
+/// <summary>
+/// Ответ API: бронирование для пользователя.
+/// </summary>
 public record BookingUserDto(
     Guid Id,
     Guid UserId,
@@ -22,10 +24,13 @@ public record BookingUserDto(
     DateTime StartTime,
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan         BookingTime,
+    decimal Price,
     DateTime CreatedAt,
     BookingStatusDto Status);
 
-/// <summary>Ответ API: бронирование для оператора</summary>
+/// <summary>
+/// Ответ API: бронирование для оператора.
+/// </summary>
 public record BookingOperatorDto(
     Guid Id,
     Guid UserId,
@@ -35,6 +40,7 @@ public record BookingOperatorDto(
     DateTime StartTime,
     [property: JsonConverter(typeof(TimeSpanIso8601Converter))]
     TimeSpan           BookingTime,
+    decimal Price,
     DateTime CreatedAt,
     BookingStatusDto Status);
 

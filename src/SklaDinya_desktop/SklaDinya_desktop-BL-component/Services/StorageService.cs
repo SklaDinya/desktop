@@ -19,6 +19,50 @@ public class StorageService(IStorageRepository storageRepository, ISessionServic
     }
 
     /// <inheritdoc/>
+    public async Task<List<StorageModel>> SearchStoragesAsync(
+        string text, int pageNumber = 0, int pageSize = 20)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return await storageRepository.GetStoragesAsync(
+                new StorageSearchQuery { PageNumber = pageNumber, PageSize = pageSize });
+        }
+
+        var trimmed = text.Trim();
+
+        var byNameTask = storageRepository.GetStoragesAsync(new StorageSearchQuery
+        {
+            Name = trimmed,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+        });
+        var byAddressTask = storageRepository.GetStoragesAsync(new StorageSearchQuery
+        {
+            Address = trimmed,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+        });
+
+        var results = await Task.WhenAll(byNameTask, byAddressTask);
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var merged = new List<StorageModel>(capacity: results[0].Count + results[1].Count);
+        foreach (var storage in results.SelectMany(r => r))
+        {
+            if (seen.Add(storage.Name))
+                merged.Add(storage);
+        }
+        return merged;
+    }
+
+    /// <inheritdoc/>
+    public Task<List<StorageModel>> GetStorageRequestsAsync(StorageSearchQuery query)
+    {
+        ArgumentNullException.ThrowIfNull(query, nameof(query));
+        return storageRepository.GetStorageRequestsAsync(query, session.Token!);
+    }
+
+    /// <inheritdoc/>
     public Task CreateStorageAsync(StorageCreateForm form)
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));

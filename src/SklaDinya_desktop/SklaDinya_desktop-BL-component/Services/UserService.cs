@@ -45,8 +45,6 @@ public class UserService(IUserRepository userRepository, ISessionService session
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
-        // Сервер возвращает новый токен (могли измениться username/password).
-        // Роль и userId извлекаются из нового токена автоматически в SetToken.
         var newToken = await userRepository.UpdateMeAsync(form, session.Token!);
         session.SetToken(newToken);
     }

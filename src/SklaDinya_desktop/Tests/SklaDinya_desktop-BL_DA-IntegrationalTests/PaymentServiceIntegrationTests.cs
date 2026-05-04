@@ -6,8 +6,6 @@ namespace SklaDinya_desktop_BL_DA_IntegrationalTests;
 
 /// <summary>
 /// Интеграционные тесты PaymentService.
-/// Цепочка: PaymentService → PaymentRepository → ApiClient(mock HTTP).
-/// BookingService используется реальный, чтобы заполнить LastReceipt через CreateBookingAsync.
 /// </summary>
 public class PaymentServiceIntegrationTests
 {
@@ -38,7 +36,7 @@ public class PaymentServiceIntegrationTests
         // Шаг 2: строим PaymentService с нужным статусом оплаты
         var paymentClient = MockHttpFactory.Create(paymentStatus,
             paymentStatus == System.Net.HttpStatusCode.OK
-                ? (object?)new[] { FakeDto.BookingForUser() }
+                ? (object?)FakeDto.BookingForUser()
                 : null);
         var paymentService = ServiceFactory.Payment(paymentClient, bookingService, session);
 
@@ -48,13 +46,13 @@ public class PaymentServiceIntegrationTests
     // ── PayNoopAsync ───────────────────────────────────────────────────────
 
     [Fact]
-    public async Task PayNoopAsync_AfterCreateBooking_ReturnsPaidBookings()
+    public async Task PayNoopAsync_AfterCreateBooking_ReturnsPaidBooking()
     {
         var (_, payment) = await BuildChainWithReceiptAsync(System.Net.HttpStatusCode.OK);
 
         var result = await payment.PayNoopAsync();
 
-        Assert.Single(result);
+        Assert.NotNull(result);
     }
 
     [Fact]
@@ -79,13 +77,13 @@ public class PaymentServiceIntegrationTests
     // ── PayRandomAsync ─────────────────────────────────────────────────────
 
     [Fact]
-    public async Task PayRandomAsync_AfterCreateBooking_ServerReturnsOk_ReturnsPaidBookings()
+    public async Task PayRandomAsync_AfterCreateBooking_ServerReturnsOk_ReturnsPaidBooking()
     {
         var (_, payment) = await BuildChainWithReceiptAsync(System.Net.HttpStatusCode.OK);
 
         var result = await payment.PayRandomAsync();
 
-        Assert.Single(result);
+        Assert.NotNull(result);
     }
 
     [Fact]

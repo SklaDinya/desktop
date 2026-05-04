@@ -12,16 +12,15 @@ public class PaymentRepositoryTests
     // ── PayNoopAsync ───────────────────────────────────────────────────────
 
     [Fact]
-    public async Task PayNoopAsync_ServerReturnsOk_ReturnsPaidBookings()
+    public async Task PayNoopAsync_ServerReturnsOk_ReturnsPaidBooking()
     {
         var id = Guid.NewGuid();
-        var repo = new PaymentRepository(MockHttpFactory.CreateOk(new[] { FakeDto.BookingForUser(id) }));
+        var repo = new PaymentRepository(MockHttpFactory.CreateOk(FakeDto.BookingForUser(id)));
         var form = new PaymentForm { Receipt = "receipt.jwt" };
 
         var result = await repo.PayNoopAsync(form, Token);
 
-        Assert.Single(result);
-        Assert.Equal(id, result[0].Id);
+        Assert.Equal(id, result.Id);
     }
 
     [Fact]
@@ -45,16 +44,15 @@ public class PaymentRepositoryTests
     // ── PayRandomAsync ─────────────────────────────────────────────────────
 
     [Fact]
-    public async Task PayRandomAsync_ServerReturnsOk_ReturnsPaidBookings()
+    public async Task PayRandomAsync_ServerReturnsOk_ReturnsPaidBooking()
     {
         var id = Guid.NewGuid();
-        var repo = new PaymentRepository(MockHttpFactory.CreateOk(new[] { FakeDto.BookingForUser(id) }));
+        var repo = new PaymentRepository(MockHttpFactory.CreateOk(FakeDto.BookingForUser(id)));
         var form = new PaymentForm { Receipt = "receipt.jwt" };
 
         var result = await repo.PayRandomAsync(form, Token);
 
-        Assert.Single(result);
-        Assert.Equal(id, result[0].Id);
+        Assert.Equal(id, result.Id);
     }
 
     [Fact]

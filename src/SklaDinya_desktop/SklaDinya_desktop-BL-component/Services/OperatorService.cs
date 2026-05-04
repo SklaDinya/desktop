@@ -8,7 +8,6 @@ namespace SklaDinya_desktop_BL_component.Services;
 
 /// <summary>
 /// Сервис для управления операторами пункта хранения.
-/// Доступен только главному оператору (MainOperator).
 /// </summary>
 public class OperatorService(IOperatorRepository operatorRepository, ISessionService session) : IOperatorService
 {

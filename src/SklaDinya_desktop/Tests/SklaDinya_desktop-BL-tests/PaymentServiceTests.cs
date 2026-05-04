@@ -26,10 +26,12 @@ public class PaymentServiceTests
     // ── PayNoopAsync ───────────────────────────────────────────────────────
 
     [Fact]
-    public async Task PayNoopAsync_WithLastReceipt_CallsRepoWithReceiptAndReturnsBookings()
+    public async Task PayNoopAsync_WithLastReceipt_CallsRepoWithReceiptAndReturnsBooking()
     {
         var receipt = ModelBuilder.BookingReceipt();
-        var expected = new List<BookingModel> { ModelBuilder.Booking() };
+        // Ожидаем одно оплаченное бронирование, а не список — сигнатура
+        // IPaymentRepository.PayNoopAsync теперь возвращает BookingModel.
+        var expected = ModelBuilder.Booking();
 
         _bookingService.Setup(b => b.LastReceipt).Returns(receipt);
         _repo.Setup(r => r.PayNoopAsync(
@@ -38,7 +40,7 @@ public class PaymentServiceTests
 
         var result = await _sut.PayNoopAsync();
 
-        Assert.Equal(expected, result);
+        Assert.Same(expected, result);
         _repo.Verify(r => r.PayNoopAsync(It.Is<PaymentForm>(f => f.Receipt == receipt.Receipt), Token), Times.Once);
     }
 
@@ -55,10 +57,10 @@ public class PaymentServiceTests
     // ── PayRandomAsync ─────────────────────────────────────────────────────
 
     [Fact]
-    public async Task PayRandomAsync_WithLastReceipt_CallsRepoWithReceiptAndReturnsBookings()
+    public async Task PayRandomAsync_WithLastReceipt_CallsRepoWithReceiptAndReturnsBooking()
     {
         var receipt = ModelBuilder.BookingReceipt();
-        var expected = new List<BookingModel> { ModelBuilder.Booking() };
+        var expected = ModelBuilder.Booking();
 
         _bookingService.Setup(b => b.LastReceipt).Returns(receipt);
         _repo.Setup(r => r.PayRandomAsync(
@@ -67,7 +69,7 @@ public class PaymentServiceTests
 
         var result = await _sut.PayRandomAsync();
 
-        Assert.Equal(expected, result);
+        Assert.Same(expected, result);
         _repo.Verify(r => r.PayRandomAsync(It.Is<PaymentForm>(f => f.Receipt == receipt.Receipt), Token), Times.Once);
     }
 
