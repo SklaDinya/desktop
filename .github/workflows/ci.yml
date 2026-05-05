@@ -1,0 +1,182 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+defaults:
+  run:
+    # Все команды запускаются из корня решения
+    working-directory: src/SklaDinya_desktop
+
+env:
+  SOLUTION: SklaDinya_desktop.sln
+  # DOTNET_VERSION: "8.0.x"  # не нужен на self-hosted — .NET уже установлен на машине
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  # 1. LINT
+  #    dotnet format analyzers — только Roslyn-диагностика, без whitespace.
+  #    .editorconfig в корне репозитория задаёт правила, совместимые с VS 2022.
+  # ────────────────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: [self-hosted, Windows, X64, desktop]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Check code analyzers (dotnet format)
+        # Проверяем только анализаторы (Roslyn) — без whitespace и style.
+        # Выравнивание столбцами в object initializers и switch-выражениях
+        # делается Visual Studio автоматически и не является проблемой.
+        run: >
+          dotnet format ${{ env.SOLUTION }}
+          analyzers
+          --verify-no-changes
+          --no-restore
+          --severity warn
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 2. BUILD-DEBUG
+  #    Debug-сборка всего решения.
+  #    Скомпилированные bin/ загружаются как артефакт и передаются в test.
+  # ────────────────────────────────────────────────────────────────────────────
+  build-debug:
+    name: Build (Debug)
+    runs-on: [self-hosted, Windows, X64, desktop]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build Debug
+        run: >
+          dotnet build ${{ env.SOLUTION }}
+          --configuration Debug
+          --no-restore
+
+      - name: Upload Debug build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-build-${{ github.sha }}
+          # Загружаем только bin/ тестовых проектов — этого достаточно для dotnet test --no-build
+          path: |
+            src/SklaDinya_desktop/SklaDinya_desktop-BL-component/bin/Debug/
+            src/SklaDinya_desktop/SklaDinya_desktop-DA-component/bin/Debug/
+            src/SklaDinya_desktop/Tests/SklaDinya_desktop-BL-tests/bin/Debug/
+            src/SklaDinya_desktop/Tests/SklaDinya_desktop-DA-tests/bin/Debug/
+            src/SklaDinya_desktop/Tests/SklaDinya_desktop-BL_DA-IntegrationalTests/bin/Debug/
+          retention-days: 1
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 3. TEST
+  #    Прогон всех тестовых проектов (BL-tests, DA-tests, IntegrationalTests).
+  #    Скачивает артефакт Debug-сборки — пересборка не нужна.
+  # ────────────────────────────────────────────────────────────────────────────
+  test:
+    name: Test
+    runs-on: [self-hosted, Windows, X64, desktop]
+    needs: build-debug
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
+
+      - name: Download Debug build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: debug-build-${{ github.sha }}
+          # Распаковываем в корень репозитория — структура папок сохраняется
+          path: src/SklaDinya_desktop
+
+      - name: Run tests
+        run: >
+          dotnet test ${{ env.SOLUTION }}
+          --configuration Debug
+          --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: src/SklaDinya_desktop/TestResults/*.trx
+          retention-days: 14
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # 4. BUILD-RELEASE
+  #    Release-сборка запускается только после успешных тестов.
+  #    Публикует артефакты для каждого публикуемого проекта.
+  # ────────────────────────────────────────────────────────────────────────────
+  build-release:
+    name: Build (Release)
+    runs-on: [self-hosted, Windows, X64, desktop]
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+      # Закомментировано: на self-hosted раннере .NET уже установлен в системе.
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build Release
+        run: >
+          dotnet build ${{ env.SOLUTION }}
+          --configuration Release
+          --no-restore
+
+      - name: Publish BL component
+        run: >
+          dotnet publish SklaDinya_desktop-BL-component/SklaDinya-desktop-BL-component.csproj
+          --configuration Release
+          --no-build
+          --output publish/BL
+
+      - name: Publish DA component
+        run: >
+          dotnet publish SklaDinya_desktop-DA-component/SklaDinya_desktop-DA-component.csproj
+          --configuration Release
+          --no-build
+          --output publish/DA
+
+      - name: Upload Release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.sha }}
+          path: |
+            src/SklaDinya_desktop/publish/BL/
+            src/SklaDinya_desktop/publish/DA/
+          retention-days: 30
